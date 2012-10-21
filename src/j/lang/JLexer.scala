@@ -35,11 +35,27 @@ object JLexer {
 
 	import JState._
 		
-	sealed abstract class SMFuncCode
-	case object NextLex extends SMFuncCode
-	case object EmitLex extends SMFuncCode
-	case object Pass	extends SMFuncCode
+	object SMFuncCode extends Enumeration {
+	  type FuncCode = Value
+	  val Pass 		= Value(0)
+	  val NextWord	= Value(1)
+	  val EmitWord 	= Value(2)
+	  val EmitWErr	= Value(3)
+	  val EmitVector= Value(4)
+	  val EmitVErr	= Value(5)
+	  val Stop		= Value(6)
+	}
 	
+//	sealed abstract class SMFuncCode
+//	case object Pass		extends SMFuncCode
+//	case object NextWord	extends SMFuncCode
+//	case object EmitWord	extends SMFuncCode
+//	case object EmitWErr 	extends SMFuncCode
+//	case object EmitVector	extends SMFuncCode
+//	case object EmitVErr	extends SMFuncCode
+//	case object Stop		extends SMFuncCode
+
+	import SMFuncCode._
 	object SMFuncRes {
 	  def apply(str: String) = {
 	    val excep = new Exception("SMFuncRes: Bad domain: " + str)
@@ -63,17 +79,19 @@ object JLexer {
 	      }
 
 	      val myCode = if (str.length == 1) Pass else str.charAt(1) match {
-	        case 'I' => EmitLex
-	        case 'N' => NextLex
+	        case 'I' => EmitWord
+	        case 'N' => NextWord
 	        case _ => throw excep
 	      }
 	      
 	      new SMFuncRes(myState, myCode)
 	    }
 	  }
+	  
+	  def apply(s: Int, c: Int) = new SMFuncRes(JState(s),SMFuncCode(c))
 	}
 	
-	class SMFuncRes(val state: JState.State, val code: SMFuncCode) {
+	class SMFuncRes(val state: JState.State, val code: FuncCode) {
 	  override def toString = "(" + state + "," + code + ")"
 	}
 	
@@ -91,6 +109,23 @@ XI  SI  AI  NI  AI  9I  XI  XI  Q
 Z   Z   Z   Z   Z   Z   Z   Z   Z
 """.split("\n").drop(1).map(_.split(" +").map(SMFuncRes(_))
 )
+
+	val smLookUpTable2 = """
+' X    S    A    N    B    9    D    C    Q ']0
+ 1 1  0 0  2 1  3 1  2 1  6 1  1 1  1 1  7 1  NB. 0 space
+ 1 2  0 3  2 2  3 2  2 2  6 2  1 0  1 0  7 2  NB. 1 other
+ 1 2  0 3  2 0  2 0  2 0  2 0  1 0  1 0  7 2  NB. 2 alp/num
+ 1 2  0 3  2 0  2 0  4 0  2 0  1 0  1 0  7 2  NB. 3 N
+ 1 2  0 3  2 0  2 0  2 0  2 0  5 0  1 0  7 2  NB. 4 NB
+ 9 0  9 0  9 0  9 0  9 0  9 0  1 0  1 0  9 0  NB. 5 NB.
+ 1 4  0 5  6 0  6 0  6 0  6 0  6 0  1 0  7 4  NB. 6 num
+ 7 0  7 0  7 0  7 0  7 0  7 0  7 0  7 0  8 0  NB. 7 '
+ 1 2  0 3  2 2  3 2  2 2  6 2  1 2  1 2  7 0  NB. 8 ''
+ 9 0  9 0  9 0  9 0  9 0  9 0  9 0  9 0  9 0  NB. 9 comment
+""".split("\n").drop(2).map(_.drop(1).split("  ").dropRight(1).map(entry =>{
+  val Array(s,c) = entry.split(" ").map(_ toInt)
+  SMFuncRes(s,c)
+}))
 	    
 	import JCharClass._
 	    
@@ -123,6 +158,23 @@ Z   Z   Z   Z   Z   Z   Z   Z   Z
 	  sequentialMachine(0,JState.Space,line,List())
 	}
 	
+	@tailrec def sequentialMachine2(i:Int,j:Int,
+	    state: State, line: Seq[CharWClass],
+	    accum: List[JLexeme]): List[JLexeme] = {
+	  if (line isEmpty)
+	    accum
+	  else if (i == line.length) {
+	    (state match {
+	      case JState.Quote => throw new Exception("Open quote!")
+	      case JState.Space => accum
+	      case _ => JLexeme(line.map(_ char).mkString) +: accum
+	    }).reverse	    
+	  }
+	  else {
+	    sequentialMachine2(i+1,j,state,line,accum)
+	  }
+	}
+	
 	@tailrec def sequentialMachine(i:Int, 
 	    state: State, line: Seq[CharWClass], 
 	    accum: List[JLexeme]): List[JLexeme] = {
@@ -145,8 +197,8 @@ Z   Z   Z   Z   Z   Z   Z   Z   Z
 	    
 	    val (newi, newAccum, newLine):(Int,List[JLexeme],Seq[CharWClass]) = funcRes.code match {
 	      case Pass => (i,accum,line)
-	      case NextLex => (0, accum, line.drop(i) )
-	      case EmitLex => (0, JLexeme(line.slice(0,i).map(_ char).mkString) +: accum,
+	      case NextWord => (0, accum, line.drop(i) )
+	      case EmitWord => (0, JLexeme(line.slice(0,i).map(_ char).mkString) +: accum,
 	          line.drop(i))
 	    }
 	    

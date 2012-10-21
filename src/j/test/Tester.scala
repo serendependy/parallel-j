@@ -14,10 +14,13 @@ object Tester {
 	  smLookupTable.foreach(x => {
 	    println("[" + x.mkString(",") + "]")
 	  })
-
 	  println()
+
+	  smLookUpTable2.foreach(x => {
+	    println("[" + x.mkString(",") + "]")
+	  })
 	  
-	  println(tokenize(input).mkString("\n"))
+//	  println(tokenize(input).mkString("\n"))
 //	  tokenize(erin)
 	}
 }
