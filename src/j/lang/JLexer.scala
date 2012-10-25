@@ -4,7 +4,14 @@ import scala.annotation.tailrec
 
 object JLexer {
 
-  case class JLexeme(chars: String)
+	class JLexeme(val chars: String) {
+	  def +:(str: String) = JLexeme(this.chars + str)
+	  override def toString = "JLexeme("+chars+")"
+	}
+	object JLexeme {
+	  def apply(chars: String) = new JLexeme(chars)
+	  def apply(chars: Seq[Char]) = new JLexeme(chars.mkString(""))
+	}
   
   	object JState extends Enumeration {
 	  type State = Value
@@ -41,22 +48,13 @@ object JLexer {
 	  val NextWord	= Value(1)
 	  val EmitWord 	= Value(2)
 	  val EmitWErr	= Value(3)
-	  val EmitVector= Value(4)
+	  val EmitVect  = Value(4)
 	  val EmitVErr	= Value(5)
 	  val Stop		= Value(6)
 	}
-	
-//	sealed abstract class SMFuncCode
-//	case object Pass		extends SMFuncCode
-//	case object NextWord	extends SMFuncCode
-//	case object EmitWord	extends SMFuncCode
-//	case object EmitWErr 	extends SMFuncCode
-//	case object EmitVector	extends SMFuncCode
-//	case object EmitVErr	extends SMFuncCode
-//	case object Stop		extends SMFuncCode
 
 	import SMFuncCode._
-	object SMFuncRes {
+	object SMFuncRes { //TODO needs to be done to support ;: given a table
 	  def apply(str: String) = {
 	    val excep = new Exception("SMFuncRes: Bad domain: " + str)
 
@@ -128,50 +126,74 @@ Z   Z   Z   Z   Z   Z   Z   Z   Z
 }))
 	    
 	import JCharClass._
-	    
-	private case class CharWClass(val char: Char, val charclass: CharClass)
-  
-	private val charClasses = (0 until 256).map((i:Int) => 
-	  initCharClassify(i.toChar)).toArray
+	
+	//TODO this also needs to be done in a way that extends over arbitrary classifications
+	class CharWClass(val char: Char, val charclass: CharClass) {
+	  override def toString() = "(" + char + "," + charclass + ")"
+	}
+	object CharWClass {
+		def apply(char: Char, charClass: CharClass) = new CharWClass(char,charClass)
+	  
+		def apply(char: Char) = new CharWClass(char, charClassify(char))
+		
+		val charClasses = (0 until 256).map((i:Int) => 
+			initCharClassify(i.toChar)).toArray
 
-	private def initCharClassify(c: Char)= {
-	  import JCharClass._
-	  if 		(c == ' ')		 Space
-	  else if 	(c.isDigit 
-			  		|| c == '_') Numeric
-	  else if 	(c == 'N') 		 N
-	  else if 	(c == 'B') 	 	 B
-	  else if 	(c.isLetter) 	 AlphNotNB
-	  else if 	(c == '.') 		 Period
-	  else if 	(c == ':') 		 Colon
-	  else if 	(c == '\'') 	 Quote
-	  else 						 Other
+		def initCharClassify(c: Char)= {
+			import JCharClass._
+			if 		(c == ' ')		 Space
+			else if 	(c.isDigit 
+				|| c == '_') 		Numeric
+			else if 	(c == 'N') 	N
+			else if 	(c == 'B') 	B
+			else if 	(c.isLetter)AlphNotNB
+			else if 	(c == '.') 	Period
+			else if 	(c == ':') 	Colon
+			else if 	(c == '\'') Quote
+			else 					Other
+		}
+		
+		def charClassify(c: Char) = charClasses(c.toInt)
 	}
 	
-	def charClassify(c: Char) = charClasses(c.toInt)
-	
 	def tokenize(line: String):List[JLexeme] = {
-	  tokenize(line.map((x: Char) => CharWClass(x,charClassify(x)) ) )
+	  tokenize(line.map(CharWClass(_) ) )
 	}
 	
 	def tokenize(line: Seq[CharWClass]):List[JLexeme] = {
 	  sequentialMachine(0,JState.Space,line,List())
 	}
 	
+	def sequentialMachine2(line: String): List[JLexeme] = 
+	  sequentialMachine2(0,-1, JState.Space,line.map(CharWClass(_)),List())
+	
 	@tailrec def sequentialMachine2(i:Int,j:Int,
 	    state: State, line: Seq[CharWClass],
 	    accum: List[JLexeme]): List[JLexeme] = {
 	  if (line isEmpty)
 	    accum
-	  else if (i == line.length) {
+	  else if (i >= line.length) {
 	    (state match {
 	      case JState.Quote => throw new Exception("Open quote!")
 	      case JState.Space => accum
-	      case _ => JLexeme(line.map(_ char).mkString) +: accum
+	      case _ => JLexeme(line.drop(j).map(_ char)) +: accum
 	    }).reverse	    
 	  }
 	  else {
-	    sequentialMachine2(i+1,j,state,line,accum)
+	    val funcRes = smLookUpTable2(state.id)(line(i).charclass.id)
+	    val newState = funcRes.state
+	    
+	    val (newJ, newAccum) = funcRes.code match {
+	      case Pass => (j,accum)
+	      case NextWord => (i,accum)
+	      case EmitWord => (i,JLexeme(line.slice(j, i).map(_ char)) +: accum)
+	      case EmitWErr => (-1,JLexeme(line.slice(j, i).map(_ char)) +: accum)
+	      case EmitVect => (i,JLexeme(line.slice(j, i).map(_ char)) +: accum) //TODO fix
+	      case EmitVErr => (-1,JLexeme(line.slice(j, i).map(_ char)) +: accum)//TODO fix
+	      case Stop   	=> (line.length, accum)
+	    }
+	    println(i + "\t" + state + "\t" + line(i) + "\t" + funcRes)	    
+	    sequentialMachine2(i+1,newJ,newState,line,newAccum)
 	  }
 	}
 	
