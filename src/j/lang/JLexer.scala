@@ -55,58 +55,12 @@ object JLexer {
 
 	import SMFuncCode._
 	object SMFuncRes { //TODO needs to be done to support ;: given a table
-	  def apply(str: String) = {
-	    val excep = new Exception("SMFuncRes: Bad domain: " + str)
-
-	    if (str.isEmpty || str.length > 2) {
-	      throw excep
-	    }
-	    else {
-	      val myState = str.charAt(0) match {
-	        case 'S' => Space
-	        case 'X' => Other
-	        case 'A' => AlphNum
-	        case 'N' => N
-	        case 'B' => NB
-	        case 'C' => `NB.`
-	        case '9' => Numeric
-	        case 'Q' => Quote
-	        case 'E' => EvenQuotes
-	        case 'Z' => Comment
-	        case _ => throw excep
-	      }
-
-	      val myCode = if (str.length == 1) Pass else str.charAt(1) match {
-	        case 'I' => EmitWord
-	        case 'N' => NextWord
-	        case _ => throw excep
-	      }
-	      
-	      new SMFuncRes(myState, myCode)
-	    }
-	  }
-	  
 	  def apply(s: Int, c: Int) = new SMFuncRes(JState(s),SMFuncCode(c))
 	}
 	
 	class SMFuncRes(val state: JState.State, val code: FuncCode) {
 	  override def toString = "(" + state + "," + code + ")"
 	}
-	
-	
-	val smLookupTable = """
-XN  S   AN  NN  AN  9N  XN  XN  QN
-XI  SI  AI  NI  AI  9I  X   X   QI
-XI  SI  A   A   A   A   X   X   QI
-XI  SI  A   A   B   A   X   X   QI
-XI  SI  A   A   A   A   C   X   QI
-Z   Z   Z   Z   Z   Z   X   X   Z
-XI  SI  9   9   9   9   9   X   QI
-Q   Q   Q   Q   Q   Q   Q   Q   E
-XI  SI  AI  NI  AI  9I  XI  XI  Q
-Z   Z   Z   Z   Z   Z   Z   Z   Z
-""".split("\n").drop(1).map(_.split(" +").map(SMFuncRes(_))
-)
 
 	val smLookUpTable2 = """
 ' X    S    A    N    B    9    D    C    Q ']0
@@ -155,15 +109,7 @@ Z   Z   Z   Z   Z   Z   Z   Z   Z
 		
 		def charClassify(c: Char) = charClasses(c.toInt)
 	}
-	
-	def tokenize(line: String):List[JLexeme] = {
-	  tokenize(line.map(CharWClass(_) ) )
-	}
-	
-	def tokenize(line: Seq[CharWClass]):List[JLexeme] = {
-	  sequentialMachine(0,JState.Space,line,List())
-	}
-	
+
 	def sequentialMachine2(line: String): List[JLexeme] = 
 	  sequentialMachine2(0,-1, JState.Space,line.map(CharWClass(_)),List())
 	
@@ -196,38 +142,4 @@ Z   Z   Z   Z   Z   Z   Z   Z   Z
 	    sequentialMachine2(i+1,newJ,newState,line,newAccum)
 	  }
 	}
-	
-	@tailrec def sequentialMachine(i:Int, 
-	    state: State, line: Seq[CharWClass], 
-	    accum: List[JLexeme]): List[JLexeme] = {
-	  if (line isEmpty) {
-	    accum
-	  }
-	  else if (i == line.length) {
-//	    if (state == JState.Quote) {
-//	      throw new Exception("Open quote!")
-//	    }
-//	    if ()
-	    (state match {
-	      case JState.Quote => throw new Exception("Open quote!")
-	      case JState.Space => accum
-	      case _ => JLexeme(line.map(_ char).mkString) +: accum
-	    }).reverse
-	  }
-	  else {
-	    val funcRes = smLookupTable(state.id)(line(i).charclass.id)
-	    
-	    val (newi, newAccum, newLine):(Int,List[JLexeme],Seq[CharWClass]) = funcRes.code match {
-	      case Pass => (i,accum,line)
-	      case NextWord => (0, accum, line.drop(i) )
-	      case EmitWord => (0, JLexeme(line.slice(0,i).map(_ char).mkString) +: accum,
-	          line.drop(i))
-	    }
-	    
-	    println(i + "\t" + state + "\t" + line(i) + "\t" + funcRes)
-	    
-	    sequentialMachine(newi+1, funcRes.state, newLine, newAccum)
-	  }
-	}
-	
 }
