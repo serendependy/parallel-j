@@ -110,12 +110,53 @@ object JLexer {
 		def charClassify(c: Char) = charClasses(c.toInt)
 	}
 
-	def sequentialMachine2(line: String): List[JLexeme] = 
-	  sequentialMachine2(0,-1, JState.Space,line.map(CharWClass(_)),List())
+	private object SMRunningState {
+	  def apply(i: Int, j: Int, state: State) = {
+		  new SMRunningState(i,j,state, List())
+	  }
+	}
 	
-	@tailrec def sequentialMachine2(i:Int,j:Int,
-	    state: State, line: Seq[CharWClass],
-	    accum: List[JLexeme]): List[JLexeme] = {
+	private class SMRunningState private(private var ip: Int, private var jp: Int,
+	    private var sp: State, private var ap: List[JLexeme]){
+	  
+	  def i = ip
+	  def j = jp
+	  def accum = ap
+	  def state = sp
+	  
+	  def next(fr: SMFuncRes, line:Seq[CharWClass]) = {
+		  val (newJ, newAccum) = fr.code match {
+	  		case Pass => (j,accum)
+	  		case NextWord => (i,accum)
+	  		case EmitWord => (i,
+	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum)
+	  		case EmitWErr => (-1,
+	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum)
+	  		case EmitVect => (i,
+	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum) //TODO fix
+	  		case EmitVErr => (-1,
+	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum)//TODO fix
+	  		case Stop     => (line.length, accum)
+		 }
+		  
+  	    println(i + "\t" + state + "\t" + line(i) + "\t" + fr)
+  	    
+  	    ip += 1
+  	    jp = newJ
+  	    sp = fr.state
+  	    ap = newAccum
+  	    
+
+	  }
+	}
+	
+	def sequentialMachine2(line: String): List[JLexeme] =
+	  sequentialMachine2(SMRunningState(0,-1,JState.Space),line.map(CharWClass(_)))
+	  //sequentialMachine2(0,-1, JState.Space,line.map(CharWClass(_)),List())
+	
+	@tailrec def sequentialMachine2(runState: SMRunningState,
+	    line:Seq[CharWClass]): List[JLexeme] = {
+	  import runState._
 	  if (line isEmpty)
 	    accum
 	  else if (i >= line.length) {
@@ -123,23 +164,43 @@ object JLexer {
 	      case JState.Quote => throw new Exception("Open quote!")
 	      case JState.Space => accum
 	      case _ => JLexeme(line.drop(j).map(_ char)) +: accum
-	    }).reverse	    
+	    }).reverse
 	  }
 	  else {
 	    val funcRes = smLookUpTable2(state.id)(line(i).charclass.id)
-	    val newState = funcRes.state
-	    
-	    val (newJ, newAccum) = funcRes.code match {
-	      case Pass => (j,accum)
-	      case NextWord => (i,accum)
-	      case EmitWord => (i,JLexeme(line.slice(j, i).map(_ char)) +: accum)
-	      case EmitWErr => (-1,JLexeme(line.slice(j, i).map(_ char)) +: accum)
-	      case EmitVect => (i,JLexeme(line.slice(j, i).map(_ char)) +: accum) //TODO fix
-	      case EmitVErr => (-1,JLexeme(line.slice(j, i).map(_ char)) +: accum)//TODO fix
-	      case Stop   	=> (line.length, accum)
-	    }
-	    println(i + "\t" + state + "\t" + line(i) + "\t" + funcRes)	    
-	    sequentialMachine2(i+1,newJ,newState,line,newAccum)
+	    runState.next(funcRes, line)
+	    sequentialMachine2(runState,line)
 	  }
+	  
 	}
+	  
+//	@tailrec def sequentialMachine2(i:Int,j:Int,
+//	    state: State, line: Seq[CharWClass],
+//	    accum: List[JLexeme]): List[JLexeme] = {
+//	  if (line isEmpty)
+//	    accum
+//	  else if (i >= line.length) {
+//	    (state match {
+//	      case JState.Quote => throw new Exception("Open quote!")
+//	      case JState.Space => accum
+//	      case _ => JLexeme(line.drop(j).map(_ char)) +: accum
+//	    }).reverse	    
+//	  }
+//	  else {
+//	    val funcRes = smLookUpTable2(state.id)(line(i).charclass.id)
+//	    val newState = funcRes.state
+//	    
+////	    val (newJ, newAccum) = funcRes.code match {
+////	      case Pass => (j,accum)
+////	      case NextWord => (i,accum)
+////	      case EmitWord => (i,JLexeme(line.slice(j, i).map(_ char)) +: accum)
+////	      case EmitWErr => (-1,JLexeme(line.slice(j, i).map(_ char)) +: accum)
+////	      case EmitVect => (i,JLexeme(line.slice(j, i).map(_ char)) +: accum) //TODO fix
+////	      case EmitVErr => (-1,JLexeme(line.slice(j, i).map(_ char)) +: accum)//TODO fix
+////	      case Stop   	=> (line.length, accum)
+////	    }
+////	    println(i + "\t" + state + "\t" + line(i) + "\t" + funcRes)	    
+////	    sequentialMachine2(i+1,newJ,newState,line,newAccum)
+//	  }
+//	}
 }
