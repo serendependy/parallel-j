@@ -13,11 +13,6 @@ object Tester {
 	  
 	  println()
 	  
-	  smLookupTable.foreach(x => {
-	    println("[" + x.mkString(",") + "]")
-	  })
-	  println()
-
 	  smLookUpTable2.foreach(x => {
 	    println("[" + x.mkString(",") + "]")
 	  })
