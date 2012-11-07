@@ -181,16 +181,7 @@ object JLexer {
 	  
 	  private val endState = smLookUpTable2(JCharClass.Space.id)
 	  def finalize(fr: SMFuncRes, line:Seq[CharWClass]) = {
-      evState match {
-        case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
-        case ev: Some[EmitState] => {
-          if (ev.get.r == state) {
-            accum.head.+:(line.slice(ev.get.k, i).map(_ char).mkString) +: accum.drop(1)
-          } else {
-            JLexeme(line.slice(j, i).map(_ char)) +: accum
-          }
-        }
-      }
+		  ap = ev(line)
 	  }
 //	    (state match {
 //	      case JState.Quote => throw new Exception("Open quote!")
@@ -214,11 +205,6 @@ object JLexer {
 	    val funcRes = smLookUpTable2(state.id)(JCharClass.Space.id)
 	    runState.finalize(funcRes,line)
 	    accum.reverse
-//	    (state match {
-//	      case JState.Quote => throw new Exception("Open quote!")
-//	      case JState.Space => accum
-//	      case _ => JLexeme(line.drop(j).map(_ char)) +: accum
-//	    }).reverse
 	  }
 	  else {
 	    val funcRes = smLookUpTable2(state.id)(line(i).charclass.id)
