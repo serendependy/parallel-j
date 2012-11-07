@@ -128,6 +128,24 @@ object JLexer {
 	  def state = sp
 	  def evState = vp
 
+	  private def ev(line:Seq[CharWClass]) = {
+	    import SMRunningState._
+		    evState match {
+		      case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
+		      case v: Some[EmitState] => {
+		        if (v.get.r == state) {
+		          accum.head.+:(line.slice(v.get.k,i).map(_ 
+		          char).mkString) +: accum.drop(1)
+		        }
+		        else {
+		          JLexeme(line.slice(j, i).map(_ char)) +: accum
+		        }
+		      }
+		    }	    
+	  }
+	  
+	  def ew(line:Seq[CharWClass]) = JLexeme(line.slice(j, i).map(_ char)) +: accum
+	  
 	  import SMRunningState._
 	  def next(fr: SMFuncRes, line:Seq[CharWClass]) = {
 
@@ -135,39 +153,11 @@ object JLexer {
 		  case Pass     => accum
 		  case NextWord => accum
 		  
-		  case EmitWord => JLexeme(line.slice(j, i).map(_ char)) +: accum 
-		  case EmitWErr => JLexeme(line.slice(j, i).map(_ char)) +: accum
+		  case EmitWord => ew(line) 
+		  case EmitWErr => ew(line)
 		  
-		  case EmitVect => {
-		    evState match {
-		      case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
-		      case ev: Some[EmitState] => {
-		        println("\tEmitVector!")
-		        if (ev.get.r == state) {
-		          accum.head.+:(line.slice(ev.get.k,i).map(_ 
-		          char).mkString) +: accum.drop(1)
-		        }
-		        else {
-		          JLexeme(line.slice(j, i).map(_ char)) +: accum
-		        }
-		      }
-		    }
-		  }
-		  case EmitVErr => {
-		    evState match {
-		      case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
-		      case ev: Some[EmitState] => {
-		        println("\tEmitVector!")
-		        if (ev.get.r == state) {
-		          accum.head.+:(line.slice(ev.get.k,i).map(_ 
-		          char).mkString) +: accum.drop(1)
-		        }
-		        else {
-		          JLexeme(line.slice(j, i).map(_ char)) +: accum
-		        }
-		      }
-		    }
-		  }
+		  case EmitVect => ev(line)
+		  case EmitVErr => ev(line)
 		}
 		vp = fr.code match {
 		  case Pass     => evState
@@ -190,7 +180,18 @@ object JLexer {
 	  }
 	  
 	  private val endState = smLookUpTable2(JCharClass.Space.id)
-//	  def finalize(fr: SMFuncRes, line:Seq[CharWClass]) = {
+	  def finalize(fr: SMFuncRes, line:Seq[CharWClass]) = {
+      evState match {
+        case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
+        case ev: Some[EmitState] => {
+          if (ev.get.r == state) {
+            accum.head.+:(line.slice(ev.get.k, i).map(_ char).mkString) +: accum.drop(1)
+          } else {
+            JLexeme(line.slice(j, i).map(_ char)) +: accum
+          }
+        }
+      }
+	  }
 //	    (state match {
 //	      case JState.Quote => throw new Exception("Open quote!")
 //	      case JState.Space => accum
@@ -210,17 +211,19 @@ object JLexer {
 	  if (line isEmpty)
 	    accum.reverse
 	  else if (i >= line.length) {
-	    (state match {
-	      case JState.Quote => throw new Exception("Open quote!")
-	      case JState.Space => accum
-	      case _ => JLexeme(line.drop(j).map(_ char)) +: accum
-	    }).reverse
+	    val funcRes = smLookUpTable2(state.id)(JCharClass.Space.id)
+	    runState.finalize(funcRes,line)
+	    accum.reverse
+//	    (state match {
+//	      case JState.Quote => throw new Exception("Open quote!")
+//	      case JState.Space => accum
+//	      case _ => JLexeme(line.drop(j).map(_ char)) +: accum
+//	    }).reverse
 	  }
 	  else {
 	    val funcRes = smLookUpTable2(state.id)(line(i).charclass.id)
 	    runState.next(funcRes, line)
 	    sequentialMachine2(runState,line)
 	  }
-	  
 	}
 }
