@@ -133,7 +133,7 @@ object JLexer {
 		  val (newJ, newAccum, newEV):(Int, List[JLexeme], Option[EmitState]) = 
 		    fr.code match {
 	  		case Pass => (j,accum,vp)
-	  		case NextWord => (i,accum,None)
+	  		case NextWord => (i,accum,evState)
 	  		case EmitWord => (i,
 	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum,
 	  		    None)
@@ -147,8 +147,10 @@ object JLexer {
 	  		    	Some(EmitState(state,i)))
 	  		      case ev: Some[EmitState] => {
 	  		        if (ev.get.r == state) {
+	  		          
 	  		          (i,
-	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString), Some(EmitState(state,i)))
+	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString) +: accum.drop(1),
+	  		              Some(EmitState(state,i)))
 	  		        }
 	  		        else {
 	  		          (i,
@@ -166,7 +168,8 @@ object JLexer {
 	  		      case ev: Some[EmitState] => {
 	  		        if (ev.get.r == state) {
 	  		          (-1,
-	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString), Some(EmitState(state,i)))
+	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString) +: accum.drop(1), 
+	  		              Some(EmitState(state,i)))
 	  		        }
 	  		        else {
 	  		          (-1,
@@ -179,12 +182,13 @@ object JLexer {
 	  		case Stop     => (line.length, accum, None)
 		 }
 		  
-  	    println(i + "\t" + state + "\t" + line(i) + "\t" + fr)
+		println(Array(i,state,line(i),fr,newEV).map(_ toString).mkString("\t")) 
   	    
   	    ip += 1
   	    jp = newJ
   	    sp = fr.state
   	    ap = newAccum
+  	    vp = newEV
 
 	  }
 	}

@@ -6,7 +6,7 @@ import j.lang.JLexer._
 
 object Tester {
 	def main(args:Array[String]) {
-	  var input = "sum =:+/_6.95*i.3 4"
+	  var input = "sum =:+/_6.95*i.3 4 2"
 	  var erin  = "\'"
 	  val classes = input.map(CharWClass.charClassify)
 	  classes.foreach(println)
