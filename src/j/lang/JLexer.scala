@@ -95,7 +95,7 @@ object JLexer {
 
 		def initCharClassify(c: Char)= {
 			import JCharClass._
-			if 		(c == ' ')		 Space
+			if 		(c == ' ')		Space
 			else if 	(c.isDigit 
 				|| c == '_') 		Numeric
 			else if 	(c == 'N') 	N
@@ -130,66 +130,63 @@ object JLexer {
 
 	  import SMRunningState._
 	  def next(fr: SMFuncRes, line:Seq[CharWClass]) = {
-		  val (newJ, newAccum, newEV):(Int, List[JLexeme], Option[EmitState]) = 
-		    fr.code match {
-	  		case Pass => (j,accum,vp)
-	  		case NextWord => (i,accum,evState)
-	  		case EmitWord => (i,
-	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum,
-	  		    None)
-	  		case EmitWErr => (-1,
-	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum,
-	  		    None)
-	  		case EmitVect => {
-	  		    evState match {
-	  		      case None => (i,
-	  		    	JLexeme(line.slice(j, i).map(_ char)) +: accum,
-	  		    	Some(EmitState(state,i)))
-	  		      case ev: Some[EmitState] => {
-	  		        if (ev.get.r == state) {
-	  		          
-	  		          (i,
-	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString) +: accum.drop(1),
-	  		              Some(EmitState(state,i)))
-	  		        }
-	  		        else {
-	  		          (i,
-	  		              JLexeme(line.slice(j,i).map(_ char)) +: accum,
-	  		              Some(EmitState(state,i)))
-	  		        }
-	  		      }
-	  		    }
-	  		}
-	  		case EmitVErr => {
-	  		    evState match {
-	  		      case None => (i,
-	  		    	JLexeme(line.slice(j, i).map(_ char)) +: accum,
-	  		    	Some(EmitState(state,i)))
-	  		      case ev: Some[EmitState] => {
-	  		        if (ev.get.r == state) {
-	  		          (-1,
-	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString) +: accum.drop(1), 
-	  		              Some(EmitState(state,i)))
-	  		        }
-	  		        else {
-	  		          (-1,
-	  		              JLexeme(line.slice(j,i).map(_ char)) +: accum,
-	  		              Some(EmitState(state,i)))
-	  		        }
-	  		      }
-	  		    }
-	  		}
-	  		case Stop     => (line.length, accum, None)
-		 }
-		  
-		println(Array(i,state,line(i),fr,newEV).map(_ toString).mkString("\t")) 
-  	    
-  	    ip += 1
-  	    jp = newJ
-  	    sp = fr.state
-  	    ap = newAccum
-  	    vp = newEV
 
+		ap = fr.code match {
+		  case Pass     => accum
+		  case NextWord => accum
+		  
+		  case EmitWord => JLexeme(line.slice(j, i).map(_ char)) +: accum 
+		  case EmitWErr => JLexeme(line.slice(j, i).map(_ char)) +: accum
+		  
+		  case EmitVect => {
+		    evState match {
+		      case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
+		      case ev: Some[EmitState] => {
+		        println("\tEmitVector!")
+		        if (ev.get.r == state) {
+		          accum.head.+:(line.slice(ev.get.k,i).map(_ 
+		          char).mkString) +: accum.drop(1)
+		        }
+		        else {
+		          JLexeme(line.slice(j, i).map(_ char)) +: accum
+		        }
+		      }
+		    }
+		  }
+		  case EmitVErr => {
+		    evState match {
+		      case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
+		      case ev: Some[EmitState] => {
+		        println("\tEmitVector!")
+		        if (ev.get.r == state) {
+		          accum.head.+:(line.slice(ev.get.k,i).map(_ 
+		          char).mkString) +: accum.drop(1)
+		        }
+		        else {
+		          JLexeme(line.slice(j, i).map(_ char)) +: accum
+		        }
+		      }
+		    }
+		  }
+		}
+		vp = fr.code match {
+		  case Pass     => evState
+		  case NextWord => evState
+		  case EmitWord => None
+		  case EmitWErr => None
+		  case _ => Some(EmitState(state,i))
+		}
+		
+		println(Array(i,j,state,line(i),fr).map(_ toString).mkString("\t"))
+		
+		sp = fr.state		
+		jp = fr.code match {
+		  case EmitWErr => -1
+		  case EmitVErr => -1
+		  case Pass     => j
+		  case _        => i
+		}
+		ip += 1
 	  }
 	}
 	
