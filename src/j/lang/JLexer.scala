@@ -111,18 +111,16 @@ object JLexer {
 	}
 
 	private object SMRunningState {
-	  class EmitVecState
-	  object NoEmitVec extends EmitVecState
-	  case class YesEmitVec(r: State, k: Int)
+	  case class EmitState(r: State, k: Int)
 	  
 	  def apply(i: Int, j: Int, state: State) = {
-		  new SMRunningState(i,j,state, List(), NoEmitVec)
+		  new SMRunningState(i,j,state, List(), None)
 	  }
 	}
 	
 	private class SMRunningState private(private var ip: Int, private var jp: Int,
 	    private var sp: State, private var ap: List[JLexeme],
-	    private var vp: SMRunningState.EmitVecState) {
+	    private var vp: Option[SMRunningState.EmitState]) {
 	  
 	  def i = ip
 	  def j = jp
@@ -132,37 +130,53 @@ object JLexer {
 
 	  import SMRunningState._
 	  def next(fr: SMFuncRes, line:Seq[CharWClass]) = {
-		  val (newJ, newAccum, newEV) = fr.code match {
+		  val (newJ, newAccum, newEV):(Int, List[JLexeme], Option[EmitState]) = 
+		    fr.code match {
 	  		case Pass => (j,accum,vp)
-	  		case NextWord => (i,accum,NoEmitVec)
+	  		case NextWord => (i,accum,None)
 	  		case EmitWord => (i,
 	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum,
-	  		    NoEmitVec)
+	  		    None)
 	  		case EmitWErr => (-1,
 	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum,
-	  		    NoEmitVec)
+	  		    None)
 	  		case EmitVect => {
 	  		    evState match {
-	  		      case NoEmitVec => (i,
-	  		    	JLexeme(line.slice(j, i).map(_ char)) 
-	  		    		+: accum,
-	  		    	YesEmitVec(state,i))
-	  		      case ev: YesEmitVec => {
-	  		        if (ev.r == state) {
+	  		      case None => (i,
+	  		    	JLexeme(line.slice(j, i).map(_ char)) +: accum,
+	  		    	Some(EmitState(state,i)))
+	  		      case ev: Some[EmitState] => {
+	  		        if (ev.get.r == state) {
 	  		          (i,
-	  		              accum.head, YesEmitVec(state,i))
+	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString), Some(EmitState(state,i)))
 	  		        }
 	  		        else {
-	  		          
+	  		          (i,
+	  		              JLexeme(line.slice(j,i).map(_ char)) +: accum,
+	  		              Some(EmitState(state,i)))
 	  		        }
 	  		      }
 	  		    }
-//	  		  (i,
-//	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum) //TODO fix
 	  		}
-	  		case EmitVErr => (-1,
-	  		    JLexeme(line.slice(j, i).map(_ char)) +: accum)//TODO fix
-	  		case Stop     => (line.length, accum)
+	  		case EmitVErr => {
+	  		    evState match {
+	  		      case None => (i,
+	  		    	JLexeme(line.slice(j, i).map(_ char)) +: accum,
+	  		    	Some(EmitState(state,i)))
+	  		      case ev: Some[EmitState] => {
+	  		        if (ev.get.r == state) {
+	  		          (-1,
+	  		              accum.head.+:(line.slice(ev.get.k,i).map(_ char).mkString), Some(EmitState(state,i)))
+	  		        }
+	  		        else {
+	  		          (-1,
+	  		              JLexeme(line.slice(j,i).map(_ char)) +: accum,
+	  		              Some(EmitState(state,i)))
+	  		        }
+	  		      }
+	  		    }
+	  		}
+	  		case Stop     => (line.length, accum, None)
 		 }
 		  
   	    println(i + "\t" + state + "\t" + line(i) + "\t" + fr)
