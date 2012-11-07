@@ -188,6 +188,17 @@ object JLexer {
 		}
 		ip += 1
 	  }
+	  
+	  private val endState = smLookUpTable2(JCharClass.Space.id)
+//	  def finalize(fr: SMFuncRes, line:Seq[CharWClass]) = {
+//	    (state match {
+//	      case JState.Quote => throw new Exception("Open quote!")
+//	      case JState.Space => accum
+//	      case _ => {
+//	        
+//	      }
+//	    }).reverse
+//	  }
 	}
 	
 	def sequentialMachine2(line: String): List[JLexeme] =
@@ -197,7 +208,7 @@ object JLexer {
 	    line:Seq[CharWClass]): List[JLexeme] = {
 	  import runState._
 	  if (line isEmpty)
-	    accum
+	    accum.reverse
 	  else if (i >= line.length) {
 	    (state match {
 	      case JState.Quote => throw new Exception("Open quote!")
