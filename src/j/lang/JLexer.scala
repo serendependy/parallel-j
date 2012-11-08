@@ -152,7 +152,7 @@ object JLexer {
 		ap = fr.code match {
 		  case Pass     => accum
 		  case NextWord => accum
-		  
+
 		  case EmitWord => ew(line) 
 		  case EmitWErr => ew(line)
 		  
@@ -167,7 +167,7 @@ object JLexer {
 		  case _ => Some(EmitState(state,i))
 		}
 		
-		println(Array(i,j,state,line(i),fr).map(_ toString).mkString("\t"))
+//		println(Array(i,j,state,line(i),fr).map(_ toString).mkString("\t"))
 		
 		sp = fr.state		
 		jp = fr.code match {
@@ -183,14 +183,6 @@ object JLexer {
 	  def finalize(fr: SMFuncRes, line:Seq[CharWClass]) = {
 		  ap = ev(line)
 	  }
-//	    (state match {
-//	      case JState.Quote => throw new Exception("Open quote!")
-//	      case JState.Space => accum
-//	      case _ => {
-//	        
-//	      }
-//	    }).reverse
-//	  }
 	}
 	
 	def sequentialMachine2(line: String): List[JLexeme] =
