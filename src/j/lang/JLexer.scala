@@ -4,13 +4,13 @@ import scala.annotation.tailrec
 
 object JLexer {
 
-	class JLexeme(val chars: String) {
-	  def +:(str: String) = JLexeme(this.chars + str)
-	  override def toString = "JLexeme("+chars+")"
+	class JLexeme(val chars: String, val state: JState.State) {
+	  def +:(str: String) = JLexeme(this.chars + str, state)
+	  override def toString = "JLexeme("+chars+","+state+")"
 	}
 	object JLexeme {
-	  def apply(chars: String) = new JLexeme(chars)
-	  def apply(chars: Seq[Char]) = new JLexeme(chars.mkString(""))
+	  def apply(chars: String, state: JState.State) = new JLexeme(chars, state)
+	  def apply(chars: Seq[Char], state: JState.State) = new JLexeme(chars.mkString(""), state)
 	}
   
   	object JState extends Enumeration {
@@ -131,20 +131,20 @@ object JLexer {
 	  private def ev(line:Seq[CharWClass]) = {
 	    import SMRunningState._
 		    evState match {
-		      case None => JLexeme(line.slice(j, i).map(_ char)) +: accum
+		      case None => JLexeme(line.slice(j, i).map(_ char), state) +: accum
 		      case v: Some[EmitState] => {
 		        if (v.get.r == state) {
 		          accum.head.+:(line.slice(v.get.k,i).map(_ 
 		          char).mkString) +: accum.drop(1)
 		        }
 		        else {
-		          JLexeme(line.slice(j, i).map(_ char)) +: accum
+		          JLexeme(line.slice(j, i).map(_ char),state) +: accum
 		        }
 		      }
 		    }	    
 	  }
 	  
-	  def ew(line:Seq[CharWClass]) = JLexeme(line.slice(j, i).map(_ char)) +: accum
+	  def ew(line:Seq[CharWClass]) = JLexeme(line.slice(j, i).map(_ char),state) +: accum
 	  
 	  import SMRunningState._
 	  def next(fr: SMFuncRes, line:Seq[CharWClass]) = {
