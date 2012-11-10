@@ -15,12 +15,12 @@ object Tester {
 	  
 	  println()
 	  
-	  smLookUpTable2.foreach(x => {
+	  smLookUpTable.foreach(x => {
 	    println("[" + x.mkString(",") + "]")
 	  })
 	  println()
 	  
-	  println(sequentialMachine2(input).mkString("\n"))
+	  println(sequentialMachine(input).mkString("\n"))
 	  
 	  testLexerfromFile(new File("/home/christopher/j701-user/temp/game_of_life.ijs") )
 	  
@@ -29,7 +29,7 @@ object Tester {
 	}
 	
 	def testLexerfromFile(ijs: File) {
-	  Source.fromFile(ijs).getLines.map(sequentialMachine2).foreach(
+	  Source.fromFile(ijs).getLines.map(sequentialMachine).foreach(
 	     (l: List[JLexeme]) => println(l mkString("\n"))) 
 	}
 	

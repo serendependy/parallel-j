@@ -62,7 +62,7 @@ object JLexer {
 	  override def toString = "(" + state + "," + code + ")"
 	}
 
-	val smLookUpTable2 = """
+	val smLookUpTable = """
 ' X    S    A    N    B    9    D    C    Q ']0
  1 1  0 0  2 1  3 1  2 1  6 1  1 1  1 1  7 1  NB. 0 space
  1 2  0 3  2 2  3 2  2 2  6 2  1 0  1 0  7 2  NB. 1 other
@@ -162,8 +162,10 @@ object JLexer {
 		vp = fr.code match {
 		  case Pass     => evState
 		  case NextWord => evState
+		  
 		  case EmitWord => None
 		  case EmitWErr => None
+		  
 		  case _ => Some(EmitState(state,i))
 		}
 		
@@ -173,35 +175,37 @@ object JLexer {
 		jp = fr.code match {
 		  case EmitWErr => -1
 		  case EmitVErr => -1
+		  
 		  case Pass     => j
+		  
 		  case _        => i
 		}
 		ip += 1
 	  }
 	  
-	  private val endState = smLookUpTable2(JCharClass.Space.id)
+	  private val endState = smLookUpTable(JCharClass.Space.id)
 	  def finalize(fr: SMFuncRes, line:Seq[CharWClass]) = {
 		  ap = ev(line)
 	  }
 	}
 	
-	def sequentialMachine2(line: String): List[JLexeme] =
-	  sequentialMachine2(SMRunningState(0,-1,JState.Space),line.map(CharWClass(_)))
+	def sequentialMachine(line: String): List[JLexeme] =
+	  sequentialMachine(SMRunningState(0,-1,JState.Space),line.map(CharWClass(_)))
 	
-	@tailrec def sequentialMachine2(runState: SMRunningState,
+	@tailrec def sequentialMachine(runState: SMRunningState,
 	    line:Seq[CharWClass]): List[JLexeme] = {
 	  import runState._
 	  if (line isEmpty)
 	    accum.reverse
 	  else if (i >= line.length) {
-	    val funcRes = smLookUpTable2(state.id)(JCharClass.Space.id)
+	    val funcRes = smLookUpTable(state.id)(JCharClass.Space.id)
 	    runState.finalize(funcRes,line)
 	    accum.reverse
 	  }
 	  else {
-	    val funcRes = smLookUpTable2(state.id)(line(i).charclass.id)
+	    val funcRes = smLookUpTable(state.id)(line(i).charclass.id)
 	    runState.next(funcRes, line)
-	    sequentialMachine2(runState,line)
+	    sequentialMachine(runState,line)
 	  }
 	}
 }
