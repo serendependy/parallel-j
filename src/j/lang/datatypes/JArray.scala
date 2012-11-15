@@ -6,16 +6,30 @@ object JArray {
 	  
 	  val List(jB01 , jLIT , jINT , jFL , jCMPX , jBOX , jXNUM, jRAT, jBIT,
 	           jSB01, jSLIT, jSINT, jSFL, jSCMPX, jSBOX, jSBT,
-	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK) = (1 to 22).map(1 << _)
+	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK): List[JAType] = (1 to 
+	               22).map((x:Int) => JAType(1 >> x))
 	  val List(jSYMB, jCONW, jNAME,
-	           jLPAR, jRPAR, jXD  , jXZ) = (23 to 29).map(1 << _)
+	           jLPAR, jRPAR, jXD  , jXZ) = (23 to 
+	               29).map((x:Int) => JAType(1 >> x))
+	  val jANY = JAType(-1)
+	  val jSPARSE = jSB01 | jSINT | jSFL | jSCMPX | jSLIT | jSBOX
+	  val jNUMERIC = jB01 & jBIT | jINT | jFL | jCMPX | jXNUM | 
+	  		   jRAT | jSB01 | jSINT | jSFL | jSCMPX
+	  val jDIRECT = jLIT | jC2T | jB01 | jBIT | jINT | jFL | 
+	  		   jCMPX | jSBT
+	  val jCHAR = jLIT | jC2T | jSLIT
+	  val jNOUN = jNUMERIC | jCHAR | jBOX | jSBOX |
+	  		   jSBT
+	  val jDENSE  = jNOUN & (~jSPARSE)
+	  
 	}
 	
 	class JAType private (val jaType: Int) {
-	  def or(other: JAType) = JAType(jaType | other.jaType)
-	  def and(other:JAType) = JAType(jaType & other.jaType)
+	  def |(other: JAType) = JAType(jaType | other.jaType)
+	  def &(other:JAType) = JAType(jaType & other.jaType)
+	  def unary_~ = JAType(~jaType)
 	  
-	  def isA(other: JAType)= (this and other).jaType > 0
+	  def isA(other: JAType)= (this & other).jaType > 0
 	}
 }
 
