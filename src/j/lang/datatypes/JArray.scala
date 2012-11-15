@@ -9,7 +9,7 @@ object JArray {
 	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK): List[JAType] = (1 to 
 	               22).map((x:Int) => JAType(1 >> x))
 	  val List(jSYMB, jCONW, jNAME,
-	           jLPAR, jRPAR, jXD  , jXZ) = (23 to 
+	           jLPAR, jRPAR, jXD  , jXZ):List[JAType] = (23 to 
 	               29).map((x:Int) => JAType(1 >> x))
 	  val jANY = JAType(-1)
 	  val jSPARSE = jSB01 | jSINT | jSFL | jSCMPX | jSLIT | jSBOX
@@ -21,6 +21,10 @@ object JArray {
 	  val jNOUN = jNUMERIC | jCHAR | jBOX | jSBOX |
 	  		   jSBT
 	  val jDENSE  = jNOUN & (~jSPARSE)
+	  val jFUNC = jVERB | jADV | jCONJ
+	  val jRHS  = jNOUN | jFUNC
+	  val jIS1BYTE = jB01 | jLIT
+	  val jLAST0 = jB01 | jLIT | jC2T | jNAME
 	  
 	}
 	
