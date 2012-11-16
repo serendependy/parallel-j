@@ -1,16 +1,23 @@
 package j.lang.datatypes
 
 object JArray {
+  import j.util.CMacroType
+  
+  	protected class JAT
+	type JAType = CMacroType[JAT]
 	object JAType {
 	  def apply(jat: Int) = new JAType(jat)
-	  
+
+	  //simple j types
 	  val List(jB01 , jLIT , jINT , jFL , jCMPX , jBOX , jXNUM, jRAT, jBIT,
 	           jSB01, jSLIT, jSINT, jSFL, jSCMPX, jSBOX, jSBT,
-	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK): List[JAType] = (1 to 
-	               22).map((x:Int) => JAType(1 >> x))
+	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK): List[JAType] = (0 to 
+	               21).map((x:Int) => JAType(1 >> x))
 	  val List(jSYMB, jCONW, jNAME,
-	           jLPAR, jRPAR, jXD  , jXZ):List[JAType] = (23 to 
-	               29).map((x:Int) => JAType(1 >> x))
+	           jLPAR, jRPAR, jXD  , jXZ):List[JAType] = (22 to 
+	               28).map((x:Int) => JAType(1 >> x))
+
+	  //composite j types
 	  val jANY = JAType(-1)
 	  val jSPARSE = jSB01 | jSINT | jSFL | jSCMPX | jSLIT | jSBOX
 	  val jNUMERIC = jB01 & jBIT | jINT | jFL | jCMPX | jXNUM | 
@@ -24,17 +31,16 @@ object JArray {
 	  val jFUNC = jVERB | jADV | jCONJ
 	  val jRHS  = jNOUN | jFUNC
 	  val jIS1BYTE = jB01 | jLIT
-	  val jLAST0 = jB01 | jLIT | jC2T | jNAME
-	  
+	  val jLAST0 = jB01 | jLIT | jC2T | jNAME 
 	}
-	
-	class JAType private (val jaType: Int) {
-	  def |(other: JAType) = JAType(jaType | other.jaType)
-	  def &(other:JAType) = JAType(jaType & other.jaType)
-	  def unary_~ = JAType(~jaType)
-	  
-	  def isA(other: JAType)= (this & other).jaType > 0
-	}
+  
+  protected class JAF
+  type JAFlag = CMacroType[JAF]
+  
+  object JAFlag {
+	  val List(afRO, afNJA, afSMM, afREL):List[JAFlag] =
+		(0 to 3).map((x:Int) => new JAFlag(1 >> x))
+  }
 }
 
 import JArray._
