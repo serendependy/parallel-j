@@ -3,8 +3,8 @@ package j.lang.datatypes
 import j.lang.datatypes.JArray._
 
 //TODO better implementation of field name?
-class SymbolPoolEntry(val name: JArray[String], 
-    val value: JArray[JArrayType], val flag: Int, val sn: Int, 
+class SymbolPoolEntry[T: JArrayType](val name: JArray[String], 
+    val value: JArray[T], val flag: Int, val sn: Int, 
     val next: Int, val prev: Int) {
 
 }
