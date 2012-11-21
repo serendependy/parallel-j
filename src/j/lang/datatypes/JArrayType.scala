@@ -3,7 +3,8 @@ package j.lang.datatypes
 import j.util.CMacroType
 import j.util.Rational
 
-trait JArrayType
+class JArrayType[InternalType](val value: InternalType) {
+}
 
 object JArrayType {
 	import j.util.CMacroType
@@ -38,9 +39,9 @@ object JArrayType {
 	  val jIS1BYTE = jB01 | jLIT
 	  val jLAST0 = jB01 | jLIT | jC2T | jNAME
 	  
-	  type JB01		= Byte		with JArrayType 
-	  type JINT		= Int 		with JArrayType
-	  type JFLOAT	= Double	with JArrayType
-	  type JCHAR	= Char		with JArrayType
-	  type JXNUM	= Rational  with JArrayType
+	type JB01 	= JArrayType[Byte]
+	type JINT 	= JArrayType[Int]
+	type JFLOAT = JArrayType[Double]
+	type JCHAR	= JArrayType[Char]
+	type JXNUM	= JArrayType[Rational]
 }

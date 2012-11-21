@@ -1,7 +1,5 @@
 package j.lang.datatypes
 
-import j.lang.datatypes.SymbolPoolEntry._
-
 class JName(val hash: Int, val entry: SymbolPoolEntry, val sn: Int, val m: Byte, 
     val flag: Byte, val s: String) {
 	
