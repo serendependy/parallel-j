@@ -3,20 +3,35 @@ package j.lang.datatypes
 import j.lang.datatypes.JArrayType._
 import j.lang.datatypes.JArrayFlag._
 
+import j.util.Rational
+
 object JArray {
   
-  def apply[T: JArrayType](flag: JArrayFlag, jaType: JAType, refcount: Int, numItems: Int,
-      shape: List[Int], ravel: Array[T]) = 
+  def apply[T: JArrayType](flag: JArrayFlag, jaType: JAType, refcount: Int, 
+      numItems: Int, shape: List[Int], ravel: Array[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
-  def scalar(k: Int) = JArray(afNONE, jINT, 0, 1, List(), Array(k) )
+  def scalar[T: JArrayType](sc: T) = {
+    sc match { // should have exhaustiveness check, but doesn't b/c nesting
+      case x:Byte	=> JArray(afNONE, jB01, 0, 1, List(), Array(x))
+      case x:Int 	=> JArray(afNONE, jINT,	0, 1, List(), Array(x))
+      case x:Double	=> JArray(afNONE, jFL,	0, 1, List(), Array(x))
+      case x:Char	=> JArray(afNONE, jCHAR,0, 1, List(), Array(x))
+      case x:Rational=>JArray(afNONE, jXNUM,0, 1, List(), Array(x))
+    }
+  }
+  
   
   val test = scalar(0)
 }
 
 import JArray._
-class JArray[T: JArrayType](val flag: JArrayFlag, val jaType: JAType, var refcount: Int, 
-    val numItems: Int, val shape: List[Int], val ravel: Array[T]) {
+class JArray[T: JArrayType](val flag: JArrayFlag, val jaType: JAType, 
+    var refcount: Int, val numItems: Int, val shape: List[Int], 
+    val ravel: Array[T]) {
+
+  
+  
   val rank = shape.length
   def tally = shape(0)
 }

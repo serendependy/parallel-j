@@ -3,7 +3,7 @@ package j.lang.datatypes
 import j.util.CMacroType
 import j.util.Rational
 
-sealed class JArrayType[InternalType]
+sealed trait JArrayType[InternalType]
 
 object JArrayType {
   
@@ -48,18 +48,4 @@ object JArrayType {
 	  implicit object JFlOAT 	extends JArrayType[Double]
 	  implicit object JCHAR		extends JArrayType[Char]
 	  implicit object JXNUM		extends JArrayType[Rational]
-//	type JB01 	= JArrayType[Byte]
-//	implicit def byte2j(b: Byte) = new JB01(b)
-//	
-//	type JINT 	= JArrayType[Int]
-//	implicit def int2j(i: Int) = new JINT(i)
-//	
-//	type JFLOAT = JArrayType[Double]
-//	implicit def double2j(d: Double) = new JFLOAT(d)
-//	
-//	type JCHAR	= JArrayType[Char]
-//	implicit def char2j(c: Char) = new JCHAR(c)
-//	
-//	type JXNUM	= JArrayType[Rational]
-//	implicit def rat2j(rat: Rational) = new JXNUM(rat)
 }
