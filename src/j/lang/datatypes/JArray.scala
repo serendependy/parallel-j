@@ -11,7 +11,7 @@ object JArray {
   
   def scalar(k: JINT) = JArray(afNONE, jINT, 0, 1, List(), Array(k) )
   
-  val test = scalar(JINT(0))
+  val test = scalar(0)
 }
 
 import JArray._
