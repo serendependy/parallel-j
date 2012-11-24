@@ -37,7 +37,11 @@ object JArray {
   }
   
   
-  val test = scalar(0)
+  val zero = scalar(0)
+  val one  = scalar(1)
+  val two  = scalar(2)
+  val mone = scalar(-1)
+  val pi   = scalar(scala.Math.Pi)
 }
 
 import JArray._
