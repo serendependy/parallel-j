@@ -8,5 +8,5 @@ abstract class JFunc(val rep: String, val funcType: JType) {
 }
 
 object JFunc {
-  def inDomain(dom: JType)(argType: JType) = argType isA dom
+  def inDomain(dom: JType)(argType: JType) = argType isA dom 
 }
