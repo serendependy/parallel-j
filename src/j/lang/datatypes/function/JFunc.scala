@@ -3,7 +3,7 @@ package j.lang.datatypes.function
 import j.lang.datatypes.JTypeMacros._
 import j.util.CMacroType._
 
-abstract class JFunc(rep: String) {
+abstract class JFunc(val rep: String, val funcType: JType) {
 
 }
 

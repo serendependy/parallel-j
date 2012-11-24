@@ -2,8 +2,7 @@ package j.lang.datatypes.function
 
 import j.lang.datatypes.JTypeMacros._
 
-trait JDyad extends JMonad {
-	def rightInDomain(x: JType): Boolean
+class JDyad(rep: String, ldomType: JType, rdomType: JType) extends
+	JFunc(rep, if ( (ldomType | rdomType) isA jVERB) jCONJ else jVERB){
 	
-	def bothInDomain(x: JType, y: JType) = rightInDomain(y) && leftInDomain(x)
 }
