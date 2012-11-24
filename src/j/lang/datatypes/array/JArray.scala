@@ -1,7 +1,7 @@
-package j.lang.datatypes
+package j.lang.datatypes.array
 
-import j.lang.datatypes.JArrayType._
-import j.lang.datatypes.JArrayFlag._
+import JArrayType._
+import JArrayFlag._
 
 import j.util.Rational
 
@@ -35,8 +35,7 @@ object JArray {
       JArray(afNONE, jINT, 0, 1, List(1), Array(a))
     }
   }
-  
-  
+
   val zero = scalar(0)
   val one  = scalar(1)
   val two  = scalar(2)
@@ -49,8 +48,6 @@ class JArray[T: JArrayType](val flag: JArrayFlag, val jaType: JAType,
     var refcount: Int, val numItems: Int, val shape: List[Int], 
     val ravel: Array[T]) {
 
-  
-  
   val rank = shape.length
   def tally = shape(0)
 }

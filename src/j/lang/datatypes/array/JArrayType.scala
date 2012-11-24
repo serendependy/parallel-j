@@ -1,4 +1,4 @@
-package j.lang.datatypes
+package j.lang.datatypes.array
 
 import j.util.CMacroType
 import j.util.Rational

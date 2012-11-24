@@ -1,6 +1,6 @@
 package j.lang.datatypes
 
-import j.lang.datatypes.JArray._
+import j.lang.datatypes.array._
 
 //TODO better implementation of field name?
 class SymbolPoolEntry[T: JArrayType](val name: JArray[String], 
