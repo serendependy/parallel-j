@@ -1,5 +1,6 @@
 package j.lang.datatypes.array
 
+import j.lang.datatypes.JTypeMacros._
 import JArrayType._
 import JArrayFlag._
 
@@ -7,7 +8,7 @@ import j.util.Rational
 
 object JArray {
   
-  def apply[T: JArrayType](flag: JArrayFlag, jaType: JAType, refcount: Int, 
+  def apply[T: JArrayType](flag: JArrayFlag, jaType: JType, refcount: Int, 
       numItems: Int, shape: List[Int], ravel: Array[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
@@ -44,7 +45,7 @@ object JArray {
 }
 
 import JArray._
-class JArray[T: JArrayType](val flag: JArrayFlag, val jaType: JAType, 
+class JArray[T: JArrayType](val flag: JArrayFlag, val jaType: JType, 
     var refcount: Int, val numItems: Int, val shape: List[Int], 
     val ravel: Array[T]) {
 
