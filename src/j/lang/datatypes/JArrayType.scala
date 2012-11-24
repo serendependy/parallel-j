@@ -48,4 +48,8 @@ object JArrayType {
 	  implicit object JFlOAT 	extends JArrayType[Double]
 	  implicit object JCHAR		extends JArrayType[Char]
 	  implicit object JXNUM		extends JArrayType[Rational]
+	  
+	  class Box[T: JArrayType](val value: T)
+	  
+	  implicit object JBOX	extends JArrayType[Box[_]]
 }
