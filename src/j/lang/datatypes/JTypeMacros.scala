@@ -1,6 +1,7 @@
 package j.lang.datatypes
 
 import j.util.CMacroType
+import j.util.CMacroType._
 
 class JTypeMacros private ()
 
