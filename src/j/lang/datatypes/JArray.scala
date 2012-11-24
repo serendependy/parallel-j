@@ -19,6 +19,21 @@ object JArray {
       case x:Char	=> JArray(afNONE, jCHAR,0, 1, List(), Array(x))
       case x:Rational=>JArray(afNONE, jXNUM,0, 1, List(), Array(x))
     }
+    
+    def arithmeticProgression(n: Int, b: Int, m: Int) =
+      JArray(afNONE, jINT, 0, n, List(n), (0 to n).map(b + m * _).toArray)
+
+    def string(str: String) = {
+      JArray(afNONE, jCHAR, 0, str.length, List(str.length), str.toCharArray())
+    }
+      
+    def vec2(a: Int, b: Int) = {
+      JArray(afNONE, jINT, 0, 2, List(2), Array(a,b))
+    }
+    
+    def vec1(a: Int) = {
+      JArray(afNONE, jINT, 0, 1, List(1), Array(a))
+    }
   }
   
   
