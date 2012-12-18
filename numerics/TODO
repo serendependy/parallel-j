@@ -1,0 +1,89 @@
+This is a random list of things that either would be good to do, or would be
+good to consider doing. Some of these are mutually-incompatible (or at least,
+mutually-undesirable).
+
+Some of these may also be impossible! :)
+
+1. Implement a NumericRange class
+
+Paul Phillips has encouraged me to do this. I managed to create something that
+worked but wasn't performing as well as the direct integer ranges. The problem
+seemed to be the difference between the way foo(Int => Unit) and foo[T](T =>
+Unit) are treated. 
+
+
+2. Fix support for user-created types
+
+Right now the strategy we're using with ConvertableTo/ConvertableFrom doesn't
+scale well when users are adding their own types. This may not actually be a
+big deal, but it'd be nice if the system was more pluggable. Right now if we
+want to provide suport converting to/from "Foo" objects we have to change the
+ConvertableFrom/ConvertableTo traits to include methods "toFoo" and "fromFoo".
+
+I can imagine using something like ConvertableBetween[A, B] to solve this, but
+I don't want to sacrifice performance to do so. Experimentation necessary.
+See https://github.com/nuttycom/salt/commits/master/src/main/scala/com/nommit/salt/Bijection.scala
+for ideas.
+
+
+3. Specialize Ordering
+
+This is probably too big for this project, but it would be great if Ordering
+were specialized so that Numeric could extend it without taking a huge speed
+hit on things like Numeric.lt().
+
+
+4. Rationalize working with two different numeric types
+
+Currently if you have "def complicated[T:Numeric, U:Numeric](t:T, u:U)" you
+will have to do manual conversions to one of those types without being sure
+that you aren't losing precision. I'm not sure there's a way to get around
+this, but it might be nice to have a way to compare two Numeric objects in
+terms of which one should "win" in terms of precision. That way you could at
+least say something like "if (n1.morePreciseThan(n2)) ... else ..."
+
+I'm not sure how often this would be used, but I could imagine it being nice.
+
+
+5. Test on more hardware/JVM configurations
+
+
+6. Port tests to one of the newer performance testing frameworks
+
+
+7. Write more tests
+
+
+8. Figure out how to deal with the "strict" infix operators versus the "fuzzy"
+infix operators. There is a compiler plugin to rewrite both into the faster
+form "n.add(lhs, rhs)" but without that the strict infix operators perform
+better, and also don't fall afoul of StringOps' + method. On the other hand,
+the fuzzy infix operators work better with literals (e.g. 3) and concrete types
+(e.g i:Int). 
+
+
+9. Add "auto-specialization" to the compiler plugin
+
+I can imagine creating a type alias for Numeric ("SNumeric") and then
+making the compiler plugin automatically specialize any uses of it. This way a
+user's code could automatically get the gains of specialization without having
+to annotate every single function manually.
+
+I'm not sure if this would actually work, but it'd be worth looking into.
+
+
+10. Think about how to support other math functions
+
+Right now there are still some functions (sqrt and others from scala.math)
+which aren't defined directly on the types. This is bad, because when you need
+to use these functions you end up either calling toDouble (and thus breaking
+support for BigDecimal and friends) or you call toBigDecimal (and slow things
+down for your fast primitive types). We could define these functions to all
+return T, but then you'd have no way of getting a fractional sqrt() when using
+Ints. 
+
+This gets back to the issues with the lack of a numeric tower. When taking the
+sqrt of an Int we probably want to get back a Double, but when taking the sqrt
+of a BigInt we probably want a BigDecimal. I don't see any easy way of dealing
+with it, but I may not be creative enough. At various points I've had quixotic
+visions of a compiler plugin that could "figure it out"... 

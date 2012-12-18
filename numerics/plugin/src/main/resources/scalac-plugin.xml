@@ -1,0 +1,4 @@
+<plugin>
+  <name>optimized-numeric</name>
+  <classname>com.azavea.math.plugin.OptimizedNumeric</classname>
+</plugin>
