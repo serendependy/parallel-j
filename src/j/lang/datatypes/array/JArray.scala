@@ -12,14 +12,16 @@ object JArray {
       numItems: Int, shape: List[Int], ravel: Array[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
-  def scalar[T: JArrayType](sc: T) = {
-    sc match { // should have exhaustiveness check, but doesn't b/c nesting
-      case x:Byte	=> JArray(afNONE, jB01, 0, 1, List(), Array(x))
-      case x:Int 	=> JArray(afNONE, jINT,	0, 1, List(), Array(x))
-      case x:Double	=> JArray(afNONE, jFL,	0, 1, List(), Array(x))
-      case x:Char	=> JArray(afNONE, jCHAR,0, 1, List(), Array(x))
-      case x:Rational=>JArray(afNONE, jXNUM,0, 1, List(), Array(x))
+  def scalar[T: JArrayType : Manifest](sc: T): JArray[T] = {
+    val myTypeMacro = sc match { // should have exhaustiveness check, but doesn't b/c nesting
+      case x:Byte	=> jB01
+      case x:Int 	=> jINT
+      case x:Double	=> jFL
+      case x:Char	=> jCHAR
+      case x:Rational=> jXNUM
     }
+    JArray(afNONE, myTypeMacro,0, 1, List(), Array(sc))
+  }
     
     def arithmeticProgression(n: Int, b: Int, m: Int) =
       JArray(afNONE, jINT, 0, n, List(n), (0 to n).map(b + m * _).toArray)
@@ -35,7 +37,6 @@ object JArray {
     def vec1(a: Int) = {
       JArray(afNONE, jINT, 0, 1, List(1), Array(a))
     }
-  }
 
   val zero = scalar(0)
   val one  = scalar(1)
@@ -49,6 +50,8 @@ class JArray[T: JArrayType](val flag: JArrayFlag, val jaType: JType,
     var refcount: Int, val numItems: Int, val shape: List[Int], 
     val ravel: Array[T]) {
 
-  val rank = shape.length
+  def rank = shape.length
   def tally = shape(0)
+  
+  def apply(i: Int) = ravel(i)
 }
