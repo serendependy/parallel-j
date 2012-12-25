@@ -2,6 +2,9 @@ package j.lang.datatypes.array.types.numeric
 
 import scala.math.Ordered
 
+import JReal._
+import com.sun.corba.se.spi.extension.ZeroPortPolicy
+
 sealed abstract class JNumber {
 	def +(o: JNumber): JNumber
 	def -(o: JNumber): JNumber
@@ -22,8 +25,6 @@ object JReal {
   
   val Zero = new JInt(0)
 }
-
-import JReal._
 
 sealed abstract class JReal extends JNumber with Ordered[JReal] {
   def signum: Signum
@@ -61,7 +62,7 @@ final object Infinity extends JReal with Ordered[JReal] with Infinite {
   
   def /(o: JNumber) = o match {
     case e:Infinite => throw new Exception()
-    case _ => Infinity
+    case _ => this
   }
   
   def unary_| = this
@@ -84,6 +85,29 @@ final object NegativeInfinity extends JReal with Ordered[JReal] {
 	  case Infinity => throw new Exception() //TODO NaN error
 	  case r:JReal => this
 	}
+	
+	def -(o: JNumber) = o match {
+	  case NegativeInfinity => throw new Exception()
+	  case r: JReal => Infinity
+	}
+	
+	def *(o: JNumber) = o match {
+	  case r:JReal => (r signum) match {
+	    case Pos => NegativeInfinity
+	    case Neut=> Zero
+	    case Neg => Infinity
+	  }
+	}
+	
+	def /(o: JNumber) = o match {
+	  case e: Infinite => throw new Exception()
+	  case _ => this
+	}
+	
+	def unary_| = this
+	def unary_- = Infinity
+	
+	override def toString = "__"
 }
 
 final class JInt(val v: Int) extends JReal with Ordered[JReal] {
