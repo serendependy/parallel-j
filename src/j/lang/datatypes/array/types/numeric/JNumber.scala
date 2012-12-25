@@ -112,6 +112,8 @@ final object NegativeInfinity extends JReal with Ordered[JReal] {
 
 final class JInt(val v: Int) extends JReal with Ordered[JReal] {
 
+	def signum = if (v < 0) Neg else if (v == 0) Neut else Pos
+  
 	def compare(r: JReal): Int = r match {
 	  case i:JInt => v.compare(i.v)
 	  case f:JFloat=> -(f.v compare v)
@@ -141,6 +143,8 @@ final class JInt(val v: Int) extends JReal with Ordered[JReal] {
     
     def unary_- = new JInt(-v)
     def unary_| = new JInt(v.abs)
+    
+    override def toString = v.toString
 }
 
 final class JFloat(val v: Double) extends JReal with Ordered[JReal] {
