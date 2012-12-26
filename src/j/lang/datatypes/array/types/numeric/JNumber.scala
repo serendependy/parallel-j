@@ -157,6 +157,7 @@ final class JInt(val v: Int) extends Finite {
       case f:JFloat=> new JFloat(v + f.v)
     }
     
+    
     def -~(o: Finite):JNumber = o match {
       case i:JInt => new JInt(v - i.v)
       case f:JFloat=>new JFloat(v - f.v)

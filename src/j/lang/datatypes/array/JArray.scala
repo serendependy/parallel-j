@@ -1,6 +1,10 @@
 package j.lang.datatypes.array
 
 import j.lang.datatypes.JTypeMacros._
+import j.lang.datatypes.array.JArrayType._
+import j.lang.datatypes.array.types.numeric._
+import j.lang.datatypes.array.types.numeric.NumericImplicits._
+
 import JArrayType._
 import JArrayFlag._
 
@@ -23,18 +27,18 @@ object JArray {
     JArray(afNONE, myTypeMacro,0, 1, List(), Array(sc))
   }
     
-    def arithmeticProgression(n: Int, b: Int, m: Int) =
+    def arithmeticProgression(n: Int, b: Int, m: Int):JArray[JNumber] =
       JArray(afNONE, jINT, 0, n, List(n), (0 to n).map(b + m * _).toArray)
 
     def string(str: String) = {
       JArray(afNONE, jCHAR, 0, str.length, List(str.length), str.toCharArray())
     }
       
-    def vec2(a: Int, b: Int) = {
+    def vec2(a: Int, b: Int):JArray[JNumber] = {
       JArray(afNONE, jINT, 0, 2, List(2), Array(a,b))
     }
     
-    def vec1(a: Int) = {
+    def vec1(a: Int):JArray[JNumber] = {
       JArray(afNONE, jINT, 0, 1, List(1), Array(a))
     }
 
