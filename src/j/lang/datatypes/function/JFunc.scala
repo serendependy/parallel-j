@@ -6,8 +6,8 @@ import j.lang.datatypes.array._
 
 import j.util.CMacroType._
 
-abstract class JFunc[M: JArrayType, D1: JArrayType, D2: JArrayType,
-    MR: JArrayType, DR: JArrayType]
+abstract class JFunc[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
+    MR <% JArrayType, DR <% JArrayType]
 	(val rep: String, val funcType: JType, val ranks: List[JFuncRank],
     val mdomain: JType, val d1domain: JType, val d2domain: JType) {
 

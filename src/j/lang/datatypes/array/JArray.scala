@@ -34,7 +34,7 @@ object JArray {
       JArray(afNONE, jINT, 0, 1, List(1), Array(a))
     }
 
-  val zero:JArray[JInt] = scalar(0)
+  val zero = scalar(0)
   val one  = scalar(1)
   val two  = scalar(2)
   val mone = scalar(-1)
