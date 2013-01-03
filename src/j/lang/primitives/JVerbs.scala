@@ -1,7 +1,10 @@
 package j.lang.primitives
 
 import j.lang.datatypes.JFuncRank
+import j.lang.datatypes.JTypeMacros._
+
 import j.lang.datatypes.function.JVerb
+import j.lang.datatypes.function.JVerb1Type
 
 import j.lang.datatypes.array.{JArray, JArrayType}
 
@@ -10,18 +13,20 @@ import j.lang.datatypes.array.types.JNumber
 
 object JVerbs {
   
-  val leftIdentity = new JVerb[JArrayType,JArrayType,JArrayType,JArrayType,JArrayType](
-      "[",
+  val leftIdentity = new JVerb1Type[JArrayType](
+      "]",
       List(JFuncRank(0,0,0)), //TODO should be infinity
-      
+      (y: JArray[JArrayType]) => y,
+      (x: JArray[JArrayType], y: JArray[JArrayType]) => x,
+      jANY
   )
   
-  val conjugatePlus = new JVerb[JNumber,JNumber,JNumber,JNumber,JNumber](
-	  "+",
-	  List(JFuncRank(0,0,0)),
-	  _,
-		  
-  )
+//  val conjugatePlus = new JVerb[JNumber,JNumber,JNumber,JNumber,JNumber](
+//	  "+",
+//	  List(JFuncRank(0,0,0)),
+//	  _,
+//		  
+//  )
 //	val conjugatePlus: JVerb[Numeric[A], Numeric[B], Numeric[C], Numeric[D], Numeric[E]] = Unit
   
 //   def plus[T : JNUMERIC] (x: JArray[T], y:JArray[T]) = {
