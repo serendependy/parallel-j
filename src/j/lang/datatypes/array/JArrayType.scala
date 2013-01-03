@@ -1,3 +1,5 @@
 package j.lang.datatypes.array
 
-class JArrayType // the top of the J type hierarchy
+import j.lang.datatypes.JTypeMacros._
+
+class JArrayType(val typeMacro: JType) // the top of the J type hierarchy

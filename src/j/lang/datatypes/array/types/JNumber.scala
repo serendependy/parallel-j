@@ -3,10 +3,11 @@ package j.lang.datatypes.array.types
 import scala.math.Ordered
 
 import j.lang.datatypes.array.JArrayType
+import j.lang.datatypes.JTypeMacros._
 
 import JReal._
 
-sealed abstract class JNumber extends JArrayType{
+sealed abstract class JNumber(jtype: JType) extends JArrayType(jtype){
 	def +(o: JNumber): JNumber
 	def -(o: JNumber): JNumber
 	def *(o: JNumber): JNumber
@@ -27,11 +28,11 @@ object JReal {
   val Zero = new JInt(0)
 }
 
-sealed abstract class JReal extends JNumber with Ordered[JReal] {
+sealed abstract class JReal(jtype: JType) extends JNumber(jtype) with Ordered[JReal] {
   def signum: Signum
 }
 
-sealed abstract class Infinite extends JReal with Ordered[JReal] {
+sealed abstract class Infinite extends JReal(jFL) with Ordered[JReal] {
   
   def /(o: JNumber) = o match {
     case fi: Finite => this
@@ -41,7 +42,7 @@ sealed abstract class Infinite extends JReal with Ordered[JReal] {
   def unary_| = Infinity
 }
 
-sealed abstract class Finite extends JReal with Ordered[JReal]{
+sealed abstract class Finite(jtype: JType) extends JReal(jtype) with Ordered[JReal]{
   def compareFinite(fi: Finite): Int
   
   def compare(r: JReal) = r match {
@@ -143,7 +144,7 @@ final object NegativeInfinity extends Infinite with Ordered[JReal] {
 	override def toString = "__"
 }
 
-final class JInt(val v: Int) extends Finite {
+final class JInt(val v: Int) extends Finite(jINT) {
 
 	import JReal._
 	def signum = if (v < 0) Neg else if (v == 0) Neut else Pos
@@ -180,7 +181,7 @@ final class JInt(val v: Int) extends Finite {
     override def toString = v.toString
 }
 
-final class JFloat(val v: Double) extends Finite {
+final class JFloat(val v: Double) extends Finite(jFL) {
 
 	def compareFinite(r: Finite): Int = r match {
 	  case i:JInt => v.compare(i.v)

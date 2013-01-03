@@ -1,10 +1,8 @@
 package j.lang.datatypes.array
 
 import j.lang.datatypes.JTypeMacros._
-import j.lang.datatypes.array.JArrayType._
 import j.lang.datatypes.array.types._
-import j.lang.datatypes.array.types.NumericImplicits._
-import JArrayType._
+import j.lang.datatypes.array.ArrayImplicits._
 import JArrayFlag._
 import j.util.Rational
 
@@ -13,19 +11,12 @@ import j.lang.datatypes.array.types.JNumber
 
 object JArray {
   
-  def apply[T <% JArrayType : JArrayConstructType](flag: JArrayFlag, jaType: JType, refcount: Int, 
+  def apply[T <% JArrayType](flag: JArrayFlag, jaType: JType, refcount: Int, 
       numItems: Int, shape: List[Int], ravel: Array[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
-  def scalar[T <% JArrayType : JArrayConstructType : Manifest](sc: T): JArray[T] = {
-    val myTypeMacro = sc match { // should have exhaustiveness check, but doesn't b/c nesting
-      case x:Byte	=> jB01
-      case x:Int 	=> jINT
-      case x:Double	=> jFL
-      case x:Char	=> jCHAR
-      case x:Rational=> jXNUM
-    }
-    JArray(afNONE, myTypeMacro,0, 1, List(), Array[T](sc))
+  def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
+    JArray(afNONE, sc.typeMacro,0, 1, List(), Array[T](sc))
   }
     
     def arithmeticProgression(n: Int, b: Int, m: Int):JArray[JInt] =
@@ -35,11 +26,11 @@ object JArray {
       JArray(afNONE, jCHAR, 0, str.length, List(str.length), str.toCharArray())
     }
       
-    def vec2(a: Int, b: Int):JArray[JNumber] = {
+    def vec2(a: Int, b: Int):JArray[JInt] = {
       JArray(afNONE, jINT, 0, 2, List(2), Array(a,b))
     }
     
-    def vec1(a: Int):JArray[JNumber] = {
+    def vec1(a: Int):JArray[JInt] = {
       JArray(afNONE, jINT, 0, 1, List(1), Array(a))
     }
 
