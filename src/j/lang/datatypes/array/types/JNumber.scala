@@ -11,7 +11,7 @@ sealed abstract class JNumber(jtype: JType) extends JArrayType(jtype){
 	def +(o: JNumber): JNumber
 	def -(o: JNumber): JNumber
 	def *(o: JNumber): JNumber
-	def /(o: JNumber): JNumber
+	def %(o: JNumber): JNumber
 	
 	def unary_| : JNumber
 	def unary_- : JNumber
@@ -19,8 +19,16 @@ sealed abstract class JNumber(jtype: JType) extends JArrayType(jtype){
 	override def toString: String
 }
 
+object JNumber {
+  def apply(a: Any) = a match {
+    case i:Int => new JInt(i)
+    case d:Double=> new JFloat(d)
+    case _ => NaN
+  }
+}
+
 object JReal {
-  sealed class Signum
+  sealed abstract class Signum
   final object Neg extends Signum
   final object Neut extends Signum
   final object Pos extends Signum
@@ -32,11 +40,27 @@ sealed abstract class JReal(jtype: JType) extends JNumber(jtype) with Ordered[JR
   def signum: Signum
 }
 
+final object NaN extends JNumber(jFL){
+  
+  def compare(r: JReal) = 0
+  
+  def +(o: JNumber) = this
+  def -(o: JNumber) = this
+  def *(o: JNumber) = this
+  def %(o: JNumber) = this
+
+  def unary_- = this
+  def unary_| = this
+  
+  override def toString = "_."
+}
+
 sealed abstract class Infinite extends JReal(jFL) with Ordered[JReal] {
   
-  def /(o: JNumber) = o match {
+  def %(o: JNumber) = o match {
     case fi: Finite => this
-    case inf:Infinite=> throw new Exception()
+    case inf:Infinite=> NaN
+    case NaN => NaN
   }
   
   def unary_| = Infinity
@@ -54,26 +78,30 @@ sealed abstract class Finite(jtype: JType) extends JReal(jtype) with Ordered[JRe
   protected def +~(fi: Finite): JNumber
   protected def -~(fi: Finite): JNumber
   protected def *~(fi: Finite): JNumber
-  protected def /~(fi: Finite): JNumber
+  protected def %~(fi: Finite): JNumber
   
   def +(o: JNumber) = o match {
     case inf: Infinite => inf + o
     case fi: Finite => this +~ fi
+    case NaN => NaN
   }
   
   def -(o: JNumber) = o match {
     case inf: Infinite => (-inf) + this
     case fi: Finite => this -~ fi
+    case NaN => NaN
   }
   
   def *(o: JNumber) = o match {
     case inf: Infinite => inf * this
     case fi: Finite => this *~ fi
+    case NaN => NaN
   }
   
-  def /(o: JNumber) = o match {
+  def %(o: JNumber) = o match {
     case inf: Infinite => Zero
-    case fi: Finite => this /~ fi
+    case fi: Finite => this %~ fi
+    case NaN => NaN
   }
 }
 
@@ -89,16 +117,19 @@ final object Infinity extends Infinite with Ordered[JReal] {
   }
   
   def +(o: JNumber) = o match {
-    case NegativeInfinity => throw new Exception() //TODO NaN error
+    case NegativeInfinity => NaN //TODO NaN error
+    case NaN => NaN
     case r:JReal => this
   }
   
   def -(o: JNumber) = o match {
-    case Infinity => throw new Exception()
+    case Infinity => NaN //TODO NaN error
+    case NaN => NaN
     case r:JReal => NegativeInfinity
   }
   
   def *(o: JNumber) = o match {
+    case NaN => NaN
     case r:JReal => (r signum) match {
       case Pos => Infinity
       case Neut=> Zero
@@ -122,16 +153,19 @@ final object NegativeInfinity extends Infinite with Ordered[JReal] {
 	}
 	
 	def +(o: JNumber) = o match {
-	  case Infinity => throw new Exception() //TODO NaN error
+	  case Infinity => NaN //TODO NaN error
+	  case NaN => NaN
 	  case r:JReal => this
 	}
 	
 	def -(o: JNumber) = o match {
-	  case NegativeInfinity => throw new Exception()
+	  case NegativeInfinity => NaN //TODO NaN error
+	  case NaN => NaN
 	  case r: JReal => Infinity
 	}
 	
 	def *(o: JNumber) = o match {
+	  case NaN => NaN
 	  case r:JReal => (r signum) match {
 	    case Pos => NegativeInfinity
 	    case Neut=> Zero
@@ -170,7 +204,7 @@ final class JInt(val v: Int) extends Finite(jINT) {
       case f:JFloat=>new JFloat(v * f.v)
     }
     
-    def /~(o: Finite):JNumber = o match {
+    def %~(o: Finite):JNumber = o match {
       case i: JInt => if (i.v == 0) this * Infinity else new JFloat(v / i.v)
       case f: JFloat=>if (f.v == 0.0)this *Infinity else new JFloat(v / f.v)
     }
@@ -205,7 +239,7 @@ final class JFloat(val v: Double) extends Finite(jFL) {
 	  case f: JFloat=>new JFloat(v + f.v)
 	}
 	
-	def /~(o: Finite):JNumber = o match {
+	def %~(o: Finite):JNumber = o match {
 	  case i: JInt => new JFloat(v / i.v)
 	  case f: JFloat=>new JFloat(v / f.v)
 	}

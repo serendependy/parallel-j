@@ -14,7 +14,7 @@ import j.lang.datatypes.array.types.JNumber
 object JVerbs {
   
   val leftIdentity = new JVerb1Type[JArrayType](
-      "]",
+      "[",
       List(JFuncRank(0,0,0)), //TODO should be infinity
       (y: JArray[JArrayType]) => y,
       (x: JArray[JArrayType], y: JArray[JArrayType]) => x,
