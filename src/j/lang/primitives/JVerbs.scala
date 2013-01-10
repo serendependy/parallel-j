@@ -38,7 +38,7 @@ object JVerbs {
         val numItems:Int = x.ravel.fold(One)(_ * _).v
         val ravel:Array[JArrayType] = Array.tabulate(numItems)((i: Int) => 
           y(i % y.numItems) //TODO global fill used for fit
-        )
+        ) //TODO modulo == slow performance
         JArray(afNONE, y.jaType, 0, numItems, x.ravel.toList.map(_ v), ravel)
       },
       jANY, jINT, jANY
