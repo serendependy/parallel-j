@@ -34,6 +34,7 @@ object JReal {
   final object Pos extends Signum
   
   val Zero = new JInt(0)
+  val One  = new JInt(1)
 }
 
 sealed abstract class JReal(jtype: JType) extends JNumber(jtype) with Ordered[JReal] {
@@ -203,6 +204,8 @@ final class JInt(val v: Int) extends Finite(jINT) {
       case i:JInt => new JInt(v * i.v)
       case f:JFloat=>new JFloat(v * f.v)
     }
+    
+    def *(i: JInt): JInt = new JInt(this.v * i.v)
     
     def %~(o: Finite):JNumber = o match {
       case i: JInt => if (i.v == 0) this * Infinity else new JFloat(v / i.v)
