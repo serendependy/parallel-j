@@ -1,11 +1,15 @@
-package j.lang.datatypes.array
+package j.lang.datatypes.array.types
 
 import j.lang.datatypes.array.types._
 
-object ArrayImplicits {
+object TypeImplicits {
+    //Organized by parameter types
+  
+    //takes Int (or collections thereof
 	implicit def intarray(ar: Array[Int]):Array[JInt] =
 	  ar.map(new JInt(_))
 	implicit def i2j(i: Int): JInt = new JInt(i)
+	
 	
 	implicit def d2j(d: Double): JFloat = new JFloat(d)
 	implicit def doubarray(ar: Array[Double]):Array[JFloat] = 

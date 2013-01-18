@@ -8,14 +8,16 @@ import j.lang.datatypes.function.JVerb1Type
 
 import j.lang.datatypes.array.{JArray, JArrayType}
 
-import j.lang.datatypes.array.JArrayType
-import j.lang.datatypes.array.types.JNumber 
+import j.lang.datatypes.array.types.JNumber
+import j.lang.datatypes.array.types._
+import j.lang.datatypes.array.types.TypeImplicits._
+
 
 object JVerbs {
   
   val leftIdentity = new JVerb1Type[JArrayType](
       "[",
-      List(JFuncRank(0,0,0)), //TODO should be infinity
+      List(JFuncRank(Infinity,Infinity,Infinity)),
       (y: JArray[JArrayType]) => y,
       (x: JArray[JArrayType], y: JArray[JArrayType]) => x,
       jANY
