@@ -8,7 +8,7 @@ import j.lang.datatypes.function.JVerb1Type
 
 import j.lang.datatypes.array.{JArray, JArrayType}
 
-import j.lang.datatypes.array.types.JNumber
+import j.lang.datatypes.array.types.JNumberTypes._
 import j.lang.datatypes.array.types._
 import j.lang.datatypes.array.types.TypeImplicits._
 
@@ -17,7 +17,7 @@ object JVerbs {
   
   val leftIdentity = new JVerb1Type[JArrayType](
       "[",
-      List(JFuncRank(Infinity,Infinity,Infinity)),
+      List(JFuncRank(JInfinity,JInfinity,JInfinity)),
       (y: JArray[JArrayType]) => y,
       (x: JArray[JArrayType], y: JArray[JArrayType]) => x,
       jANY

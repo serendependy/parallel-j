@@ -1,6 +1,6 @@
 package j.lang.datatypes
 
-import j.lang.datatypes.array.types.JNumber
+import j.lang.datatypes.array.types.JNumberTypes._
 
 
 object JFuncRank {

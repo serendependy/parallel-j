@@ -7,7 +7,7 @@ import JArrayFlag._
 import j.util.Rational
 
 import JArray._
-import j.lang.datatypes.array.types.JNumber
+import j.lang.datatypes.array.types.JNumberTypes._
 
 object JArray {
   
@@ -48,6 +48,10 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
   def tally = shape(0)
   
   def isScalar = shape isEmpty
+  
+  	def apply(inds: List[Int]) {
+    
+  	}
   
     def apply(ind: Int):JArray[T] = {
      if (ind < 0) this(tally + ind) else {

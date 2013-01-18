@@ -1,6 +1,7 @@
 package j.lang.datatypes.array.types
 
 import j.lang.datatypes.array.types._
+import j.lang.datatypes.array.types.JNumberTypes._
 
 object TypeImplicits {
     //Organized by parameter types

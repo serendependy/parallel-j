@@ -5,8 +5,8 @@ import scala.math.Ordered
 import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.JTypeMacros._
 
-import JReal._
-
+object JNumberTypes {
+  import JReal._
 sealed abstract class JNumber(jtype: JType) extends JArrayType(jtype){
 	def +(o: JNumber): JNumber
 	def -(o: JNumber): JNumber
@@ -23,7 +23,7 @@ object JNumber {
   def apply(a: Any) = a match {
     case i:Int => new JInt(i)
     case d:Double=> new JFloat(d)
-    case _ => NaN
+    case _ => JNaN
   }
 }
 
@@ -40,7 +40,7 @@ sealed abstract class JReal(jtype: JType) extends JNumber(jtype) with Ordered[JR
   def signum: Signum
 }
 
-final object NaN extends JNumber(jFL){
+final object JNaN extends JNumber(jFL){
   
   def compare(r: JReal) = 0
   
@@ -55,23 +55,23 @@ final object NaN extends JNumber(jFL){
   override def toString = "_."
 }
 
-sealed abstract class Infinite extends JReal(jFL) with Ordered[JReal] {
+sealed abstract class JInfinite extends JReal(jFL) with Ordered[JReal] {
   
   def %(o: JNumber) = o match {
     case fi: Finite => this
-    case inf:Infinite=> NaN
-    case NaN => NaN
+    case inf:JInfinite=> JNaN
+    case JNaN => JNaN
   }
   
-  def unary_| = Infinity
+  def unary_| = JInfinity
 }
 
 sealed abstract class Finite(jtype: JType) extends JReal(jtype) with Ordered[JReal]{
   def compareFinite(fi: Finite): Int
   
   def compare(r: JReal) = r match {
-    case Infinity => -1
-    case NegativeInfinity => 1
+    case JInfinity => -1
+    case JNegativeInfinity => 1
     case fi:Finite => compareFinite(fi)
   }
   
@@ -81,99 +81,99 @@ sealed abstract class Finite(jtype: JType) extends JReal(jtype) with Ordered[JRe
   protected def %~(fi: Finite): JNumber
   
   def +(o: JNumber) = o match {
-    case inf: Infinite => inf + o
+    case inf: JInfinite => inf + o
     case fi: Finite => this +~ fi
-    case NaN => NaN
+    case JNaN => JNaN
   }
   
   def -(o: JNumber) = o match {
-    case inf: Infinite => (-inf) + this
+    case inf: JInfinite => (-inf) + this
     case fi: Finite => this -~ fi
-    case NaN => NaN
+    case JNaN => JNaN
   }
   
   def *(o: JNumber) = o match {
-    case inf: Infinite => inf * this
+    case inf: JInfinite => inf * this
     case fi: Finite => this *~ fi
-    case NaN => NaN
+    case JNaN => JNaN
   }
   
   def %(o: JNumber) = o match {
-    case inf: Infinite => Zero
+    case inf: JInfinite => Zero
     case fi: Finite => this %~ fi
-    case NaN => NaN
+    case JNaN => JNaN
   }
 }
 
 
-final object Infinity extends Infinite with Ordered[JReal] {
+final object JInfinity extends JInfinite with Ordered[JReal] {
   import JReal._
   
   def signum = Pos
   
   def compare(r: JReal): Int = r match {
-    case Infinity => 0
+    case JInfinity => 0
     case _ => -1
   }
   
   def +(o: JNumber) = o match {
-    case NegativeInfinity => NaN //TODO NaN error
-    case NaN => NaN
+    case JNegativeInfinity => JNaN //TODO JNaN error
+    case JNaN => JNaN
     case r:JReal => this
   }
   
   def -(o: JNumber) = o match {
-    case Infinity => NaN //TODO NaN error
-    case NaN => NaN
-    case r:JReal => NegativeInfinity
+    case JInfinity => JNaN //TODO JNaN error
+    case JNaN => JNaN
+    case r:JReal => JNegativeInfinity
   }
   
   def *(o: JNumber) = o match {
-    case NaN => NaN
+    case JNaN => JNaN
     case r:JReal => (r signum) match {
-      case Pos => Infinity
+      case Pos => JInfinity
       case Neut=> Zero
-      case Neg => NegativeInfinity
+      case Neg => JNegativeInfinity
     }
   }
 
-  def unary_- = NegativeInfinity
+  def unary_- = JNegativeInfinity
   
   override def toString = "_"
 }
 
-final object NegativeInfinity extends Infinite with Ordered[JReal] {
+final object JNegativeInfinity extends JInfinite with Ordered[JReal] {
 	import JReal._
 	
 	def signum = Neg
 	
 	def compare(r: JReal): Int = r match {
-	  case NegativeInfinity => 0
+	  case JNegativeInfinity => 0
 	  case _ => 1
 	}
 	
 	def +(o: JNumber) = o match {
-	  case Infinity => NaN //TODO NaN error
-	  case NaN => NaN
+	  case JInfinity => JNaN //TODO JNaN error
+	  case JNaN => JNaN
 	  case r:JReal => this
 	}
 	
 	def -(o: JNumber) = o match {
-	  case NegativeInfinity => NaN //TODO NaN error
-	  case NaN => NaN
-	  case r: JReal => Infinity
+	  case JNegativeInfinity => JNaN //TODO JNaN error
+	  case JNaN => JNaN
+	  case r: JReal => JInfinity
 	}
 	
 	def *(o: JNumber) = o match {
-	  case NaN => NaN
+	  case JNaN => JNaN
 	  case r:JReal => (r signum) match {
-	    case Pos => NegativeInfinity
+	    case Pos => JNegativeInfinity
 	    case Neut=> Zero
-	    case Neg => Infinity
+	    case Neg => JInfinity
 	  }
 	}
 
-	def unary_- = Infinity
+	def unary_- = JInfinity
 	
 	override def toString = "__"
 }
@@ -205,8 +205,8 @@ final class JInt(val v: Int) extends Finite(jINT) {
     }
     
     def %~(o: Finite):JNumber = o match {
-      case i: JInt => if (i.v == 0) this * Infinity else new JFloat(v / i.v)
-      case f: JFloat=>if (f.v == 0.0)this *Infinity else new JFloat(v / f.v)
+      case i: JInt => if (i.v == 0) this * JInfinity else new JFloat(v / i.v)
+      case f: JFloat=>if (f.v == 0.0)this *JInfinity else new JFloat(v / f.v)
     }
     
     def unary_- = new JInt(-v)
@@ -248,4 +248,5 @@ final class JFloat(val v: Double) extends Finite(jFL) {
 	def unary_| = new JFloat(v.abs)
 	
 	override def toString = v.toString
+}
 }
