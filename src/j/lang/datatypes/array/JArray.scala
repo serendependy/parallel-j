@@ -15,6 +15,10 @@ object JArray {
       numItems: Int, shape: List[Int], ravel: Array[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
+  def apply[T <% JArrayType](jaType: JType, shape: List[Int], ravel: Array[T]) = {
+    new JArray(afNONE, jaType, 0, ravel.length, shape, ravel)
+  }
+  
   def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
     JArray(afNONE, sc.typeMacro,0, 1, List(), Array[T](sc))
   }
