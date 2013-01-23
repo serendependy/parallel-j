@@ -8,12 +8,12 @@ class JTypeMacros private ()
 object JTypeMacros {
   
 	type JType = CMacroType[JTypeMacros]
-		  val List(jB01 , jLIT , jINT , jFL , jCMPX , jBOX , jXNUM, jRAT, jBIT,
+		  val Vector(jB01 , jLIT , jINT , jFL , jCMPX , jBOX , jXNUM, jRAT, jBIT,
 	           jSB01, jSLIT, jSINT, jSFL, jSCMPX, jSBOX, jSBT,
-	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK): List[JType] = (0 to 
+	           jC2T , jVERB, jADV , jCONJ,jASGN , jMARK): Vector[JType] = (0 to 
 	               21).map((x:Int) => new JType(1 >> x))
-	  val List(jSYMB, jCONW, jNAME,
-	           jLPAR, jRPAR, jXD  , jXZ):List[JType] = (22 to 
+	  val Vector(jSYMB, jCONW, jNAME,
+	           jLPAR, jRPAR, jXD  , jXZ):Vector[JType] = (22 to 
 	               28).map((x:Int) => new JType(1 >> x))
 
 	  //composite j types

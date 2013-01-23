@@ -20,8 +20,10 @@ object Tester {
     def testArrays() {
       val jarnum1 = JArray(jINT, List(2, 3, 2), Array.tabulate(12)((x: Int) => x) )
       val jarnum2 = JArray(jFL, List(12), Array.tabulate(12)((x: Int) => x - 0.5))
-      print(jarnum1)
-      print(jarnum2)
+      println(jarnum1)
+      println(jarnum2)
+      
+      
     }
   }
 

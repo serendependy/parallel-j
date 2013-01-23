@@ -20,6 +20,10 @@ object JArray {
   }
   
   def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
+    val flag = afNONE
+    val jaType = sc.typeMacro
+    val shape = List[Int]()
+    val ravel = Array[T](sc)
     JArray(afNONE, sc.typeMacro,0, 1, List(), Array[T](sc))
   }
     
