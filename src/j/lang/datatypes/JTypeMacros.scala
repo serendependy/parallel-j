@@ -19,7 +19,7 @@ object JTypeMacros {
 	  //composite j types
 	  val jANY = new JType(-1)
 	  val jSPARSE = jSB01 | jSINT | jSFL | jSCMPX | jSLIT | jSBOX
-	  val jNUMERIC = jB01 & jBIT | jINT | jFL | jCMPX | jXNUM | 
+	  val jNUMERIC = jB01 | jBIT | jINT | jFL | jCMPX | jXNUM | 
 	  		   jRAT | jSB01 | jSINT | jSFL | jSCMPX
 	  val jDIRECT = jLIT | jC2T | jB01 | jBIT | jINT | jFL | 
 	  		   jCMPX | jSBT

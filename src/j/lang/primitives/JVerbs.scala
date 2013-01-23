@@ -44,17 +44,17 @@ object JVerbs {
       jANY, jINT, jANY
   )
   
-  val ravelAppend = new JVerb1Type[JArrayType](
-      ",",
-      List(JFuncRank(0)), //TODO should be infinity
-      (y: JArray[JArrayType]) => {
-        JArray(y.flag, y.jaType, 0, y.numItems, List(y.numItems), y.ravel)
-      },
-      (x: JArray[JArrayType], y: JArray[JArrayType]) => {
-        
-      },
-      jANY
-  )
+//  val ravelAppend = new JVerb1Type[JArrayType](
+//      ",",
+//      List(JFuncRank(0)), //TODO should be infinity
+//      (y: JArray[JArrayType]) => {
+//        JArray(y.flag, y.jaType, 0, y.numItems, List(y.numItems), y.ravel)
+//      },
+//      (x: JArray[JArrayType], y: JArray[JArrayType]) => {
+//        
+//      },
+//      jANY
+//  )
 //  val conjugatePlus = new JVerb1Type[JNumber](
 //      "+",
 //      List(JFuncRank(0)),

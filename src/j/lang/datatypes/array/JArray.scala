@@ -48,4 +48,16 @@ class JArray[T <% JArrayType](val flag: JArrayFlag, val jaType: JType,
   def tally = shape(0)
   
   def apply(i: Int) = ravel(i)
+  
+    lazy private val sigInd = (for (i <- 0 until shape.length) yield {
+      shape.drop(i).reduceLeft(_ * _)
+    }).drop(1)
+  
+    override def toString = {
+    (for (i <- 0 until ravel.length) yield {
+      val endItem = sigInd.map((i+1) % _ == 0).zip(sigInd).filter(t => t._1).map(_._2)
+      ravel(i).toString + {if (endItem.length == 0) " " else "\n" * endItem.length}
+    }).mkString.dropRight(shape.length - 1)
+  }
+
 }
