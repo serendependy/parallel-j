@@ -49,9 +49,9 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
   
   def isScalar = shape isEmpty
   
-  	def apply(inds: List[Int]) {
-    
-  	}
+//  	def apply(inds: List[Int]) {
+//    
+//  	}
   
     def apply(ind: Int):JArray[T] = {
      if (ind < 0) this(tally + ind) else {
