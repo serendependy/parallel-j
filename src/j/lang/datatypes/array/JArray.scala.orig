@@ -2,7 +2,7 @@ package j.lang.datatypes.array
 
 import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.array.types._
-import j.lang.datatypes.array.ArrayImplicits._
+import j.lang.datatypes.array.types.TypeImplicits._
 import JArrayFlag._
 import j.util.Rational
 
@@ -53,6 +53,10 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
   
 <<<<<<< HEAD
   def isScalar = shape isEmpty
+  
+//  	def apply(inds: List[Int]) {
+//    
+//  	}
   
     def apply(ind: Int):JArray[T] = {
      if (ind < 0) this(tally + ind) else {
