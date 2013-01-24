@@ -1,4 +1,4 @@
-package j.lang.datatypes.array.types
+package j.lang.datatypes.array
 
 import j.lang.datatypes.array.types._
 import j.lang.datatypes.array.types.JNumberTypes._

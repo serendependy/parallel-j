@@ -8,7 +8,7 @@ object JArrayFlag {
   type JArrayFlag = CMacroType[JAF]
   
   val afNONE = new JArrayFlag(0)
-  val List(afRO, afNJA, afSMM, afREL):List[JArrayFlag] =
+  val Vector(afRO, afNJA, afSMM, afREL):Vector[JArrayFlag] =
 	(0 to 3).map((x:Int) => new JArrayFlag(1 >> x))
 
 /*Take from "jtype.h"*/	

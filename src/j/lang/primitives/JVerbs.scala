@@ -5,30 +5,19 @@ import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.function.JVerb
 import j.lang.datatypes.function.{JVerb1Type, JVerb2Type}
 import j.lang.datatypes.array.{JArray, JArrayType}
-<<<<<<< HEAD
 
 import j.lang.datatypes.array.types.JNumberTypes._
 import j.lang.datatypes.array.types._
-import j.lang.datatypes.array.types.TypeImplicits._
 
-=======
 import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.array.ArrayImplicits._
 import j.lang.datatypes.array.JArrayFlag._
-import j.lang.datatypes.array.types.JNumber
-import j.lang.datatypes.array.types.JReal._
-import j.lang.datatypes.array.types.JInt
->>>>>>> 45a352e824957fefc57da57c35dd1a2392d8d365
 
 object JVerbs {
   
   val leftIdentity = new JVerb1Type[JArrayType](
       "[",
-<<<<<<< HEAD
       List(JFuncRank(JInfinity,JInfinity,JInfinity)),
-=======
-      List(JFuncRank(0)), //TODO should be infinity
->>>>>>> 45a352e824957fefc57da57c35dd1a2392d8d365
       (y: JArray[JArrayType]) => y,
       (x: JArray[JArrayType], y: JArray[JArrayType]) => x,
       jANY
@@ -47,9 +36,9 @@ object JVerbs {
         JArray(afNONE, jINT, 0, y.rank, List[Int](y.shape.length), y.shape.toArray)
       },
       (x: JArray[JInt], y: JArray[JArrayType]) => {
-        val numItems:Int = x.ravel.fold(One)(_ * _).v
+        val numItems:Int = x.ravel.fold(JReal.One)(_ * _).v
         val ravel:Array[JArrayType] = Array.tabulate(numItems)((i: Int) => 
-          y(i % y.numItems) //TODO global fill used for fit
+          y.ravel(i % y.numItems) //TODO global fill used for fit
         ) //TODO modulo == slow performance
         JArray(afNONE, y.jaType, 0, numItems, x.ravel.toList.map(_ v), ravel)
       },
