@@ -2,7 +2,7 @@ package j.lang.datatypes.array
 
 import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.array.types._
-import j.lang.datatypes.array.ArrayImplicits._
+import j.lang.datatypes.array.types.TypeImplicits._
 import JArrayFlag._
 import j.util.Rational
 
@@ -15,15 +15,11 @@ object JArray {
       numItems: Int, shape: List[Int], ravel: Array[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
-  def apply[T <% JArrayType : Manifest](jaType: JType, shape: List[Int], ravel: Array[T]) = {
+  def apply[T <% JArrayType](jaType: JType, shape: List[Int], ravel: Array[T]) = {
     new JArray(afNONE, jaType, 0, ravel.length, shape, ravel)
   }
   
   def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
-    val flag = afNONE
-    val jaType = sc.typeMacro
-    val shape = List[Int]()
-    val ravel = Array[T](sc)
     JArray(afNONE, sc.typeMacro,0, 1, List(), Array[T](sc))
   }
     
@@ -55,7 +51,12 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
   def rank = shape.length
   def tally = shape(0)
   
+<<<<<<< HEAD
   def isScalar = shape isEmpty
+  
+//  	def apply(inds: List[Int]) {
+//    
+//  	}
   
     def apply(ind: Int):JArray[T] = {
      if (ind < 0) this(tally + ind) else {
@@ -66,7 +67,9 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
         new JArray(flag, jaType, 0, itemSize, itemShape, (trueIndex).until(trueIndex + itemSize).
             map(ravel).toArray  )
         }
-    }
+    } 
+=======
+  def apply(i: Int) = ravel(i)
   
     lazy private val sigInd = (for (i <- 0 until shape.length) yield {
       shape.drop(i).reduceLeft(_ * _)
@@ -78,4 +81,6 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
       ravel(i).toString + {if (endItem.length == 0) " " else "\n" * endItem.length}
     }).mkString.dropRight(shape.length - 1)
   }
+
+>>>>>>> 45a352e824957fefc57da57c35dd1a2392d8d365
 }
