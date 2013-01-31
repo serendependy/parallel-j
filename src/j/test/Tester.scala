@@ -5,7 +5,14 @@ object Tester {
   def main(args: Array[String]) {
     {
      import ArrayTester._
-     testArrays()
+     import j.lang.datatypes.array.JArray
+     import j.lang.datatypes.array.ArrayImplicits._
+     
+     import j.lang.datatypes.JTypeMacros._
+     
+     testArraysPrint()
+     val jarnum = JArray(jINT, List(5,5), Array.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
+     testArrayFrames(jarnum)
     }
 	 
     
@@ -13,17 +20,39 @@ object Tester {
   
   object ArrayTester {
     import j.lang.datatypes.JTypeMacros._
+    
     import j.lang.datatypes.array.JArray
     import j.lang.datatypes.array.JArrayType
+    import j.lang.datatypes.array.JArrayFrame
     import j.lang.datatypes.array.ArrayImplicits._
     
-    def testArrays() {
+    import j.lang.datatypes.array.types.JNumberTypes._
+    
+    def testArraysPrint() {
       val jarnum1 = JArray(jINT, List(2, 3, 2), Array.tabulate(12)((x: Int) => x) )
       val jarnum2 = JArray(jFL, List(12), Array.tabulate(12)((x: Int) => x - 0.5))
       println(jarnum1)
       println(jarnum2)
       
       
+    }
+    
+    def testArrayFrames[T <% JArrayType : Manifest](jar: JArray[T]) {
+      val jarnum = JArray(jINT, List(2,3,2), Array.tabulate(12)((x: Int) => x))
+      val jarfrm_ = JArrayFrame(JInfinity, jarnum)
+      val jarfrm3 = JArrayFrame(3, jarnum)
+      val jarfrm2 = JArrayFrame(2, jarnum)
+      val jarfrm1 = JArrayFrame(1, jarnum)
+      val jarfrm0 = JArrayFrame(0, jarnum)
+      
+      println(jarfrm_)
+      println(jarfrm3)
+      println(jarfrm2)
+      println(jarfrm1)
+      println(jarfrm0)
+      
+      val jarfrms = (0 to jar.rank).map((x: Int) => JArrayFrame(x, jar) )
+      jarfrms.foreach(println)
     }
   }
 
