@@ -27,6 +27,29 @@ class JArrayFrame private(val frameLevels: List[Int], val jar: JArray[_]) {
     }).toList :+ tempShape
   }
   
+  	def shapeAgreement(other: JArrayFrame):Option[List[Int]] = {
+  	  if (this.frames.length != other.frames.length) None
+  	  else {
+  	    (this.frames, other.frames).zipped.map((l1, l2) => {
+  	      if (l1.length > l2.length) {
+  	        if (l1.take(l2.length) == l2) Some(l1)
+  	        else None
+  	      }
+  	      else {
+  	        if (l2.take(l1.length) == l1) Some(l2)
+  	        else None
+  	      }
+  	    }).foldLeft(Option(List[Int]()))( (o,l) => {
+  	      o match {
+  	        case None => None
+  	        case Some(lp) => l match {
+  	          case None => None
+  	          case Some(ln) => Some(lp ++ ln)
+  	        }
+  	      }
+  	    })
+  	  }
+  	}
   
 	override def toString() = {
 	  "" + frames + "\n" + jar
