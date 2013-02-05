@@ -5,33 +5,32 @@ import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.function.JVerb
 import j.lang.datatypes.function.{JVerb1Type, JVerb2Type}
 import j.lang.datatypes.array.{JArray, JArrayType}
-
 import j.lang.datatypes.array.types.JNumberTypes._
 import j.lang.datatypes.array.types._
-
 import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.array.ArrayImplicits._
 import j.lang.datatypes.array.JArrayFlag._
+import j.lang.datatypes.function.JVerb1Type
 
 object JVerbs {
   
   val leftIdentity = new JVerb1Type[JArrayType](
       "[",
-      List(JFuncRank(JInfinity,JInfinity,JInfinity)),
+      List(JFuncRank(JInfinity)),
       (y: JArray[JArrayType]) => y,
       (x: JArray[JArrayType], y: JArray[JArrayType]) => x,
       jANY
   )
   val rightIdentity = new JVerb1Type[JArrayType](
       "]",
-      List(JFuncRank(0)), //TODO should be infinity
+      List(JFuncRank(JInfinity)),
       (y: JArray[JArrayType]) => y,
       (x: JArray[JArrayType], y: JArray[JArrayType]) => y,
       jANY
   )
   val shapeReshape = new JVerb[JArrayType, JInt, JArrayType, JInt, JArrayType](
       "$",
-      List(JFuncRank(0, 1, 0)), //TODO should be _ 1 _
+      List[JFuncRank](JFuncRank(JInfinity, 1, JInfinity)),
       (y: JArray[JArrayType]) => {
         JArray(afNONE, jINT, 0, y.rank, List[Int](y.shape.length), y.shape.toArray)
       },
@@ -43,6 +42,21 @@ object JVerbs {
         JArray(afNONE, y.jaType, 0, numItems, x.ravel.toList.map(_ v), ravel)
       },
       jANY, jINT, jANY
+  )
+  
+  val conjugatePlus = new JVerb1Type[JNumber](
+      "+",
+      List(JFuncRank(0, 0, 0)),
+      (y: JArray[JNumber]) => {
+        y(0) match {
+          //TODO case c: JComplex => ...
+          case a:JNumber => a
+        }
+      },
+      (x: JArray[JNumber], y: JArray[JNumber]) => {
+        JArray(x.jaType | y.jaType, List(), Array(x.ravel(0) + y.ravel(0)))
+      },
+      jNUMERIC
   )
   
 //  val ravelAppend = new JVerb1Type[JArrayType](
