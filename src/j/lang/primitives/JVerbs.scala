@@ -46,17 +46,37 @@ object JVerbs {
   
   val conjugatePlus = new JVerb1Type[JNumber](
       "+",
-      List(JFuncRank(0, 0, 0)),
+      List(JFuncRank(0)),
       (y: JArray[JNumber]) => {
         y(0) match {
           //TODO case c: JComplex => ...
-          case a:JNumber => a
+          case a:JNumber => JArray.scalar(a)
         }
       },
       (x: JArray[JNumber], y: JArray[JNumber]) => {
         JArray(x.jaType | y.jaType, List(), Array(x.ravel(0) + y.ravel(0)))
       },
       jNUMERIC
+  )
+  
+  val negateMinus = new JVerb1Type[JNumber](
+      "-",
+      List(JFuncRank(0)),
+      (y: JArray[JNumber]) => {
+        JArray.scalar(- y.ravel(0))
+      },
+      (x: JArray[JNumber], y: JArray[JNumber]) => {
+        JArray.scalar(x.ravel(0) - y.ravel(0))
+      },
+      jNUMERIC
+  )
+  
+  val boxLessthan = new JVerb[JArrayType, JReal, JReal, JBox, JInt](
+      "<",
+      List(JFuncRank(JInfinity, 0, 0)),
+      (y: JArray[JArrayType]) => JArray.scalar(JBox(y)),
+      (x: JArray[JReal], y: JArray[JReal]) => JArray.scalar(x.ravel(0) < y.ravel(0)),
+      jANY, jNUMERIC, jNUMERIC
   )
   
 //  val ravelAppend = new JVerb1Type[JArrayType](

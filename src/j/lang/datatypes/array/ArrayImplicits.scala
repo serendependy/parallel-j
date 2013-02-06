@@ -18,4 +18,6 @@ object ArrayImplicits {
 	implicit def c2j(c: Char): JChar = new JChar(c)
 	implicit def chararray(ar: Array[Char]): Array[JChar] = 
 	  ar.map(new JChar(_))
+	  
+	implicit def b2j(b: Boolean): JInt = new JInt(if (b) 1 else 0)
 }

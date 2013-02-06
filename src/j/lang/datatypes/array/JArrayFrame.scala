@@ -7,7 +7,7 @@ import j.lang.datatypes.array.JArrayFlag._
 import j.lang.datatypes.JFuncRank
 
 object JArrayFrame {
-  def apply(frameLevels: List[JNumber], jar: JArray[_]) = {
+  def apply[T <% JArrayType : Manifest](frameLevels: List[JNumber], jar: JArray[T]) = {
     new JArrayFrame(frameLevels.map(jnum => jnum match {
       case i: JInt => i.v
       case inf: JInfinite => jar.rank
@@ -15,16 +15,16 @@ object JArrayFrame {
     }), jar)
   }
   
-  def apply(rank: JNumber, jar: JArray[_]): JArrayFrame = JArrayFrame(List(rank), jar)
+  def apply[T <% JArrayType : Manifest](rank: JNumber, jar: JArray[T]): JArrayFrame[T] = JArrayFrame(List(rank), jar)
   
-  def createFrames(rs: List[JFuncRank], jar: JArray[_]) = JArrayFrame(rs.map(_ r1), jar)
-  def createFrames(rs: List[JFuncRank], jar1: JArray[_], jar2: JArray[_]): (JArrayFrame, JArrayFrame) = {
+  def createFrames[T <% JArrayType : Manifest](rs: List[JFuncRank], jar: JArray[T]) = JArrayFrame(rs.map(_ r1), jar)
+  def createFrames[T <% JArrayType : Manifest, U <% JArrayType : Manifest](rs: List[JFuncRank], jar1: JArray[T], jar2: JArray[U]): (JArrayFrame[T], JArrayFrame[U]) = {
     (JArrayFrame(rs.map(_ r2), jar1), JArrayFrame(rs.map(_ r3), jar2))
   }
 }
 
-class JArrayFrame private(val frameLevels: List[Int], val jar: JArray[_]) {
-  lazy val frames = {
+class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int], val jar: JArray[T]) {
+  val frames = {
     var tempShape = jar.shape
     (for (rank <- frameLevels.reverse) yield {
     	val frame = tempShape.take(tempShape.length - rank)
@@ -32,8 +32,17 @@ class JArrayFrame private(val frameLevels: List[Int], val jar: JArray[_]) {
     	frame
     }).toList :+ tempShape
   }
+  val cellShape = frames.last
+  val cellSize = cellShape.foldLeft(1)(_ * _)
+  val frameSize = jar.shape.foldLeft(1)(_ * _) / cellSize
+ 
+  	def mapOnCells[U](func: JArray[T] => JArray[U]): JArray[U] = {
+  	  for (fr <- 0 to frameSize) yield {
+  	    func(JArray(jar.jaType, cellShape, jar.ravel.view(fr, fr + cellSize).toArray))
+  	  }
+  	}
   
-  	def shapeAgreement(other: JArrayFrame):Option[List[Int]] = {
+  	def shapeAgreement(other: JArrayFrame[_]):Option[List[Int]] = {
   	  if (this.frames.length != other.frames.length) None
   	  else {
   	    (this.frames, other.frames).zipped.map((l1, l2) => {
