@@ -6,8 +6,10 @@ import j.lang.datatypes.array.JArray
 import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.array.JArrayFrame
 
-class JVerb[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
-  MR <% JArrayType, DR <% JArrayType](rep: String, ranks: List[JFuncRank],
+import j.lang.datatypes.array.types.JNumberTypes._
+
+class JVerb[M <% JArrayType : Manifest, D1 <% JArrayType, D2 <% JArrayType,
+  MR <% JArrayType : Manifest, DR <% JArrayType](rep: String, ranks: List[JFuncRank],
   mimpl: JArray[M] => JArray[MR], dimpl: (JArray[D1], JArray[D2]) => JArray[DR],
   mdomain: JType, d1domain: JType, d2domain: JType) extends 
   JFunc[M,D1,D2,MR,DR](rep, jVERB, ranks, mdomain, d1domain, d2domain)
