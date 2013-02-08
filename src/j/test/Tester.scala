@@ -14,8 +14,44 @@ object Tester {
      val jarnum = JArray(jINT, List(5,5), Array.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
      testArrayFrames(jarnum)
     }
+    
+    {
+      import FunctionTester._
+      
+      testIntegers()
+    }
 	 
     
+  }
+  
+  object FunctionTester {
+    import j.lang.datatypes.JTypeMacros._
+    
+    import j.lang.datatypes.array.JArray
+    import j.lang.datatypes.array.JArrayType
+    import j.lang.datatypes.array.JArrayFrame
+    import j.lang.datatypes.array.ArrayImplicits._
+    
+    import j.lang.datatypes.array.types.JNumberTypes._
+    
+    import j.lang.primitives.JVerbs._
+    
+    import j.lang.datatypes.JFuncRank
+    
+    def testIntegers() {
+      println("\nTesting integers")
+      val r3s232 = integersIndex.monad(JArray.auto(2,3,2))
+      println(r3s232.shape + "\n" + (r3s232.ravel.map(_ v).mkString(" ")))
+      println(r3s232)
+      println("Done")
+    }
+    
+    def testNegate() {
+      println("\nTesting Negate")
+      val ar = integersIndex.monad(JArray.auto(2,3,2))
+      val res = negateMinus.monad(ar)
+      println("Done")
+    }
   }
   
   object ArrayTester {

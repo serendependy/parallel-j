@@ -79,6 +79,18 @@ object JVerbs {
       jANY, jNUMERIC, jNUMERIC
   )
   
+  val integersIndex = new JVerb[JInt, JArrayType, JArrayType, JInt, JInt](
+      "i.",
+      List(JFuncRank(1, JInfinity, JInfinity)),
+      (y: JArray[JInt]) => {
+        JArray(jINT, y.ravel.toList, Array.tabulate(y.ravel.foldLeft(1)(_ * _))((x: Int) => x))
+      },
+      (x: JArray[JArrayType], y: JArray[JArrayType]) => {
+        throw new Exception()//TODO implement
+      },
+      jINT, jANY, jANY
+  )
+  
 //  val ravelAppend = new JVerb1Type[JArrayType](
 //      ",",
 //      List(JFuncRank(0)), //TODO should be infinity
