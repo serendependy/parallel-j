@@ -38,7 +38,7 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int]
 
   //println("--In new JArrayFrame, frameSize: " + frameSize)
   
-  	def mapOnCells[U <% JArrayType : Manifest](func: JArray[T] => JArray[U]): JArray[U] = {
+  	def mapOnCells[ST <: T, U <% JArrayType : Manifest](func: JArray[ST] => JArray[U]): JArray[U] = {
 
   	  val newCells = (for (fr <- 0 until frameSize) yield {
   	    func(JArray(jar.jaType, cellShape, jar.ravel.view(fr*frameSize, (fr*frameSize) + cellSize).toArray))

@@ -52,7 +52,7 @@ object JArray {
   val mone = scalar(-1)
   val pi   = scalar(scala.Math.Pi)
 }
-class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType, 
+class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType, 
     var refcount: Int, val numItems: Int, val shape: List[Int], 
     val ravel: Array[T]) {//
 

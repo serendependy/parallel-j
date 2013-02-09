@@ -48,7 +48,7 @@ object Tester {
     
     def testNegate() {
       println("\nTesting Negate")
-      val ar = integersIndex.monad(JArray.auto(2,3,2))
+      val ar: JArray[JNumber] = integersIndex.monad(JArray.auto(2,3,2))
       val res = negateMinus.monad(ar)
       println("Done")
     }

@@ -14,7 +14,7 @@ class JVerb[M <% JArrayType : Manifest, D1 <% JArrayType, D2 <% JArrayType,
   mdomain: JType, d1domain: JType, d2domain: JType) extends 
   JFunc[M,D1,D2,MR,DR](rep, jVERB, ranks, mdomain, d1domain, d2domain)
 {  
-	override def monadImpl(y: JArray[M]) = {
+	override def monadImpl[ST <: M : Manifest](y: JArray[ST]) = {
 	  val yframed = JArrayFrame.createFrames(ranks, y)
 	  yframed.mapOnCells(mimpl)
 	}

@@ -20,7 +20,7 @@ abstract class JFunc[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
   protected def monadImpl(y: JArray[M]): JArray[MR]
   protected def dyadImpl(x: JArray[D1], y: JArray[D2]): JArray[DR]
   
-  def monad(y: JArray[M]):JArray[MR] = {
+  def monad[ST <: M](y: JArray[ST]):JArray[MR] = {
     if (mInDomain(y.jaType) ) {
       monadImpl(y)
     }
