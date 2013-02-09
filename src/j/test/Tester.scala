@@ -19,6 +19,7 @@ object Tester {
       import FunctionTester._
       
       testIntegers()
+      testNegate()
     }
 	 
     
@@ -49,7 +50,9 @@ object Tester {
     def testNegate() {
       println("\nTesting Negate")
       val ar: JArray[JNumber] = integersIndex.monad(JArray.auto(2,3,2))
+      println(ar)
       val res = negateMinus.monad(ar)
+      println(res)
       println("Done")
     }
   }

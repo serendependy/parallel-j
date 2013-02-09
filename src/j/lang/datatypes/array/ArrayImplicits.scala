@@ -3,6 +3,8 @@ package j.lang.datatypes.array
 import j.lang.datatypes.array.types._
 import j.lang.datatypes.array.types.JNumberTypes._
 
+import j.lang.datatypes.JTypeMacros._
+
 object ArrayImplicits {
     //Organized by parameter types
   
@@ -23,4 +25,15 @@ object ArrayImplicits {
 	  ar.map(new JChar(_))
 	  
 	implicit def b2j(b: Boolean): JInt = new JInt(if (b) 1 else 0)
+	
+	//TODO salvage my soul
+	/* This problem occurred because I wanted to treat JArray[JInt] like JArray[JNumber]
+	 * but the type parameter of JArray isn't covariant. I have yet to figure out a 
+	 * good way to solve this.
+	 * 
+	 * One option might be to implement the actual primitives as objects which take type arguments,
+	 * and then let all user constructed primitives be of a different type.
+	 */
+	implicit def jia2jna(jia: JArray[JInt]): JArray[JNumber] = 
+	  JArray(jNUMERIC, jia.shape, jia.ravel.map((x: JInt) => x))
 }
