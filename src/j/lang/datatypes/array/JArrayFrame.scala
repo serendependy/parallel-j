@@ -39,10 +39,10 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int]
   	def mapOnCells[U <% JArrayType : Manifest](func: JArray[T] => JArray[U]): JArray[U] = {
 
   	  val newCells = (for (fr <- 0 until frameSize) yield {
-  	    func(JArray(jar.jaType, cellShape, jar.ravel.slice(fr*cellSize, (1+fr)*cellSize).toArray))
+  	    func(JArray(jar.jaType, cellShape, jar.ravel.slice(fr*cellSize, (1+fr)*cellSize)))
   	  })
   	  val newShape = frames.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-  	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Array[U]())(_ ++ _.ravel) )
+  	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[U]())(_ ++ _.ravel) )
   	  
   	}
   

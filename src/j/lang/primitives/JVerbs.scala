@@ -32,11 +32,11 @@ object JVerbs {
       "$",
       List[JFuncRank](JFuncRank(JInfinity, 1, JInfinity)),
       (y: JArray[JArrayType]) => {
-        JArray(afNONE, jINT, 0, y.rank, List[Int](y.shape.length), y.shape.toArray)
+        JArray(afNONE, jINT, 0, y.rank, List[Int](y.shape.length), Vector() ++ y.shape)
       },
       (x: JArray[JInt], y: JArray[JArrayType]) => {
         val numItems:Int = x.ravel.fold(JReal.One)(_ * _).v
-        val ravel:Array[JArrayType] = Array.tabulate(numItems)((i: Int) => 
+        val ravel = Vector.tabulate(numItems)((i: Int) => 
           y.ravel(i % y.numItems) //TODO global fill used for fit
         ) //TODO modulo == slow performance
         JArray(afNONE, y.jaType, 0, numItems, x.ravel.toList.map(_ v), ravel)
@@ -54,7 +54,7 @@ object JVerbs {
         }
       },
       (x: JArray[JNumber], y: JArray[JNumber]) => {
-        JArray(x.jaType | y.jaType, List(), Array(x.ravel(0) + y.ravel(0)))
+        JArray(x.jaType | y.jaType, List(), Vector(x.ravel(0) + y.ravel(0)))
       },
       jNUMERIC
   )
@@ -83,7 +83,7 @@ object JVerbs {
       "i.",
       List(JFuncRank(1, JInfinity, JInfinity)),
       (y: JArray[JInt]) => {
-        JArray(jINT, y.ravel.toList, Array.tabulate(y.ravel.foldLeft(1)(_ * _))((x: Int) => x))
+        JArray(jINT, y.ravel.toList, Vector.tabulate(y.ravel.foldLeft(1)(_ * _))((x: Int) => x))
       },
       (x: JArray[JArrayType], y: JArray[JArrayType]) => {
         throw new Exception()//TODO implement

@@ -11,7 +11,7 @@ object Tester {
      import j.lang.datatypes.JTypeMacros._
      
      testArraysPrint()
-     val jarnum = JArray(jINT, List(5,5), Array.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
+     val jarnum = JArray(jINT, List(5,5), Vector.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
      testArrayFrames(jarnum)
     }
     
@@ -68,8 +68,8 @@ object Tester {
     import j.lang.datatypes.array.types.JNumberTypes._
     
     def testArraysPrint() {
-      val jarnum1 = JArray(jINT, List(2, 3, 2), Array.tabulate(12)((x: Int) => x) )
-      val jarnum2 = JArray(jFL, List(12), Array.tabulate(12)((x: Int) => x - 0.5))
+      val jarnum1 = JArray(jINT, List(2, 3, 2), Vector.tabulate(12)((x: Int) => x) )
+      val jarnum2 = JArray(jFL, List(12), Vector.tabulate(12)((x: Int) => x - 0.5))
       println(jarnum1)
       println(jarnum2)
       
@@ -77,7 +77,7 @@ object Tester {
     }
     
     def testArrayFrames[T <% JArrayType : Manifest](jar: JArray[T]) {
-      val jarnum = JArray(jINT, List(2,3,2), Array.tabulate(12)((x: Int) => x))
+      val jarnum = JArray(jINT, List(2,3,2), Vector.tabulate(12)((x: Int) => x))
       val jarfrm_ = JArrayFrame(JInfinity, jarnum)
       val jarfrm3 = JArrayFrame(3, jarnum)
       val jarfrm2 = JArrayFrame(2, jarnum)

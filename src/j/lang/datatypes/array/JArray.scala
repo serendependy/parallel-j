@@ -1,5 +1,7 @@
 package j.lang.datatypes.array
 
+import collection.breakOut
+
 import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.array.types._
 import j.lang.datatypes.array.ArrayImplicits._
@@ -12,15 +14,15 @@ import j.lang.datatypes.array.types.JNumberTypes._
 object JArray {
   
   def apply[T <% JArrayType : Manifest](flag: JArrayFlag, jaType: JType, refcount: Int, 
-      numItems: Int, shape: List[Int], ravel: Array[T]) = 
+      numItems: Int, shape: List[Int], ravel: Vector[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
-  def apply[T <% JArrayType : Manifest](jaType: JType, shape: List[Int], ravel: Array[T]) = {
+  def apply[T <% JArrayType : Manifest](jaType: JType, shape: List[Int], ravel: Vector[T]) = {
     new JArray(afNONE, jaType, 0, ravel.length, shape, ravel)
   }
   
   def auto[T <% JArrayType : Manifest](args: T*) = {
-    new JArray(afNONE, args(0).typeMacro, 0, args.length, List(args.length), args.toArray)
+    new JArray(afNONE, args(0).typeMacro, 0, args.length, List(args.length), Vector(args:_*))
   }
   
   def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
@@ -28,22 +30,22 @@ object JArray {
     val jaType = sc.typeMacro
     val shape = List[Int]()
     val ravel = Array[T](sc)
-    JArray(afNONE, sc.typeMacro,0, 1, List(), Array[T](sc))
+    JArray(afNONE, sc.typeMacro,0, 1, List(), Vector[T](sc))
   }
     
     def arithmeticProgression(n: Int, b: Int, m: Int) =
-      JArray(afNONE, jINT, 0, n, List(n), (0 to n).map(b + m * _).toArray)
+      JArray(afNONE, jINT, 0, n, List(n), Vector((0 to n).map(b + m * _):_*))
 
     def string(str: String) = {
-      JArray(afNONE, jCHAR, 0, str.length, List(str.length), str.toCharArray())
+      JArray(afNONE, jCHAR, 0, str.length, List(str.length), Vector(str:_*))
     }
       
     def vec2(a: Int, b: Int)= {
-      JArray(afNONE, jINT, 0, 2, List(2), Array(a,b))
+      JArray(afNONE, jINT, 0, 2, List(2), Vector(a,b))
     }
     
     def vec1(a: Int) = {
-      JArray(afNONE, jINT, 0, 1, List(1), Array(a))
+      JArray(afNONE, jINT, 0, 1, List(1), Vector(a))
     }
 
   val zero = scalar(0)
@@ -52,9 +54,9 @@ object JArray {
   val mone = scalar(-1)
   val pi   = scalar(scala.Math.Pi)
 }
-class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType, 
+class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType, 
     var refcount: Int, val numItems: Int, val shape: List[Int], 
-    val ravel: Array[T]) {//
+    val ravel: Vector[T]) {//
 
   def rank = shape.length
   def tally = shape(0)
@@ -68,7 +70,7 @@ class JArray[T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType
         val trueIndex = ind * itemSize
         //new JArray(itemShape, (ind * itemSize).until((ind+1) * itemSize).toList.map(vals))
         new JArray(flag, jaType, 0, itemSize, itemShape, (trueIndex).until(trueIndex + itemSize).
-            map(ravel).toArray  )
+            map(ravel)(breakOut)  )
         }
     }
   

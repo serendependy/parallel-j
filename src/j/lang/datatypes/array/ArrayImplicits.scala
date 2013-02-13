@@ -9,7 +9,7 @@ object ArrayImplicits {
     //Organized by parameter types
   
     //takes Int (or collections thereof
-	implicit def intarray(ar: Array[Int]):Array[JInt] =
+	implicit def intarray(ar: Vector[Int]):Vector[JInt] =
 	  ar.map(new JInt(_))
 	implicit def jintlist(ar: List[JInt]): List[Int] =
 	  ar.map(_.v)
@@ -17,11 +17,11 @@ object ArrayImplicits {
 	implicit def j2i(ji: JInt): Int = ji.v
 
 	implicit def d2j(d: Double): JFloat = new JFloat(d)
-	implicit def doubarray(ar: Array[Double]):Array[JFloat] = 
+	implicit def doubarray(ar: Vector[Double]):Vector[JFloat] = 
 	  ar.map(new JFloat(_))
 	
 	implicit def c2j(c: Char): JChar = new JChar(c)
-	implicit def chararray(ar: Array[Char]): Array[JChar] = 
+	implicit def chararray(ar: Vector[Char]): Vector[JChar] = 
 	  ar.map(new JChar(_))
 	  
 	implicit def b2j(b: Boolean): JInt = new JInt(if (b) 1 else 0)
@@ -34,6 +34,6 @@ object ArrayImplicits {
 	 * One option might be to implement the actual primitives as objects which take type arguments,
 	 * and then let all user constructed primitives be of a different type.
 	 */
-	implicit def jia2jna(jia: JArray[JInt]): JArray[JNumber] = 
-	  JArray(jNUMERIC, jia.shape, jia.ravel.map((x: JInt) => x))
+//	implicit def jia2jna(jia: JArray[JInt]): JArray[JNumber] = 
+//	  JArray(jNUMERIC, jia.shape, jia.ravel.map((x: JInt) => x))
 }
