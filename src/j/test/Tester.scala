@@ -13,6 +13,8 @@ object Tester {
      testArraysPrint()
      val jarnum = JArray(jINT, List(5,5), Vector.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
      testArrayFrames(jarnum)
+     println()
+     testAFShapeTo()
     }
     
     {
@@ -52,7 +54,7 @@ object Tester {
       val ar: JArray[JNumber] = integersIndex.monad(JArray.auto(2,3,2))
       println(ar)
       val res = negateMinus.monad(ar)
-      println(res)
+      println("\n" + res)
       println("Done")
     }
   }
@@ -66,6 +68,8 @@ object Tester {
     import j.lang.datatypes.array.ArrayImplicits._
     
     import j.lang.datatypes.array.types.JNumberTypes._
+    
+    import j.lang.primitives.JVerbs._
     
     def testArraysPrint() {
       val jarnum1 = JArray(jINT, List(2, 3, 2), Vector.tabulate(12)((x: Int) => x) )
@@ -92,6 +96,13 @@ object Tester {
       
       val jarfrms = (0 to jar.rank).map((x: Int) => JArrayFrame(x, jar) )
       jarfrms.foreach(println)
+    }
+    
+    def testAFShapeTo() {
+      println("Testing ShapeTo function")
+      val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto(2,2) ))
+      println(jarf.shapeToNewFrame(List(List(2), List(3), List(2), List())) )
+      println("Done")
     }
   }
 
