@@ -8,11 +8,20 @@ import j.lang.datatypes.JFuncRank
 
 object JArrayFrame {
   def apply[T <% JArrayType : Manifest](frameLevels: List[JNumber], jar: JArray[T]) = {
-    new JArrayFrame(frameLevels.map(jnum => jnum match {
+    val intFrameLevels = frameLevels.map(_ match {
       case i: JInt => i.v
       case inf: JInfinite => jar.rank
       case _ => throw new Exception() //TODO domain error
-    }), jar)
+    })
+	  val frames = {
+		  var tempShape = jar.shape
+    	  (for (rank <- intFrameLevels.reverse) yield {
+    		val frame = tempShape.take(tempShape.length - rank)
+    		tempShape = tempShape.drop(tempShape.length - rank)
+    		frame
+    	}).toList :+ tempShape
+  	}
+    new JArrayFrame(frames, jar)
   }
   
   def apply[T <% JArrayType : Manifest](rank: JNumber, jar: JArray[T]): JArrayFrame[T] = JArrayFrame(List(rank), jar)
@@ -23,18 +32,10 @@ object JArrayFrame {
   }
 }
 
-class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int], val jar: JArray[T]) {
-  val frames = {
-    var tempShape = jar.shape
-    (for (rank <- frameLevels.reverse) yield {
-    	val frame = tempShape.take(tempShape.length - rank)
-    	tempShape = tempShape.drop(tempShape.length - rank)
-    	frame
-    }).toList :+ tempShape
-  }
-  val cellShape = frames.last
-  val cellSize = cellShape.foldLeft(1)(_ * _)
-  val frameSize = jar.shape.foldLeft(1)(_ * _) / cellSize
+class JArrayFrame[T <% JArrayType : Manifest] private(val frames: List[List[Int]], val jar: JArray[T]) {
+  lazy val cellShape = frames.last
+  lazy val cellSize = cellShape.foldLeft(1)(_ * _)
+  lazy val frameSize = jar.shape.foldLeft(1)(_ * _) / cellSize
 
   	def mapOnCells[R <% JArrayType : Manifest](func: JArray[T] => JArray[R]): JArray[R] = {
 
@@ -47,12 +48,27 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int]
   	}
   
   def mapOnCells[U <% JArrayType : Manifest, R <% JArrayType : Manifest](
-      func: (JArray[T], JArray[U]) => JArray[R], other: JArrayFrame[R]) = {
+      func: (JArray[T], JArray[U]) => JArray[R], other: JArrayFrame[U]) = {
   		val resShapeAgree = this.shapeAgreement(other)
   		resShapeAgree match {
   		  case None => throw new Exception() //TODO shape error
   		  case Some(sv) => {
+		    
+  		    val thisReframed = this.shapeToNewFrame(sv)
+  		    val otherReframed= other.shapeToNewFrame(sv)
+
+  		    val cellShape = sv.last
+  		    val cellSize  = cellShape.foldLeft(1)(_ * _)
+  		    val frameSize = thisReframed.shape.foldLeft(1)(_ * _) / cellSize 
   		    
+  		    val newCells = (for (fr <- 0 until frameSize) yield {
+  		      println("xFramedSlice: " + thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize))
+  		      println("yFramedSlice: " + otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) + "\n")
+  		      func(JArray(jar.jaType, cellShape, thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)),
+  		           JArray(other.jar.jaType, cellShape, otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) ))
+  		    })
+  		    val newShape = sv.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
+  		    JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
   		  }
   		}
   }
@@ -84,10 +100,8 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int]
   	def shapeToNewFrame(newFrame: List[List[Int]]) = {
   	  val howManyToRight = this.frames.map(_.foldLeft(1)(_ * _)).scanRight(1)(_ * _)
   	  val howManyToLeft  = newFrame.map(_.foldLeft(1)(_ * _)).scanLeft(1)(_ * _)
-  	  println("Old frame: " + this.frames)
-  	  println("Desired frame: " + newFrame)
-  	  def helper(ofs: List[List[Int]], nfs: List[List[Int]], hmrs: List[Int], hmls: List[Int], acc: Vector[T]):Vector[T] = {
-  	    println("acc is: " + acc)
+  	  
+  	  def helper(ofs: List[List[Int]], nfs: List[List[Int]], hmrs: List[Int], hmls: List[Int], acc: Vector[T]): Vector[T] = {
   	    if (ofs.isEmpty) acc
   	    else {
   	      val (of, nf, hmr, hml) = (ofs.head, nfs.head, hmrs.head, hmls.head)
@@ -95,25 +109,18 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frameLevels: List[Int]
   	        helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), acc)
   	      else {
   	        val numCopies = nf.foldLeft(1)(_ * _) / of.foldLeft(1)(_ * _)
-  	        println("num copies: " + numCopies)
   	        val newacc = (0 until hml).foldLeft(Vector[T]())((vec, i) => {
-  	        	vec ++ (0 until numCopies).map( (k: Int) => {
+  	        	vec ++ (0 until numCopies).map( (k: Int) => { //TODO optimize
   	        	    (0 until hmr).map(
   	        	        (j: Int) => acc(j + i*hmr))
   	        	 }).foldLeft(Vector[T]())(_ ++ _)
-//  	          vec ++ ((0 until numCopies).map((0 until hmr).map((j: Int) => {
-//  	            println("Index " + (j + i*hmr) + " of acc is " + acc(j + i*hmr))
-//  	            acc(j + (i*hmr))
-//  	          } ) ))
   	        })
-  	        val newRavel = helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), newacc)
-  	        //TODO fix, but the rest works!
-  	        new JArrayFrame(newFrame, JArray(jar.jaType, newFrame.fold(List())(_ ++ _)))
+  	        helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), newacc)
   	      }
   	    }
   	  }
   	  
-  	  helper(this.frames, newFrame, howManyToRight, howManyToLeft, jar.ravel)
+  	  JArray(jar.jaType, newFrame.foldLeft(List[Int]())(_ ++ _), helper(this.frames, newFrame, howManyToRight, howManyToLeft, jar.ravel))
   	}
   	
 	override def toString() = {

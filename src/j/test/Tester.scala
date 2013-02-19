@@ -22,6 +22,7 @@ object Tester {
       
       testIntegers()
       testNegate()
+      testPlus()
     }
 	 
     
@@ -42,7 +43,7 @@ object Tester {
     import j.lang.datatypes.JFuncRank
     
     def testIntegers() {
-      println("\nTesting integers")
+      println("\n--Testing integers")
       val r3s232 = integersIndex.monad(JArray.auto(2,3,2))
       println(r3s232.shape + "\n" + (r3s232.ravel.map(_ v).mkString(" ")))
       println(r3s232)
@@ -50,11 +51,27 @@ object Tester {
     }
     
     def testNegate() {
-      println("\nTesting Negate")
-      val ar: JArray[JNumber] = integersIndex.monad(JArray.auto(2,3,2))
+      println("\n--Testing Negate")
+      val ar = integersIndex.monad(JArray.auto(2,3,2))
       println(ar)
       val res = negateMinus.monad(ar)
       println("\n" + res)
+      println("Done")
+    }
+    
+    //dyads
+    def testPlus() {
+      println("\n--Testing plus")
+      val jar1:JArray[JInt] = JArray.auto(1)
+      val jarRes= conjugatePlus.dyad(jar1, jar1)
+      println(jarRes)
+      
+      val vec = integersIndex.monad(JArray.auto(2))
+      val mat = integersIndex.monad(JArray.auto(2,3))
+      val vmRes = conjugatePlus.dyad(vec, mat)
+      println(vmRes + "\nShape: " + vmRes.shape + "\nRavel: " + vmRes.ravel)
+      
+      
       println("Done")
     }
   }
@@ -71,13 +88,13 @@ object Tester {
     
     import j.lang.primitives.JVerbs._
     
-    def testArraysPrint() {
+    def testArraysPrint() {//TODO autospacing
+      println("\n--Testing Array printing")
       val jarnum1 = JArray(jINT, List(2, 3, 2), Vector.tabulate(12)((x: Int) => x) )
       val jarnum2 = JArray(jFL, List(12), Vector.tabulate(12)((x: Int) => x - 0.5))
       println(jarnum1)
       println(jarnum2)
-      
-      
+      println("--Done")
     }
     
     def testArrayFrames[T <% JArrayType : Manifest](jar: JArray[T]) {
@@ -99,7 +116,7 @@ object Tester {
     }
     
     def testAFShapeTo() {
-      println("Testing ShapeTo function")
+      println("\n--Testing ShapeTo function")
       val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto(2,2) ))
       println(jarf.shapeToNewFrame(List(List(2), List(3), List(2), List())) )
       println("Done")
