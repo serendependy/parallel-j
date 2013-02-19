@@ -62,8 +62,6 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frames: List[List[Int]
   		    val frameSize = thisReframed.shape.foldLeft(1)(_ * _) / cellSize 
   		    
   		    val newCells = (for (fr <- 0 until frameSize) yield {
-  		      println("xFramedSlice: " + thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize))
-  		      println("yFramedSlice: " + otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) + "\n")
   		      func(JArray(jar.jaType, cellShape, thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)),
   		           JArray(other.jar.jaType, cellShape, otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) ))
   		    })
@@ -98,29 +96,36 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frames: List[List[Int]
   	}
   
   	def shapeToNewFrame(newFrame: List[List[Int]]) = {
-  	  val howManyToRight = this.frames.map(_.foldLeft(1)(_ * _)).scanRight(1)(_ * _)
-  	  val howManyToLeft  = newFrame.map(_.foldLeft(1)(_ * _)).scanLeft(1)(_ * _)
+  	  val niofs = this.frames.map(_.foldLeft(1)(_ * _)) // num in old frame
+  	  val ninfs = newFrame.map(_.foldLeft(1)(_ * _))    // num in new frame
+  	  val hmrs  = niofs.scanRight(1)(_ * _).drop(1)     // how many to right
+  	  val hmls  = ninfs.scanLeft(1)(_ * _).drop(1) 		// how many to left
   	  
-  	  def helper(ofs: List[List[Int]], nfs: List[List[Int]], hmrs: List[Int], hmls: List[Int], acc: Vector[T]): Vector[T] = {
+  	  def helper(ofs: List[List[Int]], nfs: List[List[Int]], hmrs: List[Int], hmls: List[Int], ninfs: List[Int], niofs: List[Int], acc: Vector[T]): Vector[T] = {
+  	    println("---shapeToNewFrame: helper:\n" + ofs)
+  	    println(nfs)
+  	    println(hmrs)
+  	    println(hmls)
+  	    println(acc)
   	    if (ofs.isEmpty) acc
   	    else {
-  	      val (of, nf, hmr, hml) = (ofs.head, nfs.head, hmrs.head, hmls.head)
+  	      val (of, nf, hmr, hml, ninf, niof) = (ofs.head, nfs.head, hmrs.head, hmls.head, ninfs.head, niofs.head)
   	      if (of.length == nf.length)
-  	        helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), acc)
+  	        helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), ninfs.drop(1), niofs.drop(1), acc)
   	      else {
-  	        val numCopies = nf.foldLeft(1)(_ * _) / of.foldLeft(1)(_ * _)
-  	        val newacc = (0 until hml).foldLeft(Vector[T]())((vec, i) => {
+  	        val numCopies = ninf / niof
+  	        val newacc = (0 until ((hml/ninf)*niof)).foldLeft(Vector[T]())((vec, i) => {
   	        	vec ++ (0 until numCopies).map( (k: Int) => { //TODO optimize
   	        	    (0 until hmr).map(
   	        	        (j: Int) => acc(j + i*hmr))
   	        	 }).foldLeft(Vector[T]())(_ ++ _)
   	        })
-  	        helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), newacc)
+  	        helper(ofs.drop(1), nfs.drop(1), hmrs.drop(1), hmls.drop(1), ninfs.drop(1), niofs.drop(1), newacc)
   	      }
   	    }
   	  }
   	  
-  	  JArray(jar.jaType, newFrame.foldLeft(List[Int]())(_ ++ _), helper(this.frames, newFrame, howManyToRight, howManyToLeft, jar.ravel))
+  	  JArray(jar.jaType, newFrame.foldLeft(List[Int]())(_ ++ _), helper(this.frames, newFrame, hmrs, hmls, ninfs, niofs, jar.ravel))
   	}
   	
 	override def toString() = {

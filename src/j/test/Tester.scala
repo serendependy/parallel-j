@@ -68,6 +68,16 @@ object Tester {
       
       val vec = integersIndex.monad(JArray.auto(2))
       val mat = integersIndex.monad(JArray.auto(2,3))
+      println("vec: " + vec)
+      println("mat:\n" + mat)
+      val (xframed, yframed) = JArrayFrame.createFrames(conjugatePlus.ranks, vec, mat)
+      println("xframed: " + xframed)
+      println("yframed: " + yframed)
+      val sa = xframed.shapeAgreement(yframed).get
+      println("Shape Agreement: " + sa)
+      println("xreshaped: " + xframed.shapeToNewFrame(sa))
+      println("yreshaped:\n" + yframed.shapeToNewFrame(sa))
+      
       val vmRes = conjugatePlus.dyad(vec, mat)
       println(vmRes + "\nShape: " + vmRes.shape + "\nRavel: " + vmRes.ravel)
       
@@ -98,6 +108,7 @@ object Tester {
     }
     
     def testArrayFrames[T <% JArrayType : Manifest](jar: JArray[T]) {
+      println("\n--Test Array Frames")
       val jarnum = JArray(jINT, List(2,3,2), Vector.tabulate(12)((x: Int) => x))
       val jarfrm_ = JArrayFrame(JInfinity, jarnum)
       val jarfrm3 = JArrayFrame(3, jarnum)
@@ -113,12 +124,19 @@ object Tester {
       
       val jarfrms = (0 to jar.rank).map((x: Int) => JArrayFrame(x, jar) )
       jarfrms.foreach(println)
+      println("--Done")
     }
     
     def testAFShapeTo() {
       println("\n--Testing ShapeTo function")
       val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto(2,2) ))
+      println("jarf: " + jarf)
       println(jarf.shapeToNewFrame(List(List(2), List(3), List(2), List())) )
+      
+      val vec2 = JArrayFrame(List[JNumber](0), JArray.auto(0,1))
+      println("vec2framed: " + vec2)
+      val extVec2 = vec2.shapeToNewFrame(List(List(2,3), List()))
+      println("extVec2:\n" + extVec2)
       println("Done")
     }
   }
