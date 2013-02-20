@@ -80,7 +80,13 @@ object Tester {
       
       val vmRes = conjugatePlus.dyad(vec, mat)
       println(vmRes + "\nShape: " + vmRes.shape + "\nRavel: " + vmRes.ravel)
+      println("---Testing associativity")
+      println(conjugatePlus.dyad(mat, vec))
       
+      val edges = JArray.auto(JNegativeInfinity, JNumber(-1), JNumber(0), JNumber(1), JInfinity)
+      val arr1  = integersIndex.monad(JArray.auto(5,3,2))
+      val edgeRes = conjugatePlus.dyad(edges, arr1)
+      println("Testing edgeCases with infinities, signs\n" + edgeRes)
       
       println("Done")
     }
