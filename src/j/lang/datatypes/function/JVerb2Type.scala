@@ -8,9 +8,8 @@ import j.lang.datatypes.array.JArrayType
 
 import j.lang.datatypes.array.types.JNumberTypes._
 
-class JVerb2Type[T <% JArrayType : Manifest, S <% JArrayType : Manifest](rep: String, ranks: List[JFuncRank],
-    mimple: JArray[T] => JArray[T], dimple: (JArray[S], JArray[T]) => JArray[T],
-    d1: JType, d2: JType) extends 
-    JVerb[T,S,T,T,T](rep, ranks, mimple, dimple, d1, d2, d1){
+abstract class JVerb2Type[T <% JArrayType : Manifest, S <% JArrayType : Manifest](rep: String, ranks: List[JFuncRank],
+    d1: JTypeMacro, d2: JTypeMacro) extends 
+    JVerb[T,S,T,T,T](rep, ranks, d1, d2, d1){
 
 }

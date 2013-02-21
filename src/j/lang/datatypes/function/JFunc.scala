@@ -1,15 +1,16 @@
 package j.lang.datatypes.function
 
 import j.lang.datatypes._
+import j.lang.datatypes.JDataType
 import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.array._
 
 import j.util.CMacroType._
 
-abstract class JFunc[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
-    MR <% JArrayType, DR <% JArrayType]
-	(val rep: String, val funcType: JType, val ranks: List[JFuncRank],
-    val mdomain: JType, val d1domain: JType, val d2domain: JType) {
+abstract class JFunc[M <% JDataType, D1 <% JDataType, D2 <% JDataType,
+    MR <% JDataType, DR <% JDataType](
+    val rep: String, val funcType: JTypeMacro, 
+	val mdomain: JTypeMacro, val d1domain: JTypeMacro, val d2domain: JTypeMacro) {
 
   import JFunc._
   
@@ -17,11 +18,11 @@ abstract class JFunc[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
   val d1InDomain= inDomain(d1domain)_
   val d2InDomain= inDomain(d2domain)_
   
-  protected def monadImpl(y: JArray[M]): JArray[MR]
-  protected def dyadImpl(x: JArray[D1], y: JArray[D2]): JArray[DR]
+  protected def monadImpl(y: M): MR
+  protected def dyadImpl(x: D1, y: D2): DR
   
-  def monad(y: JArray[M]):JArray[MR] = {
-    if (mInDomain(y.jaType) ) {
+  def monad(y: M):MR = {
+    if (mInDomain(y.jtype) ) {
       monadImpl(y)
     }
     else {
@@ -29,8 +30,8 @@ abstract class JFunc[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
     }
   }
   
-  def dyad(x: JArray[D1], y: JArray[D2]): JArray[DR] = {
-    if (d1InDomain(x.jaType) && d2InDomain(x.jaType)) {
+  def dyad(x: D1, y: D2): DR = {
+    if (d1InDomain(x.jtype) && d2InDomain(x.jtype)) {
       dyadImpl(x,y)
     }
     else {
@@ -40,5 +41,5 @@ abstract class JFunc[M <% JArrayType, D1 <% JArrayType, D2 <% JArrayType,
 }
 
 object JFunc {
-  def inDomain(domain: JType)(argType: JType) = argType isA domain 
+  def inDomain(domain: JTypeMacro)(argType: JTypeMacro) = argType isA domain 
 }

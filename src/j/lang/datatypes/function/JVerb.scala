@@ -8,18 +8,9 @@ import j.lang.datatypes.array.JArrayFrame
 
 import j.lang.datatypes.array.types.JNumberTypes._
 
-class JVerb[M <% JArrayType : Manifest, D1 <% JArrayType : Manifest, D2 <% JArrayType : Manifest,
-  MR <% JArrayType : Manifest, DR <% JArrayType : Manifest](rep: String, ranks: List[JFuncRank],
-  mimpl: JArray[M] => JArray[MR], dimpl: (JArray[D1], JArray[D2]) => JArray[DR],
-  mdomain: JType, d1domain: JType, d2domain: JType) extends 
-  JFunc[M,D1,D2,MR,DR](rep, jVERB, ranks, mdomain, d1domain, d2domain)
-{  
-	override def monadImpl(y: JArray[M]) = {
-	  val yframed = JArrayFrame.createFrames(ranks, y)
-	  yframed.mapOnCells(mimpl)
-	}
-	override def dyadImpl(x: JArray[D1],y: JArray[D2]) = {
-	  val (xframed, yframed) = JArrayFrame.createFrames(ranks, x, y)
-	  xframed.mapOnCells(dimpl, yframed)
-	} 
+abstract class JVerb[M <% JArrayType : Manifest, D1 <% JArrayType : Manifest, D2 <% JArrayType : Manifest,
+  MR <% JArrayType : Manifest, DR <% JArrayType : Manifest]
+  (rep: String, val ranks: List[JFuncRank], mdomain: JTypeMacro, d1domain: JTypeMacro, d2domain: JTypeMacro) extends 
+  JFunc[JArray[M], JArray[D1], JArray[D2], JArray[MR], JArray[DR]](rep, jVERB, mdomain, d1domain, d2domain) {
+  
 }

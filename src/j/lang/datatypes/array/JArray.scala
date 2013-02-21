@@ -10,27 +10,28 @@ import j.util.Rational
 
 import JArray._
 import j.lang.datatypes.array.types.JNumberTypes._
+import j.lang.datatypes.JDataType
 
 object JArray {
   
-  def apply[T <% JArrayType : Manifest](flag: JArrayFlag, jaType: JType, refcount: Int, 
+  def apply[T <% JArrayType : Manifest](flag: JArrayFlag, jaType: JTypeMacro, refcount: Int, 
       numItems: Int, shape: List[Int], ravel: Vector[T]) = 
         new JArray(flag, jaType, refcount, numItems, shape, ravel)
   
-  def apply[T <% JArrayType : Manifest](jaType: JType, shape: List[Int], ravel: Vector[T]) = {
+  def apply[T <% JArrayType : Manifest](jaType: JTypeMacro, shape: List[Int], ravel: Vector[T]) = {
     new JArray(afNONE, jaType, 0, ravel.length, shape, ravel)
   }
   
   def auto[T <% JArrayType : Manifest](args: T*) = {
-    new JArray(afNONE, args(0).typeMacro, 0, args.length, List(args.length), Vector(args:_*))
+    new JArray(afNONE, args(0).jtype, 0, args.length, List(args.length), Vector(args:_*))
   }
   
   def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
     val flag = afNONE
-    val jaType = sc.typeMacro
+    val jaType = sc.jtype
     val shape = List[Int]()
     val ravel = Array[T](sc)
-    JArray(afNONE, sc.typeMacro,0, 1, List(), Vector[T](sc))
+    JArray(afNONE, sc.jtype,0, 1, List(), Vector[T](sc))
   }
     
     def arithmeticProgression(n: Int, b: Int, m: Int) =
@@ -54,9 +55,9 @@ object JArray {
   val mone = scalar(-1)
   val pi   = scalar(scala.Math.Pi)
 }
-class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JType, 
+class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTypeMacro, 
     var refcount: Int, val numItems: Int, val shape: List[Int], 
-    val ravel: Vector[T]) {//
+    val ravel: Vector[T]) extends JDataType(jaType){//
 
   def rank = shape.length
   def tally = shape(0)
