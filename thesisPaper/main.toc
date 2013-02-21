@@ -1,0 +1,7 @@
+\select@language {english}
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Example chapter}{1}
+\contentsline {section}{\numberline {1.1}Examples of figures and tables}{1}
+\contentsline {section}{\numberline {1.2}Examples of math}{2}
+\contentsline {section}{\numberline {1.3}Examples of references}{3}
+\contentsline {chapter}{\numberline {A}Example appendix}{4}

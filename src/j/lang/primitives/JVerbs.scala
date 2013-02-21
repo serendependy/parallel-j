@@ -20,7 +20,7 @@ object JVerbs {
       jANY
   ) {
 
-    override def monadImpl(y: JArray[JArrayType]) = y
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = y
     
     override def dyadImpl(x: JArray[JArrayType], y: JArray[JArrayType]) = x
   }
