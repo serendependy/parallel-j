@@ -7,7 +7,7 @@ import j.lang.datatypes.JTypeMacros._
 
 object JNumberTypes {
   import JReal._
-sealed abstract class JNumber(jtype: JType) extends JArrayType(jtype){
+sealed abstract class JNumber(jtype: JTypeMacro) extends JArrayType(jtype){
 	def +(o: JNumber): JNumber
 	def -(o: JNumber): JNumber
 	def *(o: JNumber): JNumber
@@ -37,7 +37,7 @@ object JReal {
   val One  = new JInt(1)
 }
 
-sealed abstract class JReal(jtype: JType) extends JNumber(jtype) with Ordered[JReal] {
+sealed abstract class JReal(jtype: JTypeMacro) extends JNumber(jtype) with Ordered[JReal] {
   def signum: Signum
 }
 
@@ -67,7 +67,7 @@ sealed abstract class JInfinite extends JReal(jFL) with Ordered[JReal] {
   def unary_| = JInfinity
 }
 
-sealed abstract class Finite(jtype: JType) extends JReal(jtype) with Ordered[JReal]{
+sealed abstract class Finite(jtype: JTypeMacro) extends JReal(jtype) with Ordered[JReal]{
   def compareFinite(fi: Finite): Int
   
   def compare(r: JReal) = r match {

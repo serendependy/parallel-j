@@ -109,6 +109,15 @@ object JVerbs {
 //      jNUMERIC
 //  )
 //  
+  final object negateMinus extends JVerb1Type[JNumber](
+      "-",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monadImpl(y: JArray[JNumber]) = JArray.scalar(- y.ravel(0))
+    override def dyadImpl(x: JArray[JNumber], y: JArray[JNumber]) =
+      JArray.scalar(x.ravel(0) - y.ravel(0))
+  }
 //  val negateMinus = new JVerb1Type[JNumber](
 //      "-",
 //      List(JFuncRank(0)),
@@ -129,6 +138,19 @@ object JVerbs {
 //      jANY, jNUMERIC, jNUMERIC
 //  )
 //  
+  final object integersIndex extends JVerb[JInt, JArrayType, JArrayType, JInt, JInt](
+      "i.",
+      List(JFuncRank(1, JInfinity, JInfinity)),
+      jINT, jANY, jANY
+   ){
+
+    override def monadImpl(y: JArray[JInt]) = 
+      JArray(jINT, y.ravel.toList, Vector.tabulate(y.ravel.foldLeft(1)(_ * _))((x: Int) => x))
+    
+    override def dyadImpl[T1 <: JArray[JArrayType]](x: T1, y: T1) = {
+      throw new Exception() //TODO implement
+    }
+  }
 //  val integersIndex = new JVerb[JInt, JArrayType, JArrayType, JInt, JInt](
 //      "i.",
 //      List(JFuncRank(1, JInfinity, JInfinity)),
