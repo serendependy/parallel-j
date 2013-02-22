@@ -20,9 +20,8 @@ object JVerbs {
       jANY
   ) {
 
-    override def monadImpl(y: JArray[JArrayType]) = y
-    
-    override def dyadImpl(x: JArray[JArrayType], y: JArray[JArrayType]) = x
+    override def monadImpl[T <: JArray[JArrayType]](y: T): T = y
+    override def dyadImpl[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2): T1 = x
   }
 //  val leftIdentity = new JVerb1Type[JArrayType](
 //      "[",

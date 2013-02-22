@@ -7,8 +7,8 @@ import j.lang.datatypes.array._
 
 import j.util.CMacroType._
 
-abstract class JFunc[M <% JDataType, D1 <% JDataType, D2 <% JDataType,
-    MR <% JDataType, DR <% JDataType](
+abstract class JFunc[M <: JDataType, D1 <: JDataType, D2 <: JDataType,
+    MR <: JDataType, DR <: JDataType](
     val rep: String, val funcType: JTypeMacro, 
 	val mdomain: JTypeMacro, val d1domain: JTypeMacro, val d2domain: JTypeMacro) {
 
@@ -18,10 +18,10 @@ abstract class JFunc[M <% JDataType, D1 <% JDataType, D2 <% JDataType,
   val d1InDomain= inDomain(d1domain)_
   val d2InDomain= inDomain(d2domain)_
   
-  protected def monadImpl[T <: M](y: T): MR
-  protected def dyadImpl[T1 <: D1, T2 <: D2](x: T1, y: T2): DR
+//  protected def monadImpl[T <: M](y: T): MR
+//  protected def dyadImpl[T1 <: D1, T2 <: D2](x: T1, y: T2): DR
   
-  def monad(y: M):MR = {
+  def monad[T <: M](y: T) = {
     if (mInDomain(y.jtype) ) {
       monadImpl(y)
     }
@@ -30,7 +30,7 @@ abstract class JFunc[M <% JDataType, D1 <% JDataType, D2 <% JDataType,
     }
   }
   
-  def dyad(x: D1, y: D2): DR = {
+  def dyad[T1 <: D1, T2 <: D2](x: T1, y: T2): DR = {
     if (d1InDomain(x.jtype) && d2InDomain(x.jtype)) {
       dyadImpl(x,y)
     }
