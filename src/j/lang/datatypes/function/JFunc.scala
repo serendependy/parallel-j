@@ -18,10 +18,10 @@ abstract class JFunc[M <% JDataType, D1 <% JDataType, D2 <% JDataType,
   val d1InDomain= inDomain(d1domain)_
   val d2InDomain= inDomain(d2domain)_
   
-  protected def monadImpl[T <: M, TR <: MR](y: T): TR
+  protected def monadImpl[TR <: MR, T <: M <% TR](y: T): TR
   protected def dyadImpl[T1 <: D1, T2 <: D2](x: T1, y: T2): DR
   
-  def monad(y: M):MR = {
+  def monad[T <: M <% MR](y: T):MR = {
     if (mInDomain(y.jtype) ) {
       monadImpl(y)
     }
