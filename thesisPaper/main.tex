@@ -1,0 +1,107 @@
+%
+% instructions for "compiling":
+%   latex main (first pass, also generates .aux file for bibtex)
+%   bibtex main (generates .bbl file with bibliography)
+%   latex main (second pass, incorporates bibliography)
+%   latex main (do this if you still get messages about labels
+%      having changed or missing references)
+% to generate/view/print postscript:
+%   dvips -o main.ps main 
+%   gv main.ps (to view)
+%   lpr main.ps (to print, or print from "gv")
+% to generate/view/print PDF:
+%   dvips -Pcmz -Ppdf -j0 -G0 -o main.ps main
+%   ps2pdf main.ps main.pdf
+%   acroread main.pdf (to view/print)
+%   
+\documentclass[11pt]{report}
+
+% miscellaneous packages
+% FIX THIS -- can add to or change, but these are useful
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{moreverb}
+\usepackage{url}
+
+% double spacing
+\usepackage{setspace}
+\doublespacing
+
+% hyphenation
+\usepackage[english]{babel}
+\selectlanguage{english}
+
+% allow more figures on a page
+\setcounter{topnumber}{10}
+\setcounter{bottomnumber}{10}
+\setcounter{totalnumber}{10}
+\setcounter{dbltopnumber}{10}
+\def\topfraction{1.0}
+\def\bottomfraction{1.0}
+\def\textfraction{0.0}
+\def\dbltopfraction{1.0}
+
+% margins
+%\usepackage[letterpaper,top=2.0in,bottom=1.5in,left=1.5in,right=1.0in]
+%	{geometry}
+\usepackage[top=2.0in,bottom=1.5in,left=1.5in,right=1.0in]{geometry}
+
+% set up to put page numbers in header
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\rhead{\rm\thepage}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% author, title, and date
+% FIX THIS
+\newcommand{\theAuthor}{Christopher Jenkins}
+% FIX THIS -- but be sure to leave in \par if title might exceed
+%   one line -- otherwise space between lines will be wrong
+\newcommand{\theTitle}{Toward a Parallel Implementation of J: Data Parallelism in Functional, Array-Oriented Languages with Data Rank\par}
+% FIX THIS
+\newcommand{\theDate}{April 19, 2013}
+
+% FIX THIS -- can put additional macro definitions here
+
+%----------------------------------------------------------------------
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+\input{abstract}
+
+\clearpage
+\input{ack}
+
+\clearpage
+\input{signatures}
+
+\clearpage
+\input{titlepage}
+
+\tableofcontents
+\listoftables
+\listoffigures
+
+\clearpage
+\pagenumbering{arabic}
+
+% FIX THIS -- one file per chapter is good but not required
+\input{chapter1}
+
+% FIX THIS -- refs.bib is the bibtex file
+\bibliography{refs}
+\bibliographystyle{plain}
+
+\appendix
+% FIX THIS
+\input{appendix1}
+
+\end{document}

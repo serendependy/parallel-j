@@ -98,8 +98,8 @@ class JArrayFrame[T <% JArrayType : Manifest] private(val frames: List[List[Int]
   	def shapeToNewFrame(newFrame: List[List[Int]]) = {
   	  val niofs = this.frames.map(_.foldLeft(1)(_ * _)) // num in old frame
   	  val ninfs = newFrame.map(_.foldLeft(1)(_ * _))    // num in new frame
-  	  val hmrs  = niofs.scanRight(1)(_ * _).drop(1)     // how many to right
-  	  val hmls  = ninfs.scanLeft(1)(_ * _).drop(1) 		// how many to left
+  	  val hmrs  = niofs.scanRight(1)(_ * _).drop(1)     // how many of this dimension
+  	  val hmls  = ninfs.scanLeft(1)(_ * _).drop(1) 		// how many in this dimension
   	  
   	  def helper(ofs: List[List[Int]], nfs: List[List[Int]], hmrs: List[Int], hmls: List[Int], ninfs: List[Int], niofs: List[Int], acc: Vector[T]): Vector[T] = {
   	    println("---shapeToNewFrame: helper:\n" + ofs)
