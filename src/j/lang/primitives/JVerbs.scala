@@ -169,46 +169,26 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ) {
-    override def monad[T <: JArray[JNumber]](y: T) = JArray.scalar(JReal.E ** y.ravel(0))/*y.ravel(0) match {
-      
-//      case JInfinity => y
-//      case JNegativeInfinity => JArray.scalar(JReal.Zero)
-//      case int: JInt => JArray.scalar(math.pow(math.E, int.v))
-//      case flo: JFloat => JArray.scalar(math.pow(math.E, flo.v))
-//      case _ => throw new Exception()//TODO implement
-    }*/
+    override def monad[T <: JArray[JNumber]](y: T) =
+      JArray.scalar(JReal.E ** y.ravel(0))
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) =
       JArray.scalar(x.ravel(0) ** y.ravel(0))
-      /*
-      x.ravel(0) match {
-        case JInfinity => y.ravel(0) match {
-          case r: JReal => JArray.scalar(if (r < JReal.Zero) JReal.Zero else if (r == JReal.Zero) JReal.One else JInfinity)
-          case _ => throw new Exception()//TODO implement
-        }
-        case JNegativeInfinity => y.ravel(0) match {
-          case r: JReal => JArray.scalar(if (r < JReal.Zero) JReal.Zero else if (r == JReal.Zero) JReal.One else throw new Exception())//TODO limit error
-          case _ => throw new Exception() //TODO implement
-        }
-        case xint:JInt => y.ravel(0) match {
-          case JInfinity => JArray.scalar(JInfinity)
-          case JNegativeInfinity => JArray.scalar(0)
-          case yint: JInt => JArray.scalar(math.pow(xint.v, yint.v))
-          case yflo: JFloat => JArray.scalar(math.pow(xint.v, yflo.v))
-          case _ => throw new Exception()
-        }
-        case xflo:JFloat => y.ravel(0) match {
-          case JInfinity => JArray.scalar(JInfinity)
-          case JNegativeInfinity => JArray.scalar(0)
-          case yint: JInt => JArray.scalar(math.pow(xflo.v, yint.v))
-          case yflo: JFloat => JArray.scalar(math.pow(xflo.v, yflo.v))
-          case _ => throw new Exception()//TODO implement
-        }
-        
-        case _ => throw new Exception()//TODO implement
-      }*/
   }
 
+  final object naturalLog extends JVerb1Type[JNumber](
+      "^.",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      JArray.scalar(JReal.E %% y.ravel(0))
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x:T1, y: T2) = {
+      JArray.scalar(x.ravel(0) %% y.ravel(0))
+    }
+  }
 }
 
   /*//TODO
@@ -220,5 +200,4 @@ object JVerbs {
    * roll
    * stitch
    * square square root
-   * power/log
    */
