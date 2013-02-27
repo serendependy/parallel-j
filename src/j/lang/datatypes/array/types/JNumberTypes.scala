@@ -13,8 +13,13 @@ sealed abstract class JNumber(jtype: JTypeMacro) extends JArrayType(jtype){
 	def *(o: JNumber): JNumber
 	def %(o: JNumber): JNumber
 	
+	def **(o: JNumber): JNumber
+	def %%(o: JNumber): JNumber
+	
 	def unary_| : JNumber
 	def unary_- : JNumber
+	
+	def |(o : JNumber): JNumber
 	
 	override def toString: String
 }
@@ -33,8 +38,12 @@ object JReal {
   final object Neut extends Signum
   final object Pos extends Signum
   
+  val NOne = new JInt(-1)
   val Zero = new JInt(0)
   val One  = new JInt(1)
+  val Two  = new JInt(2)
+  val E    = new JFloat(math.E)
+  val Pi   = new JFloat(math.Pi)
 }
 
 sealed abstract class JReal(jtype: JTypeMacro) extends JNumber(jtype) with Ordered[JReal] {
@@ -49,9 +58,14 @@ final object JNaN extends JNumber(jFL){
   def -(o: JNumber) = this
   def *(o: JNumber) = this
   def %(o: JNumber) = this
+  
+  def **(o: JNumber) = this
+  def %%(o: JNumber) = this
 
   def unary_- = this
   def unary_| = this
+  
+  def |(o: JNumber) = this
   
   override def toString = "_."
 }
@@ -63,6 +77,8 @@ sealed abstract class JInfinite extends JReal(jFL) with Ordered[JReal] {
     case inf:JInfinite=> JNaN
     case JNaN => JNaN
   }
+  
+  def %%(o: JNumber) = throw new Exception()//TODO 0s and NaN
   
   def unary_| = JInfinity
 }
@@ -80,6 +96,10 @@ sealed abstract class Finite(jtype: JTypeMacro) extends JReal(jtype) with Ordere
   protected def -~(fi: Finite): JNumber
   protected def *~(fi: Finite): JNumber
   protected def %~(fi: Finite): JNumber
+  protected def **~(fi: Finite): JNumber
+  protected def %%~(fi: Finite): JNumber
+  
+  protected def |~(fi: Finite): JNumber
   
   def +(o: JNumber) = o match {
     case inf: JInfinite => inf + o
@@ -103,6 +123,25 @@ sealed abstract class Finite(jtype: JTypeMacro) extends JReal(jtype) with Ordere
     case inf: JInfinite => Zero
     case fi: Finite => this %~ fi
     case JNaN => JNaN
+  }
+  
+  def **(o: JNumber) = o match {
+    case inf: JInfinite => inf ** this
+    case fi: Finite => this **~ fi
+    case JNaN => JNaN
+  }
+  
+  def %%(o: JNumber) = o match {
+    case JInfinity => JInfinity
+    case JNegativeInfinity => throw new Exception()//TODO complex value
+    case fi: Finite => this %%~ fi
+    case JNaN => JNaN
+  }
+  
+  def |(o: JNumber) = o match {
+    case inf: JInfinite => JNaN
+    case JNaN => JNaN
+    case fi: Finite => this |~ fi
   }
 }
 
@@ -138,6 +177,13 @@ final object JInfinity extends JInfinite with Ordered[JReal] {
     }
   }
 
+  def **(o: JNumber) = o match {
+    case r: JReal => if (r < JReal.Zero) JReal.Zero else if (r == JReal.Zero) JReal.One else this
+    case _ => throw new Exception()//TODO should be limit error
+  }
+  
+  def |(o: JNumber) = o
+  
   def unary_- = JNegativeInfinity
   
   override def toString = "_"
@@ -173,7 +219,17 @@ final object JNegativeInfinity extends JInfinite with Ordered[JReal] {
 	    case Neg => JInfinity
 	  }
 	}
-
+	
+	def **(o: JNumber) = o match {
+	  case r: JReal => if (r < JReal.Zero) JReal.Zero else if (r == JReal.Zero) JReal.One else r match {
+	    case i: JInt => if ((i | JReal.Two) == JReal.Zero) JInfinity else this
+	    case _ => throw new Exception()//TODO implement
+	  }
+	  case _ => throw new Exception()//TODO implement
+	}
+	
+	def |(o: JNumber) = this
+	
 	def unary_- = JInfinity
 	
 	override def toString = "__"
@@ -212,6 +268,21 @@ final class JInt(val v: Int) extends Finite(jINT) {
       case f: JFloat=>if (f.v == 0.0)this *JInfinity else new JFloat(v / f.v)
     }
     
+    def **~(o: Finite) = o match {
+      case f:JFloat => new JFloat(math.pow(v.toDouble, f.v))
+      case i:JInt => new JFloat(math.pow(v, i.v))
+    }
+    
+    def %%~(o: Finite) = o match {
+      case f: JFloat => new JFloat(math.log(f.v) / math.log(v))
+      case i: JInt   => new JFloat(math.log(i.v) / math.log(v))
+    }
+    
+    def |~(o: Finite) = o match {
+      case f: JFloat => new JFloat(f.v % v)
+      case i: JInt   => new JFloat(i.v % v)
+    }
+    
     def unary_- = new JInt(-v)
     def unary_| = new JInt(v.abs)
     
@@ -245,6 +316,21 @@ final class JFloat(val v: Double) extends Finite(jFL) {
 	def %~(o: Finite):JNumber = o match {
 	  case i: JInt => new JFloat(v / i.v)
 	  case f: JFloat=>new JFloat(v / f.v)
+	}
+	
+	def **~(o: Finite): JNumber = o match {
+	  case i: JInt => new JFloat(math.pow(v, i.v))
+	  case f: JFloat => new JFloat(math.pow(v, f.v))
+	}
+	
+	def %%~(o: Finite): JNumber = o match {
+	  case i: JInt => new JFloat(math.log(i.v) / math.log(v))
+	  case f: JFloat=> new JFloat(math.log(f.v) / math.log(v))
+	}
+	
+	def |~(o: Finite): JNumber = o match {
+	  case i: JInt => new JFloat(i.v % v)
+	  case f: JFloat => new JFloat(f.v % v)
 	}
 	
 	def unary_- = new JFloat(-v)
