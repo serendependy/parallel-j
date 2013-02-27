@@ -12,5 +12,5 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <% JArrayType : Manifest, D2
   MR <% JArrayType : Manifest, DR <% JArrayType : Manifest]
   (rep: String, val ranks: List[JFuncRank], mdomain: JTypeMacro, d1domain: JTypeMacro, d2domain: JTypeMacro) extends 
   JFunc[JArray[M], JArray[D1], JArray[D2], JArray[MR], JArray[DR]](rep, jVERB, mdomain, d1domain, d2domain) {
-  
+
 }

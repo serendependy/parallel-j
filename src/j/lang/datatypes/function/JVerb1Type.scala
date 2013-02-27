@@ -13,6 +13,6 @@ import j.lang.datatypes.array.types.JNumberTypes._
 //  domain: JTypeMacro) extends 
 //  JVerb[T,T,T,T,T](rep, ranks, mimpl, dimpl, domain, domain, domain)
 
-abstract class JVerb1Type[T <% JArrayType : Manifest](rep: String, ranks: List[JFuncRank],
+abstract class JVerb1Type[T <: JArrayType : Manifest](rep: String, ranks: List[JFuncRank],
     domain: JTypeMacro) extends
     JVerb[T,T,T,T,T](rep, ranks, domain, domain, domain)

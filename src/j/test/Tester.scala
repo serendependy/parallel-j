@@ -69,7 +69,7 @@ object Tester {
     //dyads
     def testPlus() {
       println("\n--Testing plus")
-      val jar1:JArray[JInt] = JArray.auto(1)
+      val jar1:JArray[JInt] = JArray.auto[JInt](1)
       val jarRes= conjugatePlus.dyad(jar1, jar1)
       println(jarRes)
       
