@@ -44,15 +44,22 @@ object Tester {
     
     def testIntegers() {
       println("\n--Testing integers")
-      val r3s232 = integersIndex.monad(JArray.auto(2,3,2))
+      val r3s232 = integersIndex.monad(JArray.auto[JInt](2,3,2))
       println(r3s232.shape + "\n" + (r3s232.ravel.map(_ v).mkString(" ")))
       println(r3s232)
       println("Done")
     }
     
+    def testIdentity() {
+      val x = JArray.auto[JInt](2,3,2)
+      val y = JArray.auto[JFloat](2.2, 3.3, 2.2)
+      val idenr = rightIdentity.monad(x)
+      val idenl = leftIdentity.monad(x)
+    }
+    
     def testNegate() {
       println("\n--Testing Negate")
-      val ar = integersIndex.monad(JArray.auto(2,3,2))
+      val ar = integersIndex.monad(JArray.auto[JInt](2,3,2))
       println(ar)
       val res = negateMinus.monad(ar)
       println("\n" + res)
@@ -62,12 +69,12 @@ object Tester {
     //dyads
     def testPlus() {
       println("\n--Testing plus")
-      val jar1:JArray[JInt] = JArray.auto(1)
+      val jar1:JArray[JInt] = JArray.auto[JInt](1)
       val jarRes= conjugatePlus.dyad(jar1, jar1)
       println(jarRes)
       
-      val vec = integersIndex.monad(JArray.auto(2))
-      val mat = integersIndex.monad(JArray.auto(2,3))
+      val vec = integersIndex.monad(JArray.auto[JInt](2))
+      val mat = integersIndex.monad(JArray.auto[JInt](2,3))
       println("vec: " + vec)
       println("mat:\n" + mat)
       val (xframed, yframed) = JArrayFrame.createFrames(conjugatePlus.ranks, vec, mat)
@@ -84,7 +91,7 @@ object Tester {
       println(conjugatePlus.dyad(mat, vec))
       
       val edges = JArray.auto(JNegativeInfinity, JNumber(-1), JNumber(0), JNumber(1), JInfinity)
-      val arr1  = integersIndex.monad(JArray.auto(5,3,2))
+      val arr1  = integersIndex.monad(JArray.auto[JInt](5,3,2))
       val edgeRes = conjugatePlus.dyad(edges, arr1)
       println("Testing edgeCases with infinities, signs\n" + edgeRes)
       
@@ -135,7 +142,7 @@ object Tester {
     
     def testAFShapeTo() {
       println("\n--Testing ShapeTo function")
-      val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto(2,2) ))
+      val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto[JInt](2,2) ))
       println("jarf: " + jarf)
       println(jarf.shapeToNewFrame(List(List(2), List(3), List(2), List())) )
       
