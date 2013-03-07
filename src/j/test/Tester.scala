@@ -22,7 +22,9 @@ object Tester {
       
       testIntegers()
       testNegate()
+      
       testPlus()
+      testShift()
     }
 	 
     
@@ -94,6 +96,20 @@ object Tester {
       val arr1  = integersIndex.monad(JArray.auto[JInt](5,3,2))
       val edgeRes = conjugatePlus.dyad(edges, arr1)
       println("Testing edgeCases with infinities, signs\n" + edgeRes)
+      
+      println("Done")
+    }
+    
+    def testShift() {
+      println("\n--Testing shift")
+      
+      val arr3 = integersIndex.monad(JArray.auto[JInt](2,3,2))
+      val sh1  = reverseShift.dyad(JArray.auto[JInt](1), arr3)
+      val sh2  = reverseShift.dyad(JArray.auto[JInt](1,2), arr3)
+      
+      println(arr3 + "\n--")
+      println(sh1 + "\n--")
+      println(sh2 + "\n--")
       
       println("Done")
     }

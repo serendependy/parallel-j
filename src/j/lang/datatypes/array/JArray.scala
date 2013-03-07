@@ -56,13 +56,24 @@ object JArray {
   val pi   = scalar(scala.Math.Pi)
 }
 class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTypeMacro, 
-    var refcount: Int, val numItems: Int, val shape: List[Int], 
+    var refcount: Int, val numScalars: Int, val shape: List[Int], 
     val ravel: Vector[T]) extends JDataType(jaType){//
 
-  def rank = shape.length
-  def tally = shape(0)
+  lazy val rank = shape.length
+  lazy val tally = shape(0)
+  lazy val itemSize = shape.drop(1).foldLeft(1)(_ * _)
+  lazy val numItemz = shape(0)
+  
+  lazy val rankSizes = shape.scanRight(1)(_ * _).reverse
+  lazy val rankItems = shape.scanLeft(1)(_ * _).reverse
   
   def isScalar = shape isEmpty
+  
+  def numItemsAt(r: Int) = numAtRank(r-1)
+  def sizeItemAt(r: Int) = sizeAtRank(r-1)
+  
+  def numAtRank(r: Int) = rankItems(if(r > rank) rank else r)
+  def sizeAtRank(r: Int)= rankSizes(if(r > rank) rank else r)
   
     def apply(ind: Int):JArray[T] = {
      if (ind < 0) this(tally + ind) else {

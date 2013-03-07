@@ -45,7 +45,7 @@ object JVerbs {
     override def dyad[T1 <: JArray[JInt], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
       val numItems: Int = x.ravel.fold(JReal.One)(_ * _)
       val ravel = Vector.tabulate(numItems)((i: Int) =>
-        y.ravel(i % y.numItems)) //TODO global fill used for !. (fit)
+        y.ravel(i % y.numScalars)) //TODO global fill used for !. (fit)
       JArray(afNONE, y.jaType, 0, numItems, x.ravel.toList.map(_ v), ravel)
     } //TODO modulo is slow
   }
@@ -96,7 +96,7 @@ object JVerbs {
       jANY
   ){
     override def monad[T <: JArray[JArrayType]](y: T) = {
-      JArray(y.jaType, List(y.numItems), y.ravel)
+      JArray(y.jaType, List(y.numScalars), y.ravel)
     }
     
     //TODO kill myself. Why have fancy type checking if I still have to do this?
@@ -187,6 +187,45 @@ object JVerbs {
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x:T1, y: T2) = {
       JArray.scalar(x.ravel(0) %% y.ravel(0))
+    }
+  }
+  
+  final object reverseShift extends JVerb[JArrayType, JInt, JArrayType, JArrayType, JArrayType](
+      "|.",
+      List(JFuncRank(0, JInfinity, 0)),
+      jANY, jINT, jANY
+  ){
+    override def monad[T <: JArray[JArrayType]](y: T) = {
+      JArray(y.jaType, y.shape,
+          (0 until y.numItemz).reverse.map(
+              i => y.ravel.slice(i, i*y.itemSize)).foldLeft(
+                  Vector[JArrayType]())(_ ++ _))
+    }
+    
+    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
+      if (x.numScalars > y.rank) throw new Exception() //TODO should be length error
+      
+      var ret = y.ravel
+    	
+      for ((ji, r) <- x.ravel.zip(y.rank to (y.rank - x.numScalars) by -1)) {
+    	  val numAt = y.numItemsAt(r)
+    	  val sizeAt= y.sizeItemAt(r)
+    	  val toDrop = ji | y.rank
+    	  
+    	  
+    	  
+//    	  val itemsForThisRank = Vector() ++ (for (i <- 0 until numAt) yield {
+//    	    //ret.slice(i*sizeAt, (i+1)*sizeAt)
+//    	    for (j <- 0 until (numAt / y.shape(y.rank - r))) yield {
+//    	      
+//    	    }
+//    	  })
+    	  
+    	  //ret = (itemsForThisRank.drop(toDrop) ++ itemsForThisRank.take(toDrop)).foldLeft(Vector[JArrayType]())(_ ++ _)
+    	  
+      }
+      
+      JArray(y.jaType, y.shape, ret)
     }
   }
 }
