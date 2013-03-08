@@ -239,7 +239,21 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
-      if (x(0) != JReal.Zero || y(0) != JReal.One)  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+      if (x(0) != JReal.Zero || y(0) != JReal.Zero)  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+    }//TODO implement GCD
+  }
+  
+  final object lengthangleAnd extends JVerb1Type[JNumber](
+      "*.",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      throw new Exception()//TODO implement
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if (x(0) != JReal.Zero && y(0) != JReal.Zero) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
 }
@@ -247,7 +261,7 @@ object JVerbs {
   /*//TODO
    * rank
    * composition/bond
-   * logical and/or
+   * logical and
    * reduce/scan(?)
    * roll
    * stitch
