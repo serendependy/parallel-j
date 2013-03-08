@@ -222,21 +222,24 @@ object JVerbs {
     	  ret = distinctionsAtThisRank.map(x => (x.drop(toDrop) ++ x.take(toDrop)).foldLeft(
     	      Vector[JArrayType]())(_ ++ _)).foldLeft(
     	          Vector[JArrayType]())(_ ++ _)
-    	  println("--in reverseShift: ret is " + ret)
-    	  println("  distinctions are: " + distinctionsAtThisRank)
-    	  println("  toDrop: " + toDrop)
-//    	  val itemsForThisRank = Vector() ++ (for (i <- 0 until numAt) yield {
-//    	    //ret.slice(i*sizeAt, (i+1)*sizeAt)
-//    	    for (j <- 0 until (numAt / y.shape(y.rank - r))) yield {
-//    	      
-//    	    }
-//    	  })
-    	  
-    	  //ret = (itemsForThisRank.drop(toDrop) ++ itemsForThisRank.take(toDrop)).foldLeft(Vector[JArrayType]())(_ ++ _)
-
       }
       
       JArray(y.jaType, y.shape, ret)
+    }
+  }
+  
+  final object realOr extends JVerb1Type[JNumber](
+      "+.",
+      List(JFuncRank(0)),
+      jNUMERIC
+   ){
+    override def monad[T <: JArray[JNumber]](y: T) = y(0) match {
+      case r: JReal => y
+      case _ => throw new Exception() //TODO implement for complex numbers
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if (x(0) != JReal.Zero || y(0) != JReal.One)  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
 }
@@ -244,7 +247,6 @@ object JVerbs {
   /*//TODO
    * rank
    * composition/bond
-   * shift
    * logical and/or
    * reduce/scan(?)
    * roll
