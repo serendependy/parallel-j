@@ -283,7 +283,7 @@ final class JInt(val v: Int) extends Finite(jINT) {
       case i: JInt   => new JFloat(i.v % v)
     }
     
-    def |(i: JInt) = new JInt(this.v % i.v)
+    def |(i: JInt) = new JInt(i.v % this.v)
     
     def unary_- = new JInt(-v)
     def unary_| = new JInt(v.abs)
