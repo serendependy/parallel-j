@@ -26,6 +26,7 @@ object Tester {
       
       testPlus()
       testShift()
+      testDeal()
     }
 	 
     

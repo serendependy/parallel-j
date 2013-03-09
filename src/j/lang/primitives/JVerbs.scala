@@ -239,7 +239,7 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
-      if (x(0) != JReal.Zero || y(0) != JReal.Zero)  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+      if ((x(0) != JReal.Zero) || (y(0) != JReal.Zero))  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }//TODO implement GCD
   }
   
@@ -253,7 +253,7 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
-      if (x(0) != JReal.Zero && y(0) != JReal.Zero) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+      if ((x(0) != JReal.Zero) && (y(0) != JReal.Zero)) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
   
