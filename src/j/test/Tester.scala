@@ -22,6 +22,7 @@ object Tester {
       
       testIntegers()
       testNegate()
+      testRoll()
       
       testPlus()
       testShift()
@@ -65,6 +66,14 @@ object Tester {
       println(ar)
       val res = negateMinus.monad(ar)
       println("\n" + res)
+      println("Done")
+    }
+    
+    def testRoll() {
+      println("\n--Testing Roll")
+      for (i <- 10 to 20)
+        println(rollDeal.monad(JArray.scalar[JInt](i)))
+        
       println("Done")
     }
     
@@ -114,6 +123,10 @@ object Tester {
       println(sh3 + "\n--")
       
       println("Done")
+    }
+    
+    def testDeal() {
+      
     }
   }
   

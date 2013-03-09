@@ -256,12 +256,25 @@ object JVerbs {
       if (x(0) != JReal.Zero && y(0) != JReal.Zero) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
+  
+  final object rollDeal extends JVerb1Type[JInt](
+      "?",
+      List(JFuncRank(0)),
+      jINT
+  ){
+    override def monad[T <: JArray[JInt]](y: T) = {
+      JArray.scalar[JInt](scala.util.Random.nextInt(y.ravel(0)))
+    }
+    
+    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JInt]](x: T1, y: T2) = {
+      JArray(jINT, List(x.ravel(0)),scala.util.Random.shuffle(Vector.tabulate[JInt](y.ravel(0))((x: Int) => x)).drop(x.ravel(0)))
+    }
+  }	
 }
 
   /*//TODO
    * rank
    * composition/bond
-   * logical and
    * reduce/scan(?)
    * roll
    * stitch
