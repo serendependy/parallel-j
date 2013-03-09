@@ -13,8 +13,8 @@ object Tester {
      testArraysPrint()
      val jarnum = JArray(jINT, List(5,5), Vector.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
      testArrayFrames(jarnum)
-     println()
      testAFShapeTo()
+     testNumAndSizes()
     }
     
     {
@@ -106,10 +106,12 @@ object Tester {
       val arr3 = integersIndex.monad(JArray.auto[JInt](2,3,2))
       val sh1  = reverseShift.dyad(JArray.auto[JInt](1), arr3)
       val sh2  = reverseShift.dyad(JArray.auto[JInt](1,2), arr3)
+      val sh3  = reverseShift.dyad(JArray.auto[JInt](1,2,1), arr3)
       
       println(arr3 + "\n--")
       println(sh1 + "\n--")
       println(sh2 + "\n--")
+      println(sh3 + "\n--")
       
       println("Done")
     }
@@ -133,7 +135,20 @@ object Tester {
       val jarnum2 = JArray(jFL, List(12), Vector.tabulate(12)((x: Int) => x - 0.5))
       println(jarnum1)
       println(jarnum2)
-      println("--Done")
+      println("Done")
+    }
+  
+    def testNumAndSizes() {
+      println("\n--Testing Num and Sizes")
+      val j1 = integersIndex.monad(JArray.auto[JInt](2,3,2))
+      val j2 = integersIndex.monad(JArray.auto[JInt](4,6,5))
+      
+      println("j1: " + j1.rankItems)
+      println("    " + j1.rankSizes)
+      println("j2: " + j2.rankItems)
+      println("    " + j2.rankSizes)
+      
+      println("Done")
     }
     
     def testArrayFrames[T <% JArrayType : Manifest](jar: JArray[T]) {

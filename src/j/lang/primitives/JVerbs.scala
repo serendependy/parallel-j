@@ -207,25 +207,53 @@ object JVerbs {
       
       var ret = y.ravel
     	
-      for ((ji, r) <- x.ravel.zip(y.rank to (y.rank - x.numScalars) by -1)) {
+      for ((shift, r) <- x.ravel.zip(y.rank to (y.rank - x.numScalars) by -1)) {
     	  val numAt = y.numItemsAt(r)
     	  val sizeAt= y.sizeItemAt(r)
-    	  val toDrop = ji | y.rank
+    	  val toDrop = r % y.shape(r-1)
     	  
+    	  val distinctionsAtThisRank = Vector() ++ (for (i <- 0 until y.numAtRank(r)) yield {
+    	    val start = i * y.sizeAtRank(r)
+    	    Vector() ++ (for (j <- 0 until (y.numItemsAt(r) / y.numAtRank(r))) yield {
+    	    	ret.slice(start + (j * sizeAt), start + (j+1)*sizeAt)
+    	    })
+    	  })
     	  
-    	  
-//    	  val itemsForThisRank = Vector() ++ (for (i <- 0 until numAt) yield {
-//    	    //ret.slice(i*sizeAt, (i+1)*sizeAt)
-//    	    for (j <- 0 until (numAt / y.shape(y.rank - r))) yield {
-//    	      
-//    	    }
-//    	  })
-    	  
-    	  //ret = (itemsForThisRank.drop(toDrop) ++ itemsForThisRank.take(toDrop)).foldLeft(Vector[JArrayType]())(_ ++ _)
-    	  
+    	  ret = distinctionsAtThisRank.map(x => (x.drop(toDrop) ++ x.take(toDrop)).foldLeft(
+    	      Vector[JArrayType]())(_ ++ _)).foldLeft(
+    	          Vector[JArrayType]())(_ ++ _)
       }
       
       JArray(y.jaType, y.shape, ret)
+    }
+  }
+  
+  final object realOr extends JVerb1Type[JNumber](
+      "+.",
+      List(JFuncRank(0)),
+      jNUMERIC
+   ){
+    override def monad[T <: JArray[JNumber]](y: T) = y(0) match {
+      case r: JReal => y
+      case _ => throw new Exception() //TODO implement for complex numbers
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if (x(0) != JReal.Zero || y(0) != JReal.Zero)  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+    }//TODO implement GCD
+  }
+  
+  final object lengthangleAnd extends JVerb1Type[JNumber](
+      "*.",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      throw new Exception()//TODO implement
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if (x(0) != JReal.Zero && y(0) != JReal.Zero) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
 }
@@ -233,8 +261,7 @@ object JVerbs {
   /*//TODO
    * rank
    * composition/bond
-   * shift
-   * logical and/or
+   * logical and
    * reduce/scan(?)
    * roll
    * stitch
