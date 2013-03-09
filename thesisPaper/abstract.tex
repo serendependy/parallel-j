@@ -24,6 +24,14 @@
 \end{center}
 
 \noindent
-% FIX THIS --- your abstract goes here.
-A nice abstract goes here.
+Many applications operate on data conceptually contained in regular, multidimensional collections.
+Frequently operations on these collections are inherently data parallel.
+However, most languages and parallel environments provide tools for exploiting data parallelism only for collections of one dimension.
+Programmers who wish to use such tools on regular, multidimensional collections often must write non-generalized code that can be difficult to maintain and which cannot scale to collections of higher dimensionas.
 
+Function rank, first developed by K. Iverson and implemented in the programming language J, formalizes the dimension (rank) of the arguments to a function in such a way that functions can be easily extended to collections of higher dimensions using a higher-order function (operator).
+This extension is relatively simple, inherently parallel, and provably safe, though this last property can be difficult to capture statically.
+
+We present a partial parallel implementation of J in the programming language Scala, particularly Scala's parallel collections framework.
+We use a suite of example problems, solved in J, Scala, and C using OpenMP, to compare scalability of the applications to related problems in higher dimensions.
+Performance results are included, but do not show any significant gains due to a lack of optimization - this work is intended as a proof-of-concept for further research.
