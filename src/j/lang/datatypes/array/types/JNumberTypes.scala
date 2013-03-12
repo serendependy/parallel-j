@@ -5,8 +5,6 @@ import scala.math.Ordered
 import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.JTypeMacros._
 
-//import j.lang.datatypes.array.ArrayImplicits._
-
 object JNumberTypes {
   import JReal._
 sealed abstract class JNumber(jtype: JTypeMacro) extends JArrayType(jtype){
@@ -22,8 +20,9 @@ sealed abstract class JNumber(jtype: JTypeMacro) extends JArrayType(jtype){
 	def unary_- : JNumber
 	
 	def |(o : JNumber): JNumber
-	def ==(o: JNumber): JInt
-	def !=(o: JNumber) = JReal.One - (this == o)
+	
+	def ==(o: JNumber): Boolean
+	def !=(o: JNumber) = !(this == o) //JReal.One - (this == o)
 	
 	override def toString: String
 }
@@ -71,7 +70,7 @@ final object JNaN extends JNumber(jFL){
   
   def |(o: JNumber) = this
   
-  def ==(o: JNumber) = JReal.Zero
+  def ==(o: JNumber) = false
   
   override def toString = "_."
 }
@@ -107,7 +106,7 @@ sealed abstract class Finite(jtype: JTypeMacro) extends JReal(jtype) with Ordere
   
   protected def |~(fi: Finite): JNumber
   
-  protected def ==~(fi: Finite): JInt
+  protected def ==~(fi: Finite): Boolean
   
   def +(o: JNumber) = o match {
     case inf: JInfinite => inf + o
@@ -153,8 +152,8 @@ sealed abstract class Finite(jtype: JTypeMacro) extends JReal(jtype) with Ordere
   }
   
   def ==(o: JNumber) = o match {
-    case inf: JInfinite => JReal.Zero
-    case JNaN => JReal.Zero
+    case inf: JInfinite => false
+    case JNaN => false
     case fi: Finite => this ==~ fi
   }
 }
@@ -198,10 +197,7 @@ final object JInfinity extends JInfinite with Ordered[JReal] {
   
   def |(o: JNumber) = o
   
-  def ==(o: JNumber) = o match {
-    case JInfinity => JReal.One
-    case _ => JReal.Zero
-  }
+  def ==(o: JNumber) = if (o eq JInfinity) true else false
   
   def unary_- = JNegativeInfinity
   
@@ -250,8 +246,8 @@ final object JNegativeInfinity extends JInfinite with Ordered[JReal] {
 	def |(o: JNumber) = this
 	
 	def ==(o: JNumber) = o match {
-	  case JNegativeInfinity => JReal.One
-	  case _ => JReal.Zero
+	  case JNegativeInfinity => true
+	  case _ => false
 	}
 	
 	def unary_- = JInfinity
@@ -312,9 +308,9 @@ final class JInt(val v: Int) extends Finite(jINT) {
     def unary_- = new JInt(-v)
     def unary_| = new JInt(v.abs)
     
-    def ==~(fi: Finite) = fi match {
-      case i: JInt => if (this.v == i.v) JReal.One else JReal.Zero
-      case f: JFloat => if(this.v == f.v) JReal.One else JReal.Zero
+    def ==~(fi: Finite): Boolean = fi match {
+      case i: JInt => this.v == i.v
+      case f: JFloat => this.v == f.v
     }
     
     override def toString = v.toString
@@ -367,9 +363,9 @@ final class JFloat(val v: Double) extends Finite(jFL) {
 	def unary_- = new JFloat(-v)
 	def unary_| = new JFloat(v.abs)
 	
-	def ==~(o: Finite): JInt = o match {
+	def ==~(o: Finite) = o match {
 	  case i: JInt => i == this
-	  case f: JFloat => if (this.v == f.v) JReal.One else JReal.Zero
+	  case f: JFloat => this.v == f.v
 	}
 	
 	override def toString = v.toString

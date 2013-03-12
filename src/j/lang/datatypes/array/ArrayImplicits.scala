@@ -24,5 +24,5 @@ object ArrayImplicits {
 	implicit def chararray(ar: Vector[Char]): Vector[JChar] = 
 	  ar.map(new JChar(_))
 	  
-	implicit def b2j(b: Boolean): JInt = new JInt(if (b) 1 else 0)
+	implicit def b2j(b: Boolean): JInt = if (b) JReal.One else JReal.Zero
 }
