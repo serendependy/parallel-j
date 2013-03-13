@@ -29,6 +29,7 @@ object Tester {
       testShift()
       testDeal()
       testLogical()
+      testRoot()
     }
 	 
     
@@ -166,6 +167,16 @@ object Tester {
       for (i <- 0 to 10)
         println(rollDeal.dyad(JArray.scalar[JInt](i), JArray.scalar[JInt](10)))
       println("Done")
+    }
+    
+    def testRoot() {
+      
+      for (i <- 0 to 4) {
+        for (j <- List(0,1,2,4,8,9,64,65,100)) {
+          print(squarerootRoot.dyad(JArray.scalar[JInt](i), JArray.scalar[JNumber](j)))
+        }
+        println()
+      }
     }
   }
   

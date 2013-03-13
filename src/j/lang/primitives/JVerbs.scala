@@ -287,7 +287,7 @@ object JVerbs {
     }
   }
   
-  final object squareSquareroot extends JVerb1Type[JNumber](
+  final object squarerootRoot extends JVerb1Type[JNumber](
       "%:",
       List(JFuncRank(0)),
       jNUMERIC
