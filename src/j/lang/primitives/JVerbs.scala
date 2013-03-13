@@ -307,6 +307,4 @@ object JVerbs {
    * composition/bond
    * reduce/scan(?)
    * stitch
-   * square
-   * square root / root
    */
