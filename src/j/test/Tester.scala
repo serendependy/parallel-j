@@ -27,6 +27,7 @@ object Tester {
       testPlus()
       testShift()
       testDeal()
+      testLogical()
     }
 	 
     
@@ -126,8 +127,37 @@ object Tester {
       println("Done")
     }
     
-    def testDeal() {
+    def testLogical() {
+      println("\n--Testing Logical")
+      val tr = JArray.scalar(JReal.One)
+      val fa = JArray.scalar(JReal.Zero)
+      val logics = List(fa, tr)
       
+      println("TRUE: " + tr)
+      println("FALSE: " + fa)
+      
+      println("OR:\n")
+      for (b1 <- logics) {
+        for (b2 <- logics) {
+          println(realOr.dyad(b1, b2))
+        }
+      }
+
+      println("AND:\n")
+      for (b1 <- logics) {
+        for (b2 <- logics) {
+          println(lengthangleAnd.dyad(b1, b2))
+        }
+      }
+      
+      println("Done")
+    }
+    
+    def testDeal() {
+      println("--Testing Deal")
+      for (i <- 0 to 10)
+        println(rollDeal.dyad(JArray.scalar[JInt](i), JArray.scalar[JInt](10)))
+      println("Done")
     }
   }
   

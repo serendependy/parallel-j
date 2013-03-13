@@ -239,7 +239,7 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
-      if ((x(0) != JReal.Zero) || (y(0) != JReal.Zero))  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+      if ((x.ravel(0) != JReal.Zero) || (y.ravel(0) != JReal.Zero))  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }//TODO implement GCD
   }
   
@@ -253,7 +253,7 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
-      if ((x(0) != JReal.Zero) && (y(0) != JReal.Zero)) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+      if ((x.ravel(0) != JReal.Zero) && (y.ravel(0) != JReal.Zero)) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
   
@@ -266,8 +266,10 @@ object JVerbs {
       JArray.scalar[JInt](scala.util.Random.nextInt(y.ravel(0)))
     }
     
-    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JInt]](x: T1, y: T2) = {
-      JArray(jINT, List(x.ravel(0)),scala.util.Random.shuffle(Vector.tabulate[JInt](y.ravel(0))((x: Int) => x)).drop(x.ravel(0)))
+    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JInt]](x: T1, y: T2) = {//TODO optimize
+      JArray(jINT, List(x.ravel(0)),
+          scala.util.Random.shuffle(Vector.tabulate[JInt](
+              y.ravel(0))((x: Int) => x)).drop(y.ravel(0) - x.ravel(0)))
     }
   }	
 }

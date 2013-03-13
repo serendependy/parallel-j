@@ -313,6 +313,8 @@ final class JInt(val v: Int) extends Finite(jINT) {
       case f: JFloat => this.v == f.v
     }
     
+    def -(i: JInt) = new JInt(this.v - i.v)
+    
     override def toString = v.toString
 }
 
