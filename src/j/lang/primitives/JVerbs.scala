@@ -272,13 +272,41 @@ object JVerbs {
               y.ravel(0))((x: Int) => x)).drop(y.ravel(0) - x.ravel(0)))
     }
   }	
+  
+  final object squareNotand extends JVerb1Type[JNumber](
+      "*:",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      JArray.scalar(y.ravel(0) ** 2)
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if ((x.ravel(0) != JReal.Zero) && (y.ravel(0) != JReal.Zero)) JArray.scalar(JReal.Zero) else JArray.scalar(JReal.One)
+    }
+  }
+  
+  final object squareSquareroot extends JVerb1Type[JNumber](
+      "%:",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      JArray.scalar(y.ravel(0) ** 0.5)
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      JArray.scalar(y.ravel(0) ** x.ravel(0).inv)
+    }
+  }
 }
 
   /*//TODO
    * rank
    * composition/bond
    * reduce/scan(?)
-   * roll
    * stitch
-   * square square root
+   * square
+   * square root / root
    */

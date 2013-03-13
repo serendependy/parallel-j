@@ -23,6 +23,7 @@ object Tester {
       testIntegers()
       testNegate()
       testRoll()
+      testSquare()
       
       testPlus()
       testShift()
@@ -76,6 +77,13 @@ object Tester {
       for (i <- 10 to 20)
         println(rollDeal.monad(JArray.scalar[JInt](i)))
         
+      println("Done")
+    }
+    
+    def testSquare() {
+      println("\n--Testing Square")
+      for (i <- 0 to 10)
+        println(squareNotand.monad(JArray.scalar[JInt](i)))
       println("Done")
     }
     

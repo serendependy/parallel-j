@@ -21,6 +21,8 @@ sealed abstract class JNumber(jtype: JTypeMacro) extends JArrayType(jtype){
 	
 	def |(o : JNumber): JNumber
 	
+	def inv = this ** JReal.NOne
+	
 	def ==(o: JNumber): Boolean
 	def !=(o: JNumber) = !(this == o) //JReal.One - (this == o)
 	
