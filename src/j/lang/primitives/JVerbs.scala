@@ -239,7 +239,65 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
-      if (x(0) != JReal.Zero || y(0) != JReal.One)  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+      if ((x.ravel(0) != JReal.Zero) || (y.ravel(0) != JReal.Zero))  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+    }//TODO implement GCD
+  }
+  
+  final object lengthangleAnd extends JVerb1Type[JNumber](
+      "*.",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      throw new Exception()//TODO implement
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if ((x.ravel(0) != JReal.Zero) && (y.ravel(0) != JReal.Zero)) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
+    }
+  }
+  
+  final object rollDeal extends JVerb1Type[JInt](
+      "?",
+      List(JFuncRank(0)),
+      jINT
+  ){
+    override def monad[T <: JArray[JInt]](y: T) = {
+      JArray.scalar[JInt](scala.util.Random.nextInt(y.ravel(0)))
+    }
+    
+    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JInt]](x: T1, y: T2) = {//TODO optimize
+      JArray(jINT, List(x.ravel(0)),
+          scala.util.Random.shuffle(Vector.tabulate[JInt](
+              y.ravel(0))((x: Int) => x)).drop(y.ravel(0) - x.ravel(0)))
+    }
+  }	
+  
+  final object squareNotand extends JVerb1Type[JNumber](
+      "*:",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      JArray.scalar(y.ravel(0) ** 2)
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      if ((x.ravel(0) != JReal.Zero) && (y.ravel(0) != JReal.Zero)) JArray.scalar(JReal.Zero) else JArray.scalar(JReal.One)
+    }
+  }
+  
+  final object squarerootRoot extends JVerb1Type[JNumber](
+      "%:",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monad[T <: JArray[JNumber]](y: T) = {
+      JArray.scalar(y.ravel(0) ** 0.5)
+    }
+    
+    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+      JArray.scalar(y.ravel(0) ** x.ravel(0).inv)
     }
   }
 }
@@ -247,9 +305,6 @@ object JVerbs {
   /*//TODO
    * rank
    * composition/bond
-   * logical and/or
    * reduce/scan(?)
-   * roll
    * stitch
-   * square square root
    */

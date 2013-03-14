@@ -78,7 +78,7 @@ class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
     def apply(ind: Int):JArray[T] = {
      if (ind < 0) this(tally + ind) else {
         val itemShape = shape.drop(1)
-        val itemSize = itemShape.reduceLeft(_ * _)
+        val itemSize = itemShape.foldLeft(1)(_ * _)
         val trueIndex = ind * itemSize
         //new JArray(itemShape, (ind * itemSize).until((ind+1) * itemSize).toList.map(vals))
         new JArray(flag, jaType, 0, itemSize, itemShape, (trueIndex).until(trueIndex + itemSize).
@@ -87,7 +87,7 @@ class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
     }
   
     lazy private val sigInd = (for (i <- 0 until shape.length) yield {
-      shape.drop(i).reduceLeft(_ * _)
+      shape.drop(i).foldLeft(1)(_ * _)
     }).drop(1)
   
     override def toString = {

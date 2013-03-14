@@ -22,9 +22,14 @@ object Tester {
       
       testIntegers()
       testNegate()
+      testRoll()
+      testSquare()
       
       testPlus()
       testShift()
+      testDeal()
+      testLogical()
+      testRoot()
     }
 	 
     
@@ -65,6 +70,21 @@ object Tester {
       println(ar)
       val res = negateMinus.monad(ar)
       println("\n" + res)
+      println("Done")
+    }
+    
+    def testRoll() {
+      println("\n--Testing Roll")
+      for (i <- 10 to 20)
+        println(rollDeal.monad(JArray.scalar[JInt](i)))
+        
+      println("Done")
+    }
+    
+    def testSquare() {
+      println("\n--Testing Square")
+      for (i <- 0 to 10)
+        println(squareNotand.monad(JArray.scalar[JInt](i)))
       println("Done")
     }
     
@@ -114,6 +134,49 @@ object Tester {
       println(sh3 + "\n--")
       
       println("Done")
+    }
+    
+    def testLogical() {
+      println("\n--Testing Logical")
+      val tr = JArray.scalar(JReal.One)
+      val fa = JArray.scalar(JReal.Zero)
+      val logics = List(fa, tr)
+      
+      println("TRUE: " + tr)
+      println("FALSE: " + fa)
+      
+      println("OR:\n")
+      for (b1 <- logics) {
+        for (b2 <- logics) {
+          println(realOr.dyad(b1, b2))
+        }
+      }
+
+      println("AND:\n")
+      for (b1 <- logics) {
+        for (b2 <- logics) {
+          println(lengthangleAnd.dyad(b1, b2))
+        }
+      }
+      
+      println("Done")
+    }
+    
+    def testDeal() {
+      println("--Testing Deal")
+      for (i <- 0 to 10)
+        println(rollDeal.dyad(JArray.scalar[JInt](i), JArray.scalar[JInt](10)))
+      println("Done")
+    }
+    
+    def testRoot() {
+      
+      for (i <- 0 to 4) {
+        for (j <- List(0,1,2,4,8,9,64,65,100)) {
+          print(squarerootRoot.dyad(JArray.scalar[JInt](i), JArray.scalar[JNumber](j)))
+        }
+        println()
+      }
     }
   }
   

@@ -24,16 +24,5 @@ object ArrayImplicits {
 	implicit def chararray(ar: Vector[Char]): Vector[JChar] = 
 	  ar.map(new JChar(_))
 	  
-	implicit def b2j(b: Boolean): JInt = new JInt(if (b) 1 else 0)
-	
-	//TODO salvage my soul
-	/* This problem occurred because I wanted to treat JArray[JInt] like JArray[JNumber]
-	 * but the type parameter of JArray isn't covariant. I have yet to figure out a 
-	 * good way to solve this.
-	 * 
-	 * One option might be to implement the actual primitives as objects which take type arguments,
-	 * and then let all user constructed primitives be of a different type.
-	 */
-//	implicit def jia2jna(jia: JArray[JInt]): JArray[JNumber] = 
-//	  JArray(jNUMERIC, jia.shape, jia.ravel.map((x: JInt) => x))
+	implicit def b2j(b: Boolean): JInt = if (b) JReal.One else JReal.Zero
 }
