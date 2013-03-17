@@ -1,7 +1,3 @@
-%
-% spacing could probably be improved
-%
-
 \begin{center}
 
 \bigskip
@@ -27,7 +23,7 @@
 Many applications operate on data conceptually contained in regular, multidimensional collections.
 Frequently operations on these collections are inherently data parallel.
 However, most languages and parallel environments provide tools for exploiting data parallelism only for collections of one dimension.
-Programmers who wish to use such tools on regular, multidimensional collections often must write non-generalized code that can be difficult to maintain and which cannot scale to collections of higher dimensionas.
+Programmers who wish to use such tools on regular, multidimensional collections often must write non-generalized code that can be difficult to maintain and which cannot automatically scale to collections of higher dimensionas.
 
 Function rank, first developed by K. Iverson and implemented in the programming language J, formalizes the dimension (rank) of the arguments to a function in such a way that functions can be easily extended to collections of higher dimensions using a higher-order function (operator).
 This extension is relatively simple, inherently parallel, and provably safe, though this last property can be difficult to capture statically.

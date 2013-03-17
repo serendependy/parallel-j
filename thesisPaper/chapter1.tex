@@ -1,106 +1,25 @@
-%
-% FIX THIS -- remove/change, just some examples of things
-%
-\chapter{Example chapter}
+\chapter{Introduction}
+Many scientific and business computing applications work on large data sets naturally structured in regular, multidimensional collections.
+In many languages, these multidimensional collections are implemted as nested collections; e.g. a 2-dimensional array of integers would be implemented as an array of arrays of integers.
+However, irregular multidimensional collections are also usually implemented as nested collections, with each of the sub-arrays containing a different number of elements.
+Thus, when implemented as such, it can be difficult to distinguish regular from irregular multidimensional collections, especially statically, which may lead to a run-time indexing errors and a program crash.
 
-Example chapter, with apologies to Alex Kolliopoulos,
-from whose thesis the examples of math and tables were
-borrowed.
+\textit{Data parallelism} is an approach to exploiting program concurrency by updating elements or subsections of collections in parallel.
+Frequently, extending existing programs to large collections in a data-parallel fashion leads to what is know as "embarrasingly parallel" problems - that is, problems in which concurrency, and thus gains in performance, are achieved with little programmer effort.%TODO cite embarassing or data parallel or Hillis Steele? TODO fix quotes
+One such extension is taking existing programs which operate on scalars (dimensionless values) or collections of fixed dimension and applying them to collections of higher dimensions.
 
-\section{Examples of figures and tables}
-\label{section:example-figtbl}
+In most imperative languages with regular multidimensional collections, applying programs to elements or sub-collections of a collection means writing the program call within nested looping structures, typically a \textit{for loop}
+This usually means that number of dimensions of the collection determines the number of loops required to do a specific operation.
+To put it another way, if an existing program needs to be extended to a collection of higher dimensions, or if the program only operates on scalar values but needs to be extended to some multidimensional collection, the programmer usually must wrap the program in nested for loops.
+This activity is tedious in the trivial cases and prone to error when the extension is more complicated.
+Above all, it is frequently difficult to do automatically without changing the existing code.
 
-This section contains some words, plus
-Figure~\ref{fig:xor} and 
-Table~\ref{table:treepurpose}.
+Functional programming languages allow programmers to view and write programs at a higher level of abstraction.
+When dealing with collections, this usually means that related types of operations can be expressed as \textit{higher-order} functions like \textit{map} and \textit{reduce} which take functions as their arguments and return functions which operate on collections.
+These higher-order functions often allow programmers to more easily understand what operations are being done to multidimensional collections than if the same operations were done imperatively using for loops.
+However, since these higher-order functions are usually designed to return functions which operate on 1-dimensional collections, they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
 
-\begin{figure}[hbtp]
-\begin{center}
-\includegraphics[width=0.5\textwidth]{xor}
-\end{center}
-\caption{An example figure.}
-\label{fig:xor}
-\end{figure}
 
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-
-\begin{table}[hbtp]
-\begin{tabular}{|l|l|}
-\hline 
-\textbf{Trial 1} & Expanding a node to select a child\\
-\hline
-\textbf{Trial 3} & Selecting a node near the middle of a long, linear list\\
-\hline
-\textbf{Trial 4} & Selecting a node near the top of a long, linear list\\
-\hline
-\textbf{Trial 5} & Selecting a node near the bottom of a long, linear list\\
-\hline
-\textbf{Trial 6} & Scrolling and expanding folders in a large tree\\
-\hline
-\textbf{Trial 7} & Finding a node deep and near the bottom in a large tree\\
-\hline
-\textbf{Trial 8} & Finding a node near the top of a large tree\\
-\hline
-\end{tabular}
-\caption{Purposes of each experimental trial.}
-\label{table:treepurpose}
-\end{table}
-\section{Examples of math}
-\label{section:example-math}
-
-This section contains some math.
-First, here's a set of equations.
-
-\begin{eqnarray*}
-y_p	&	=	&	\frac{y}{\sqrt{y^2+a^2}}, \\
-y_p^2	&	=	&	\frac{y^2}{y^2+a^2}, \\
-y_p^2	&	=	&	\frac{y^2+a^2-a^2}{y^2+a^2}, \\
-y_p^2	&	=	&	1-\frac{a^2}{y^2+a^2}, \\
-y_p^2-1	&	=	&	-\frac{a^2}{y^2+a^2}, \\
-1-y_p^2	&	=	&	\frac{a^2}{y^2+a^2}.
-\end{eqnarray*}
-
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-words, words, words, words,
-
-Now here's a numbered equation.
-
-\begin{equation}
-0 = 0 \label{eqn:example}
-\end{equation}
-
-\section{Examples of references}
-
-% the "~" makes a no-line-breaks space
-Section~\ref{section:example-figtbl} contains 
-Figure~\ref{fig:xor} and
-Table~\ref{table:treepurpose}.
-Section~\ref{section:example-math} contains
-Equation~(\ref{eqn:example}).
-The sample bibliography file contains references to
-an article \cite{pc} and a tech report \cite{opandfunc}, plus some
-other things.
-% put in bibliography even though not referenced
-\nocite{dph}
+%For example, a profits report over \it{n} years of 4 quarters of 3 months could be represented as a 3-dimensional array with extents \it{n 4 3};\begin{comment}TODO cite rank\end{comment} cellular automata like Conway's "Game of Life"\begin{comment}TODO cite Conway\end{comment} might be represented on an \it{n} by \it{m} grid - a 2-dimensional array with extents \it{n m}.
+%In C, the profits report might be declared with \begin{verbatim}int report[n][4][3]\end{verbatim}; in Scala, 
