@@ -19,6 +19,13 @@ When dealing with collections, this usually means that related types of operatio
 These higher-order functions often allow programmers to more easily understand what operations are being done to multidimensional collections than if the same operations were done imperatively using for loops.
 However, since these higher-order functions are usually designed to return functions which operate on 1-dimensional collections, they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
+\textit{Function rank} extends the notion of data rank to functions.\begin{comment}TODO cite\end{comment}
+Data rank is simply the number of dimensions of a regular dataset - scalar values are said to be rank 0, and an \textit{n}-dimensional array is an array of rank n.
+Thus, the rank of some regular dataset is usually a non-negative integer.
+Function rank is a collection of each of the associated rank values of a function's expected arguments, usually with some value to represent when the function can take data of any rank for a specific argument.
+In functional languages where the idea of function rank is formalized, extending existing functions to regular collections of higher dimension can be expressed as a single higher-order function application, instead of nesting.
+This makes it easier for a programmer to write such extensions safely, quickly, and in an inherrently parallel fashion.
+In some cases, such extensions are so trivial that the programmer need not modify the code at all, meaning this can also be done automatically.
 
 
 %For example, a profits report over \it{n} years of 4 quarters of 3 months could be represented as a 3-dimensional array with extents \it{n 4 3};\begin{comment}TODO cite rank\end{comment} cellular automata like Conway's "Game of Life"\begin{comment}TODO cite Conway\end{comment} might be represented on an \it{n} by \it{m} grid - a 2-dimensional array with extents \it{n m}.
