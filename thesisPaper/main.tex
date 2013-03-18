@@ -67,6 +67,18 @@
 % FIX THIS
 \newcommand{\theDate}{April 19, 2013}
 
+\newlength{\WidthOfX}
+% do not set here -- set just before use so we get the right font size
+%\settowidth{\WidthOfX}{X} 
+\newenvironment{TitlePageList}
+{\begin{list}{}{%
+  \setlength\leftmargin{0pt}%
+  \setlength\labelwidth{10pt}%
+  \setlength\itemindent{0pt}%
+  \let \makelabel\descriptionlabel%
+}}
+{\end{list}}
+
 % FIX THIS -- can put additional macro definitions here
 
 %----------------------------------------------------------------------
@@ -93,15 +105,12 @@
 \clearpage
 \pagenumbering{arabic}
 
-% FIX THIS -- one file per chapter is good but not required
-\input{chapter1}
+\input{intro}
 
-% FIX THIS -- refs.bib is the bibtex file
 \bibliography{refs}
 \bibliographystyle{plain}
 
 \appendix
-% FIX THIS
 \input{appendix1}
 
 \end{document}

@@ -300,6 +300,20 @@ object JVerbs {
       JArray.scalar(y.ravel(0) ** x.ravel(0).inv)
     }
   }
+  
+  final object ravelitemsStitch extends JVerb1Type[JArrayType](
+      ",.",
+      List(JFuncRank(JInfinity)),
+      jANY
+  ){
+    override def monad[T <: JArray[JArrayType]](y: T) = { //TODO implement with ,"_1 y
+      JArray(y.jaType, List((y.shape.take(1) ++ List(1)).head , (y.shape.drop(1).foldLeft(1)(_ * _))), y.ravel)
+    }
+    
+    override def dyad[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
+      
+    }
+  }
 }
 
   /*//TODO
