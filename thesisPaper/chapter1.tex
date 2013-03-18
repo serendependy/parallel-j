@@ -2,9 +2,17 @@
 Many scientific and business computing applications work on large data sets naturally structured in regular, multidimensional collections.
 In many languages, these multidimensional collections are implemted as nested collections; e.g. a 2-dimensional array of integers would be implemented as an array of arrays of integers.
 However, irregular multidimensional collections are also usually implemented as nested collections, with each of the sub-arrays containing a different number of elements.
-Thus, when implemented as such, it can be difficult to distinguish regular from irregular multidimensional collections, especially statically, which may lead to a run-time error and program crash.
+Thus, when implemented as such, it can be difficult to distinguish regular from irregular multidimensional collections, especially statically, which may lead to a run-time error and a program crash.
 
-In most imperative languages with regular multidimensional collections, operations on elements or sub-collections are done within nested looping structures, typically a \it{for loop}.
+In most imperative languages with regular multidimensional collections, operations on elements or sub-collections are done within nested looping structures, typically a \textit{for loop}.
+This usually means that number of dimensions of the collection determines the number of \textit{for loops} required to do a specific operation.
+To put it another way, if an existing program needs to be extended to a collection of higher dimensions, or if the program only operates on "scalar" or dimensionless values but needs to be extended to some multidimensional collection, the programmer usually must wrap the program in nested for loops.
+This activity is tedious in the trivial cases and prone to error when the extension is more complicated.
+
+Functional programming languages allow programmers to view and write programs at a higher level of abstraction.
+When dealing with collections, this usually means that related types of operations can be expressed as \textit{higher-order} functions like \textit{map} and \textit{reduce} which take functions as their arguments and return functions which operate on collections.
+These higher-order functions often allow programmers to more easily understand what operations are being done to multidimensional collections than if the same operations were done imperatively using for loops.
+However, since these higher-order functions are usually designed to return functions which operate on 1-dimensional collections, they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
 %For example, a profits report over \it{n} years of 4 quarters of 3 months could be represented as a 3-dimensional array with extents \it{n 4 3};\begin{comment}TODO cite rank\end{comment} cellular automata like Conway's "Game of Life"\begin{comment}TODO cite Conway\end{comment} might be represented on an \it{n} by \it{m} grid - a 2-dimensional array with extents \it{n m}.
 %In C, the profits report might be declared with \begin{verbatim}int report[n][4][3]\end{verbatim}; in Scala, 
