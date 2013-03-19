@@ -2,7 +2,7 @@ package j.lang.datatypes
 
 import j.lang.datatypes.array._
 
-class JName[T <% JArrayType](val hash: Int, val entry: SymbolPoolEntry[T], val sn: Int, val m: Byte, 
+class JName[T <: JArrayType](val hash: Int, val entry: SymbolPoolEntry[T], val sn: Int, val m: Byte, 
     val flag: Byte, val s: String) {
 	
 }
