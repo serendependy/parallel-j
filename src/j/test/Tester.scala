@@ -1,5 +1,7 @@
 package j.test
 
+import j.lang.datatypes.array.types.JNumberTypes._
+
 object Tester {
   
   def main(args: Array[String]) {
@@ -11,7 +13,7 @@ object Tester {
      import j.lang.datatypes.JTypeMacros._
      
      testArraysPrint()
-     val jarnum = JArray(jINT, List(5,5), Vector.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
+     val jarnum = JArray[JInt,Int](jINT, List(5,5), Vector.tabulate(5,5)((x: Int, y: Int) => if (x == y) 1 else 0).flatten)
      testArrayFrames(jarnum)
      testAFShapeTo()
      testNumAndSizes()
@@ -51,22 +53,22 @@ object Tester {
     
     def testIntegers() {
       println("\n--Testing integers")
-      val r3s232 = integersIndex.monad(JArray.auto[JInt](2,3,2))
+      val r3s232 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
       println(r3s232.shape + "\n" + (r3s232.ravel.map(_ v).mkString(" ")))
       println(r3s232)
       println("Done")
     }
     
     def testIdentity() {
-      val x = JArray.auto[JInt](2,3,2)
-      val y = JArray.auto[JFloat](2.2, 3.3, 2.2)
+      val x = JArray.auto[JInt, Int](2,3,2)
+      val y = JArray.auto[JFloat, Double](2.2, 3.3, 2.2)
       val idenr = rightIdentity.monad(x)
       val idenl = leftIdentity.monad(x)
     }
     
     def testNegate() {
       println("\n--Testing Negate")
-      val ar = integersIndex.monad(JArray.auto[JInt](2,3,2))
+      val ar = integersIndex.monad(JArray.auto[JInt,Int](2,3,2))
       println(ar)
       val res = negateMinus.monad(ar)
       println("\n" + res)
@@ -91,12 +93,12 @@ object Tester {
     //dyads
     def testPlus() {
       println("\n--Testing plus")
-      val jar1:JArray[JInt] = JArray.auto[JInt](1)
+      val jar1:JArray[JInt] = JArray.auto[JInt, Int](1)
       val jarRes= conjugatePlus.dyad(jar1, jar1)
       println(jarRes)
       
-      val vec = integersIndex.monad(JArray.auto[JInt](2))
-      val mat = integersIndex.monad(JArray.auto[JInt](2,3))
+      val vec = integersIndex.monad(JArray.auto[JInt, Int](2))
+      val mat = integersIndex.monad(JArray.auto[JInt, Int](2,3))
       println("vec: " + vec)
       println("mat:\n" + mat)
       val (xframed, yframed) = JArrayFrame.createFrames(conjugatePlus.ranks, vec, mat)
@@ -112,8 +114,8 @@ object Tester {
       println("---Testing associativity")
       println(conjugatePlus.dyad(mat, vec))
       
-      val edges = JArray.auto(JNegativeInfinity, JNumber(-1), JNumber(0), JNumber(1), JInfinity)
-      val arr1  = integersIndex.monad(JArray.auto[JInt](5,3,2))
+      val edges = JArray.auto[JNumber,JNumber](JNegativeInfinity, JNumber(-1), JNumber(0), JNumber(1), JInfinity)
+      val arr1  = integersIndex.monad(JArray.auto[JInt, Int](5,3,2))
       val edgeRes = conjugatePlus.dyad(edges, arr1)
       println("Testing edgeCases with infinities, signs\n" + edgeRes)
       
@@ -123,10 +125,10 @@ object Tester {
     def testShift() {
       println("\n--Testing shift")
       
-      val arr3 = integersIndex.monad(JArray.auto[JInt](2,3,2))
-      val sh1  = reverseShift.dyad(JArray.auto[JInt](1), arr3)
-      val sh2  = reverseShift.dyad(JArray.auto[JInt](1,2), arr3)
-      val sh3  = reverseShift.dyad(JArray.auto[JInt](1,2,1), arr3)
+      val arr3 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
+      val sh1  = reverseShift.dyad(JArray.auto[JInt, Int](1), arr3)
+      val sh2  = reverseShift.dyad(JArray.auto[JInt, Int](1,2), arr3)
+      val sh3  = reverseShift.dyad(JArray.auto[JInt, Int](1,2,1), arr3)
       
       println(arr3 + "\n--")
       println(sh1 + "\n--")
@@ -194,8 +196,8 @@ object Tester {
     
     def testArraysPrint() {//TODO autospacing
       println("\n--Testing Array printing")
-      val jarnum1 = JArray(jINT, List(2, 3, 2), Vector.tabulate(12)((x: Int) => x) )
-      val jarnum2 = JArray(jFL, List(12), Vector.tabulate(12)((x: Int) => x - 0.5))
+      val jarnum1 = JArray[JInt,Int](jINT, List(2, 3, 2), Vector.tabulate(12)((x: Int) => x) )
+      val jarnum2 = JArray[JFloat, Double](jFL, List(12), Vector.tabulate(12)((x: Int) => x - 0.5))
       println(jarnum1)
       println(jarnum2)
       println("Done")
@@ -203,8 +205,8 @@ object Tester {
   
     def testNumAndSizes() {
       println("\n--Testing Num and Sizes")
-      val j1 = integersIndex.monad(JArray.auto[JInt](2,3,2))
-      val j2 = integersIndex.monad(JArray.auto[JInt](4,6,5))
+      val j1 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
+      val j2 = integersIndex.monad(JArray.auto[JInt, Int](4,6,5))
       
       println("j1: " + j1.rankItems)
       println("    " + j1.rankSizes)
@@ -214,9 +216,9 @@ object Tester {
       println("Done")
     }
     
-    def testArrayFrames[T <% JArrayType : Manifest](jar: JArray[T]) {
+    def testArrayFrames[T <: JArrayType : Manifest](jar: JArray[T]) {
       println("\n--Test Array Frames")
-      val jarnum = JArray(jINT, List(2,3,2), Vector.tabulate(12)((x: Int) => x))
+      val jarnum = JArray[JInt,Int](jINT, List(2,3,2), Vector.tabulate(12)((x: Int) => x))
       val jarfrm_ = JArrayFrame(JInfinity, jarnum)
       val jarfrm3 = JArrayFrame(3, jarnum)
       val jarfrm2 = JArrayFrame(2, jarnum)
@@ -236,11 +238,11 @@ object Tester {
     
     def testAFShapeTo() {
       println("\n--Testing ShapeTo function")
-      val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto[JInt](2,2) ))
+      val jarf = JArrayFrame(List[JNumber](0,1,1), integersIndex.monad(JArray.auto[JInt, Int](2,2) ))
       println("jarf: " + jarf)
       println(jarf.shapeToNewFrame(List(List(2), List(3), List(2), List())) )
       
-      val vec2 = JArrayFrame(List[JNumber](0), JArray.auto(0,1))
+      val vec2 = JArrayFrame(List[JNumber](0), JArray.auto[JInt,Int](0,1))
       println("vec2framed: " + vec2)
       val extVec2 = vec2.shapeToNewFrame(List(List(2,3), List()))
       println("extVec2:\n" + extVec2)
