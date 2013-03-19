@@ -22,6 +22,9 @@ abstract class JFunc[M <: JDataType, D1 <: JDataType, D2 <: JDataType,
   def monad[T <: M](y: T): MR
   def dyad[T1 <: D1, T2 <: D2](x: T1, y: T2): DR
   
+  protected def monadImpl[T <: M](y: T): MR
+  protected def dyadImpl[T1 <: D1, T2 <: D2](x: T1, y: T2): DR 
+  
 //  protected def monadImpl[TR <: MR, T <: M <% TR](y: T): TR
 //  protected def dyadImpl[T1 <: D1, T2 <: D2](x: T1, y: T2): DR
   

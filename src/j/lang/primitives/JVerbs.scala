@@ -21,8 +21,8 @@ object JVerbs {
       jANY
   ) {
 
-    override def monad[T <: JArray[JArrayType]](y: T) = y
-    override def dyad[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = x
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = y
+    override def dyadImpl[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = x
   }
 
   final object rightIdentity extends JVerb1Type[JArrayType](
@@ -31,8 +31,8 @@ object JVerbs {
       jANY
   )
   {
-    override def monad[T <: JArray[JArrayType]](y: T) = y
-    override def dyad[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = y
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = y
+    override def dyadImpl[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = y
   }
   
   final object shapeReshape extends JVerb[JArrayType, JInt, JArrayType, JInt, JArrayType](
@@ -40,10 +40,10 @@ object JVerbs {
       List(JFuncRank(JInfinity, 1, JInfinity)),
       jANY, jINT, jANY
   ) {
-    override def monad[T <: JArray[JArrayType]](y: T) = 
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = 
       JArray(afNONE, jINT, 0, y.rank, List[Int](y.shape.length), Vector() ++ y.shape)
       
-    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JInt], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
       val numItems: Int = x.ravel.fold(JReal.One)(_ * _)
       val ravel = Vector.tabulate(numItems)((i: Int) =>
         y.ravel(i % y.numScalars)) //TODO global fill used for !. (fit)
@@ -57,12 +57,12 @@ object JVerbs {
       jNUMERIC
   ){
     
-    override def monad[T <: JArray[JNumber]](y: T) = y(0) match {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = y(0) match {
       //TODO case c: JComplex => ...
       case a:JNumber => y(0)
     }
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = 
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = 
       JArray(x.jaType | y.jaType, List(), Vector(x.ravel(0) + y.ravel(0)))
   }
   
@@ -71,8 +71,8 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = JArray.scalar(- y.ravel(0))
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) =
+    override def monadImpl[T <: JArray[JNumber]](y: T) = JArray.scalar(- y.ravel(0))
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) =
       JArray.scalar(x.ravel(0) - y.ravel(0))
   }
  
@@ -82,10 +82,10 @@ object JVerbs {
       jINT, jANY, jANY
    ){
 
-    override def monad[T <: JArray[JInt]](y: T): JArray[JInt] = 
+    override def monadImpl[T <: JArray[JInt]](y: T): JArray[JInt] = 
       JArray(jINT, y.ravel.toList, Vector.tabulate(y.ravel.foldLeft(1)(_ * _))((x: Int) => x))
     
-    override def dyad[T1 <: JArray[_], T2 <: JArray[_]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[_], T2 <: JArray[_]](x: T1, y: T2) = {
       throw new Exception() //TODO implement
     }
   }
@@ -96,12 +96,12 @@ object JVerbs {
       List(JFuncRank(JInfinity)),
       jANY
   ){
-    override def monad[T <: JArray[JArrayType]](y: T) = {
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = {
       JArray(y.jaType, List(y.numScalars), y.ravel)
     }
     
     //TODO kill myself. Why have fancy type checking if I still have to do this?
-    override def dyad[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2): T1 = y match {
+    override def dyadImpl[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2): T1 = y match {
         case isT1:T1 => {
           throw new Exception() //trickier than I thought
         }
@@ -114,8 +114,8 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC, jNUMERIC, jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = JArray(y.jaType, List(), Vector(y.ravel(0) + 1))
-    override def dyad[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = JArray(y.jaType, List(), Vector(y.ravel(0) + 1))
+    override def dyadImpl[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
       JArray(jINT, List(), Vector(if (x.ravel(0) >= y.ravel(0)) 1 else 0))
     }
   }
@@ -125,8 +125,8 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC, jNUMERIC, jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = JArray(y.jaType, List(), Vector(y.ravel(0) - 1))
-    override def dyad[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = JArray(y.jaType, List(), Vector(y.ravel(0) - 1))
+    override def dyadImpl[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
       JArray(jINT, List(), Vector(if (x.ravel(0) <= y.ravel(0)) 1 else 0))
     }
   }
@@ -136,14 +136,14 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC, jNUMERIC, jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = y.ravel(0) match {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = y.ravel(0) match {
       case inf: JInfinite => y
       case int: JInt => y
       case r: JFloat => JArray(jINT, List(), Vector(r.v.toInt))
       case _ => throw new Exception() //TODO implement
     }
     
-    override def dyad[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
       JArray(jNUMERIC, List(), Vector(if (x.ravel(0) < y.ravel(0)) x.ravel(0) else y.ravel(0)))
     }
   }
@@ -153,14 +153,14 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC, jNUMERIC, jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = y.ravel(0) match {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = y.ravel(0) match {
       case inf: JInfinite => y
       case int: JInt => y
       case r: JFloat => JArray(jINT, List(), Vector(r.v.+(0.5).toInt))
       case _ => throw new Exception() //TODO implement
     }
     
-    override def dyad[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JReal], T2 <: JArray[JReal]](x: T1, y: T2) = {
       JArray(jNUMERIC, List(), Vector(if (x.ravel(0) < y.ravel(0)) y.ravel(0) else x.ravel(0)))
     }
   }
@@ -170,10 +170,10 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ) {
-    override def monad[T <: JArray[JNumber]](y: T) =
+    override def monadImpl[T <: JArray[JNumber]](y: T) =
       JArray.scalar(JReal.E ** y.ravel(0))
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) =
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) =
       JArray.scalar(x.ravel(0) ** y.ravel(0))
   }
 
@@ -182,11 +182,11 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = {
       JArray.scalar(JReal.E %% y.ravel(0))
     }
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x:T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x:T1, y: T2) = {
       JArray.scalar(x.ravel(0) %% y.ravel(0))
     }
   }
@@ -196,14 +196,14 @@ object JVerbs {
       List(JFuncRank(0, JInfinity, 0)),
       jANY, jINT, jANY
   ){
-    override def monad[T <: JArray[JArrayType]](y: T) = {
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = {
       JArray(y.jaType, y.shape,
           (0 until y.numItemz).reverse.map(
               i => y.ravel.slice(i, i*y.itemSize)).foldLeft(
                   Vector[JArrayType]())(_ ++ _))
     }
     
-    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JInt], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
       if (x.numScalars > y.rank) throw new Exception() //TODO should be length error
       
       var ret = y.ravel
@@ -234,12 +234,12 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
    ){
-    override def monad[T <: JArray[JNumber]](y: T) = y(0) match {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = y(0) match {
       case r: JReal => y
       case _ => throw new Exception() //TODO implement for complex numbers
     }
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
       if ((x.ravel(0) != JReal.Zero) || (y.ravel(0) != JReal.Zero))  JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }//TODO implement GCD
   }
@@ -249,11 +249,11 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = {
       throw new Exception()//TODO implement
     }
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
       if ((x.ravel(0) != JReal.Zero) && (y.ravel(0) != JReal.Zero)) JArray.scalar(JReal.One) else JArray.scalar(JReal.Zero)
     }
   }
@@ -263,11 +263,11 @@ object JVerbs {
       List(JFuncRank(0)),
       jINT
   ){
-    override def monad[T <: JArray[JInt]](y: T) = {
+    override def monadImpl[T <: JArray[JInt]](y: T) = {
       JArray.scalar[JInt](scala.util.Random.nextInt(y.ravel(0)))
     }
     
-    override def dyad[T1 <: JArray[JInt], T2 <: JArray[JInt]](x: T1, y: T2) = {//TODO optimize
+    override def dyadImpl[T1 <: JArray[JInt], T2 <: JArray[JInt]](x: T1, y: T2) = {//TODO optimize
       JArray(jINT, List(x.ravel(0)),
           scala.util.Random.shuffle(Vector.tabulate[JInt](
               y.ravel(0))((x: Int) => x)).drop(y.ravel(0) - x.ravel(0)))
@@ -279,11 +279,11 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = {
       JArray.scalar(y.ravel(0) ** 2)
     }
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
       if ((x.ravel(0) != JReal.Zero) && (y.ravel(0) != JReal.Zero)) JArray.scalar(JReal.Zero) else JArray.scalar(JReal.One)
     }
   }
@@ -293,11 +293,11 @@ object JVerbs {
       List(JFuncRank(0)),
       jNUMERIC
   ){
-    override def monad[T <: JArray[JNumber]](y: T) = {
+    override def monadImpl[T <: JArray[JNumber]](y: T) = {
       JArray.scalar(y.ravel(0) ** 0.5)
     }
     
-    override def dyad[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JNumber], T2 <: JArray[JNumber]](x: T1, y: T2) = {
       JArray.scalar(y.ravel(0) ** x.ravel(0).inv)
     }
   }
@@ -307,11 +307,11 @@ object JVerbs {
       List(JFuncRank(JInfinity)),
       jANY
   ){
-    override def monad[T <: JArray[JArrayType]](y: T) = { //TODO implement with ,"_1 y
+    override def monadImpl[T <: JArray[JArrayType]](y: T) = { //TODO implement with ,"_1 y
       JArray(y.jaType, List((y.shape.take(1) ++ List(1)).head , (y.shape.drop(1).foldLeft(1)(_ * _))), y.ravel)
     }
     
-    override def dyad[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
+    override def dyadImpl[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
     	throw new Exception()//TODO implement
     }
   }
