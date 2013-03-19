@@ -11,6 +11,7 @@ import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.array.ArrayImplicits._
 import j.lang.datatypes.array.JArrayFlag._
 import j.lang.datatypes.function.JVerb1Type
+import j.util.CMacroType
 
 object JVerbs {
   
@@ -311,7 +312,7 @@ object JVerbs {
     }
     
     override def dyad[T1 <: JArray[JArrayType], T2 <: JArray[JArrayType]](x: T1, y: T2) = {
-      
+    	throw new Exception()//TODO implement
     }
   }
 }

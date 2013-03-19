@@ -10,7 +10,8 @@ import j.util.CMacroType._
 abstract class JFunc[M <: JDataType, D1 <: JDataType, D2 <: JDataType,
     MR <: JDataType, DR <: JDataType](
     val rep: String, val funcType: JTypeMacro, 
-	val mdomain: JTypeMacro, val d1domain: JTypeMacro, val d2domain: JTypeMacro) {
+	val mdomain: JTypeMacro, val d1domain: JTypeMacro, val d2domain: JTypeMacro)
+	extends JDataType(funcType) {
 
   import JFunc._
   
