@@ -3,7 +3,7 @@ package j.lang.datatypes
 import j.lang.datatypes.array._
 
 //TODO better implementation of field name?
-class SymbolPoolEntry[T <% JArrayType](val name: JArray[String], 
+class SymbolPoolEntry[T <: JArrayType](val name: String, 
     val value: JArray[T], val flag: Int, val sn: Int, 
     val next: Int, val prev: Int) {
 

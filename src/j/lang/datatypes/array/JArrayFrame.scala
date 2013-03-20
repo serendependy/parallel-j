@@ -7,7 +7,7 @@ import j.lang.datatypes.array.JArrayFlag._
 import j.lang.datatypes.JFuncRank
 
 object JArrayFrame {
-  def apply[T <% JArrayType : Manifest](frameLevels: List[JNumber], jar: JArray[T]) = {
+  def apply[T <: JArrayType : Manifest](frameLevels: List[JNumber], jar: JArray[T]) = {
     val intFrameLevels = frameLevels.map(_ match {
       case i: JInt => i.v
       case inf: JInfinite => jar.rank
@@ -15,7 +15,8 @@ object JArrayFrame {
     })
 	  val frames = {
 		  var tempShape = jar.shape
-    	  (for (rank <- intFrameLevels.reverse) yield {
+    	  (for (r <- intFrameLevels.reverse) yield {
+    	    val rank = if (r >= 0) r else tempShape.length - r
     		val frame = tempShape.take(tempShape.length - rank)
     		tempShape = tempShape.drop(tempShape.length - rank)
     		frame
@@ -24,52 +25,52 @@ object JArrayFrame {
     new JArrayFrame(frames, jar)
   }
   
-  def apply[T <% JArrayType : Manifest](rank: JNumber, jar: JArray[T]): JArrayFrame[T] = JArrayFrame(List(rank), jar)
+  def apply[T <: JArrayType : Manifest](rank: JNumber, jar: JArray[T]): JArrayFrame[T] = JArrayFrame(List(rank), jar)
   
-  def createFrames[T <% JArrayType : Manifest](rs: List[JFuncRank], jar: JArray[T]) = JArrayFrame(rs.map(_ r1), jar)
-  def createFrames[T <% JArrayType : Manifest, U <% JArrayType : Manifest](rs: List[JFuncRank], jar1: JArray[T], jar2: JArray[U]): (JArrayFrame[T], JArrayFrame[U]) = {
+  def createFrames[T <: JArrayType : Manifest](rs: List[JFuncRank], jar: JArray[T]) = JArrayFrame(rs.map(_ r1), jar)
+  def createFrames[T <: JArrayType : Manifest, U <: JArrayType : Manifest](rs: List[JFuncRank], jar1: JArray[T], jar2: JArray[U]): (JArrayFrame[T], JArrayFrame[U]) = {
     (JArrayFrame(rs.map(_ r2), jar1), JArrayFrame(rs.map(_ r3), jar2))
   }
 }
 
-class JArrayFrame[T <% JArrayType : Manifest] private(val frames: List[List[Int]], val jar: JArray[T]) {
+class JArrayFrame[T <: JArrayType : Manifest] private(val frames: List[List[Int]], val jar: JArray[T]) {
   lazy val cellShape = frames.last
   lazy val cellSize = cellShape.foldLeft(1)(_ * _)
   lazy val frameSize = jar.shape.foldLeft(1)(_ * _) / cellSize
 
-  	def mapOnCells[R <% JArrayType : Manifest](func: JArray[T] => JArray[R]): JArray[R] = {
-
-  	  val newCells = (for (fr <- 0 until frameSize) yield {
-  	    func(JArray(jar.jaType, cellShape, jar.ravel.slice(fr*cellSize, (1+fr)*cellSize)))
-  	  })
-  	  val newShape = frames.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-  	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
-  	  
-  	}
+//  def mapOnCells[R <: JArrayType](func: JArray[T] => JArray[R]): JArray[R] = {
+//
+//  	  val newCells = (for (fr <- 0 until frameSize) yield {
+//  	    func(JArray(jar.jaType, cellShape, jar.ravel.slice(fr*cellSize, (1+fr)*cellSize)))
+//  	  })
+//  	  val newShape = frames.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
+//  	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
+//  	  
+//  	}
   
-  def mapOnCells[U <% JArrayType : Manifest, R <% JArrayType : Manifest](
-      func: (JArray[T], JArray[U]) => JArray[R], other: JArrayFrame[U]) = {
-  		val resShapeAgree = this.shapeAgreement(other)
-  		resShapeAgree match {
-  		  case None => throw new Exception() //TODO shape error
-  		  case Some(sv) => {
-		    
-  		    val thisReframed = this.shapeToNewFrame(sv)
-  		    val otherReframed= other.shapeToNewFrame(sv)
-
-  		    val cellShape = sv.last
-  		    val cellSize  = cellShape.foldLeft(1)(_ * _)
-  		    val frameSize = thisReframed.shape.foldLeft(1)(_ * _) / cellSize 
-  		    
-  		    val newCells = (for (fr <- 0 until frameSize) yield {
-  		      func(JArray(jar.jaType, cellShape, thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)),
-  		           JArray(other.jar.jaType, cellShape, otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) ))
-  		    })
-  		    val newShape = sv.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-  		    JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
-  		  }
-  		}
-  }
+//  def mapOnCells[U <% JArrayType : Manifest, R <% JArrayType : Manifest](
+//      func: (JArray[T], JArray[U]) => JArray[R], other: JArrayFrame[U]) = {
+//  		val resShapeAgree = this.shapeAgreement(other)
+//  		resShapeAgree match {
+//  		  case None => throw new Exception() //TODO shape error
+//  		  case Some(sv) => {
+//		    
+//  		    val thisReframed = this.shapeToNewFrame(sv)
+//  		    val otherReframed= other.shapeToNewFrame(sv)
+//
+//  		    val cellShape = sv.last
+//  		    val cellSize  = cellShape.foldLeft(1)(_ * _)
+//  		    val frameSize = thisReframed.shape.foldLeft(1)(_ * _) / cellSize 
+//  		    
+//  		    val newCells = (for (fr <- 0 until frameSize) yield {
+//  		      func(JArray(jar.jaType, cellShape, thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)),
+//  		           JArray(other.jar.jaType, cellShape, otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) ))
+//  		    })
+//  		    val newShape = sv.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
+//  		    JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
+//  		  }
+//  		}
+//  }
   
   	def shapeAgreement(other: JArrayFrame[_]):Option[List[List[Int]]] = {
   	  if (this.frames.length != other.frames.length) None

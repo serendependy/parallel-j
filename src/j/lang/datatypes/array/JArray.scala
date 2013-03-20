@@ -14,49 +14,53 @@ import j.lang.datatypes.JDataType
 
 object JArray {
   
-  def apply[T <% JArrayType : Manifest](flag: JArrayFlag, jaType: JTypeMacro, refcount: Int, 
-      numItems: Int, shape: List[Int], ravel: Vector[T]) = 
-        new JArray(flag, jaType, refcount, numItems, shape, ravel)
-  
-  def apply[T <% JArrayType : Manifest](jaType: JTypeMacro, shape: List[Int], ravel: Vector[T]) = {
-    new JArray(afNONE, jaType, 0, ravel.length, shape, ravel)
+  def apply[TJ <: JArrayType : Manifest](jaType: JTypeMacro, shape: List[Int], ravel: Vector[TJ]) = {
+    new JArray(afNONE, jaType, 0, shape, ravel)
   }
   
-  def auto[T <% JArrayType : Manifest](args: T*) = {
-    new JArray(afNONE, args(0).jtype, 0, args.length, List(args.length), Vector(args:_*))
+  def apply[TJ <: JArrayType : Manifest, T <% TJ](flag: JArrayFlag, jaType: JTypeMacro, refcount: Int, shape: List[Int], ravel: Vector[T]): JArray[TJ] = { //TODO LOL!
+	  new JArray(flag, jaType, refcount, shape, ravel.map((t:T) => implicitly[T => TJ](implicitly[T => TJ])(t)) )
   }
   
-  def scalar[T <% JArrayType : Manifest](sc: T): JArray[T] = {
-    val flag = afNONE
-    val jaType = sc.jtype
-    val shape = List[Int]()
-    val ravel = Array[T](sc)
-    JArray(afNONE, sc.jtype,0, 1, List(), Vector[T](sc))
+  def apply[TJ <: JArrayType : Manifest, T <% TJ](jaType: JTypeMacro, shape: List[Int], ravel: Vector[T]):JArray[TJ] = {
+    JArray(afNONE, jaType, 0, shape, ravel)
+  }
+  
+  def auto[TJ <: JArrayType : Manifest, T <% TJ](args: T*) = {
+    JArray(afNONE, args(0).jtype, 0, List(args.length), Vector(args:_*))
+  }
+  
+  def scalar[TJ <: JArrayType : Manifest, T <% TJ](sc: T) = {
+    new JArray(afNONE, sc.jtype,0, List(), Vector[TJ](sc))
+  }
+  
+  def scalar[TJ <: JArrayType : Manifest](sc: TJ) = {
+    new JArray(afNONE, sc.jtype, 0, List(), Vector(sc))
   }
     
     def arithmeticProgression(n: Int, b: Int, m: Int) =
-      JArray(afNONE, jINT, 0, n, List(n), Vector((0 to n).map(b + m * _):_*))
+      JArray[JInt, Int](afNONE, jINT, 0, List(n), Vector((0 to n).map(b + m * _):_*))
 
-    def string(str: String) = {
-      JArray(afNONE, jCHAR, 0, str.length, List(str.length), Vector(str:_*))
-    }
+//    def string(str: String) = {
+//      JArray(afNONE, jCHAR, 0, str.length, List(str.length), Vector(str:_*))
+//    }
       
     def vec2(a: Int, b: Int)= {
-      JArray(afNONE, jINT, 0, 2, List(2), Vector(a,b))
+      JArray[JInt, Int](afNONE, jINT, 0, List(2), Vector(a,b))
     }
     
     def vec1(a: Int) = {
-      JArray(afNONE, jINT, 0, 1, List(1), Vector(a))
+      JArray[JInt,Int](afNONE, jINT, 0, List(1), Vector(a))
     }
 
-  val zero = scalar(0)
-  val one  = scalar(1)
-  val two  = scalar(2)
-  val mone = scalar(-1)
-  val pi   = scalar(scala.Math.Pi)
+  val zero = scalar[JInt,Int](0)
+  val one  = scalar[JInt,Int](1)
+  val two  = scalar[JInt,Int](2)
+  val mone = scalar[JInt,Int](-1)
+  val pi   = scalar[JFloat,Double](scala.Math.Pi)
 }
-class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTypeMacro, 
-    var refcount: Int, val numScalars: Int, val shape: List[Int], 
+class JArray[+T <: JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTypeMacro, 
+    var refcount: Int, val shape: List[Int], 
     val ravel: Vector[T]) extends JDataType(jaType){//
 
   lazy val rank = shape.length
@@ -66,6 +70,8 @@ class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
   
   lazy val rankSizes = shape.scanRight(1)(_ * _).reverse
   lazy val rankItems = shape.scanLeft(1)(_ * _).reverse
+  
+  val numScalars = ravel.length
   
   def isScalar = shape isEmpty
   
@@ -81,7 +87,7 @@ class JArray[+T <% JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
         val itemSize = itemShape.foldLeft(1)(_ * _)
         val trueIndex = ind * itemSize
         //new JArray(itemShape, (ind * itemSize).until((ind+1) * itemSize).toList.map(vals))
-        new JArray(flag, jaType, 0, itemSize, itemShape, (trueIndex).until(trueIndex + itemSize).
+        new JArray(flag, jaType, 0, itemShape, (trueIndex).until(trueIndex + itemSize).
             map(ravel)(breakOut)  )
         }
     }

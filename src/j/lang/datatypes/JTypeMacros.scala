@@ -31,5 +31,6 @@ object JTypeMacros {
 	  val jRHS  = jNOUN | jFUNC
 	  val jIS1BYTE = jB01 | jLIT
 	  val jLAST0 = jB01 | jLIT | jC2T | jNAME
+	  val jNONE = new JTypeMacro(0)
   
 }
