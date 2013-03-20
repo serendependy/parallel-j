@@ -126,7 +126,7 @@ object Tester {
       println("\n--Testing shift")
       
       val arr3 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
-      val sh1  = reverseShift.dyad(JArray.auto[JInt, Int](1), arr3)
+      val sh1  = reverseShift.dyad(JArray.auto[JInt, Int](1), arr3)//TODO it's possible J doesn't treat it's ranks uniformly...
       val sh2  = reverseShift.dyad(JArray.auto[JInt, Int](1,2), arr3)
       val sh3  = reverseShift.dyad(JArray.auto[JInt, Int](1,2,1), arr3)
       

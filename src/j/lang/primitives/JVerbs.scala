@@ -1,17 +1,21 @@
 package j.lang.primitives
 
+import j.util.CMacroType
+
+import j.lang.primitives.JAdvConjs._
+
 import j.lang.datatypes.JFuncRank
 import j.lang.datatypes.JTypeMacros._
-import j.lang.datatypes.function.JVerb
-import j.lang.datatypes.function.{JVerb1Type, JVerb2Type}
+
+import j.lang.datatypes.function.{JVerb, JVerb1Type, JVerb2Type}
+
 import j.lang.datatypes.array.{JArray, JArrayType}
-import j.lang.datatypes.array.types.JNumberTypes._
-import j.lang.datatypes.array.types._
-import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.array.ArrayImplicits._
 import j.lang.datatypes.array.JArrayFlag._
-import j.lang.datatypes.function.JVerb1Type
-import j.util.CMacroType
+
+import j.lang.datatypes.array.types.JNumberTypes._
+import j.lang.datatypes.array.types._
+
 
 object JVerbs {
   
@@ -198,7 +202,7 @@ object JVerbs {
   
   final object reverseShift extends JVerb[JArrayType, JInt, JArrayType, JArrayType, JArrayType](
       "|.",
-      List(JFuncRank(0, JInfinity, 0)),
+      List(JFuncRank(JInfinity, 1, JInfinity)),
       jANY, jINT, jANY
   ){
     override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = {
@@ -209,6 +213,8 @@ object JVerbs {
     }
     
     override def dyadImpl[T1 <: JInt : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
+      println("---in reverseShift, x is: " + x)
+      println("                  , y is: " + y)
       if (x.numScalars > y.rank) throw new Exception() //TODO should be length error
       
       var ret = y.ravel
@@ -307,23 +313,24 @@ object JVerbs {
     }
   }
   
-  final object ravelitemsStitch extends JVerb1Type[JArrayType](
-      ",.",
-      List(JFuncRank(JInfinity)),
-      jANY
-  ){
-    override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = { //TODO implement with ,"_1 y
-      JArray(y.jaType, List((y.shape.take(1) ++ List(1)).head , (y.shape.drop(1).foldLeft(1)(_ * _))), y.ravel)
-    }
-    
-    override def dyadImpl[T1 <: JArrayType : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
-    	throw new Exception()//TODO implement
-    }
-  }
+  val ravelitemsStitch = rank.dyad(ravelAppend, JArray.scalar[JInt,Int](-1))
+  
+//  final object ravelitemsStitch extends JVerb1Type[JArrayType](
+//      ",.",
+//      List(JFuncRank(JInfinity)),
+//      jANY
+//  ){
+//    override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = { //TODO implement with ,"_1 y
+//      JArray(y.jaType, List((y.shape.take(1) ++ List(1)).head , (y.shape.drop(1).foldLeft(1)(_ * _))), y.ravel)
+//    }
+//    
+//    override def dyadImpl[T1 <: JArrayType : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
+//    	throw new Exception()//TODO implement
+//    }
+//  }
 }
 
   /*//TODO
-   * rank
    * composition/bond
    * reduce/scan(?)
    * stitch

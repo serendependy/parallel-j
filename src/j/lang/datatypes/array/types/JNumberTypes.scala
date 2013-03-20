@@ -199,7 +199,7 @@ final object JInfinity extends JInfinite with Ordered[JReal] {
   
   def |(o: JNumber) = o
   
-  def ==(o: JNumber) = if (o eq JInfinity) true else false
+  def ==(o: JNumber) = o eq JInfinity
   
   def unary_- = JNegativeInfinity
   
@@ -247,10 +247,7 @@ final object JNegativeInfinity extends JInfinite with Ordered[JReal] {
 	
 	def |(o: JNumber) = this
 	
-	def ==(o: JNumber) = o match {
-	  case JNegativeInfinity => true
-	  case _ => false
-	}
+	def ==(o: JNumber) = o eq this
 	
 	def unary_- = JInfinity
 	
