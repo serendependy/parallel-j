@@ -15,7 +15,8 @@ object JArrayFrame {
     })
 	  val frames = {
 		  var tempShape = jar.shape
-    	  (for (rank <- intFrameLevels.reverse) yield {
+    	  (for (r <- intFrameLevels.reverse) yield {
+    	    val rank = if (r >= 0) r else tempShape.length - r
     		val frame = tempShape.take(tempShape.length - rank)
     		tempShape = tempShape.drop(tempShape.length - rank)
     		frame
