@@ -25,9 +25,12 @@ Frequently operations on these collections are inherently data parallel.
 However, most languages and parallel environments provide tools for exploiting data parallelism only for collections of one dimension.
 Programmers who wish to use such tools on regular, multidimensional collections often must write non-generalized code that can be difficult to maintain and which cannot automatically scale to collections of higher dimensionas.
 
-Function rank, first developed by K. Iverson and implemented in the programming language J, formalizes the dimension (rank) of the arguments to a function in such a way that functions can be easily extended to collections of higher dimensions using a higher-order function (operator).
-This extension is relatively simple, inherently parallel, and provably safe, though this last property can be difficult to capture statically.
+Function rank, first developed by K. Iverson and implemented in the programming language J, formalizes the dimension (rank) of the arguments of to a function in such a way that functions can be easily extended to collections of higher dimensions using a higher-order function (operator).
+This extension is relatively simple, inherently parallel, and provably safe from certain kinds of indexing errors which stem from not knowing the dimension, shape, or possible irregularity of the collection.
+However, this last property can be difficult to capture statically.
 
-We present a partial parallel implementation of J in the programming language Scala, particularly Scala's parallel collections framework.
-We use a suite of example problems, solved in J, Scala, and C using OpenMP, to compare scalability of the applications to related problems in higher dimensions.
-Performance results are included, but do not show any significant gains due to a lack of optimization - this work is intended as a proof-of-concept for further research.
+We present a partial parallel implementation of J to demonstrate how the notion of function rank allows a programmer to easily exploit concurrency in problems involving operations on regular multidimensional collections applied in an inherently data-parallel fashion.
+We selected for our implementation the modern, multi-paradigm programming language Scala, particularly for its parallel collections framework which allows programmers to easily write data-parallel programs for 1-dimensional collections.
+We also propose a new operator (\ttfamily 111 !:\normalfont) for future parallel implementation of the J programming language which would give the programmer greater control in assigning threads of execution to data-parallel function applications, and give a sketch of its usage.
+Finally, we use a suite of example problems, solved in J, Scala, and C using OpenMP, to compare conceptual ease of use and scalability of the applications to related problems in higher dimensions.
+Performance results are included, but do not show any significant gains due to a lack of optimization - this work is intended as a proof-of-concept for future research.
