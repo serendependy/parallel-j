@@ -38,41 +38,7 @@ class JArrayFrame[T <: JArrayType : Manifest] private(val frames: List[List[Int]
   lazy val cellSize = cellShape.foldLeft(1)(_ * _)
   lazy val frameSize = jar.shape.foldLeft(1)(_ * _) / cellSize
 
-//  def mapOnCells[R <: JArrayType](func: JArray[T] => JArray[R]): JArray[R] = {
-//
-//  	  val newCells = (for (fr <- 0 until frameSize) yield {
-//  	    func(JArray(jar.jaType, cellShape, jar.ravel.slice(fr*cellSize, (1+fr)*cellSize)))
-//  	  })
-//  	  val newShape = frames.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-//  	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
-//  	  
-//  	}
-  
-//  def mapOnCells[U <% JArrayType : Manifest, R <% JArrayType : Manifest](
-//      func: (JArray[T], JArray[U]) => JArray[R], other: JArrayFrame[U]) = {
-//  		val resShapeAgree = this.shapeAgreement(other)
-//  		resShapeAgree match {
-//  		  case None => throw new Exception() //TODO shape error
-//  		  case Some(sv) => {
-//		    
-//  		    val thisReframed = this.shapeToNewFrame(sv)
-//  		    val otherReframed= other.shapeToNewFrame(sv)
-//
-//  		    val cellShape = sv.last
-//  		    val cellSize  = cellShape.foldLeft(1)(_ * _)
-//  		    val frameSize = thisReframed.shape.foldLeft(1)(_ * _) / cellSize 
-//  		    
-//  		    val newCells = (for (fr <- 0 until frameSize) yield {
-//  		      func(JArray(jar.jaType, cellShape, thisReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)),
-//  		           JArray(other.jar.jaType, cellShape, otherReframed.ravel.slice(fr*cellSize, (1+fr)*cellSize) ))
-//  		    })
-//  		    val newShape = sv.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-//  		    JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[R]())(_ ++ _.ravel) )
-//  		  }
-//  		}
-//  }
-  
-  	def shapeAgreement(other: JArrayFrame[_]):Option[List[List[Int]]] = {
+  def shapeAgreement(other: JArrayFrame[_]):Option[List[List[Int]]] = {
   	  if (this.frames.length != other.frames.length) None
   	  else {
   	    (this.frames, other.frames).zipped.map((l1, l2) => {
@@ -83,8 +49,8 @@ class JArrayFrame[T <: JArrayType : Manifest] private(val frames: List[List[Int]
   	      else {
   	        if (l2.take(l1.length) == l1) Some(l2)
   	        else None
-  	      }
-  	    }).foldLeft(Option(List[List[Int]]()))( (o,l) => {
+  	      }//              Because the very last agreement is decided by the function
+  	    }).dropRight(1).:+(Some(List[Int]())).foldLeft(Option(List[List[Int]]()))( (o,l) => {
   	      o match {
   	        case None => None
   	        case Some(lp) => l match {
@@ -96,7 +62,9 @@ class JArrayFrame[T <: JArrayType : Manifest] private(val frames: List[List[Int]
   	  }
   	}
   
-  	def shapeToNewFrame(newFrame: List[List[Int]]) = {
+  	def shapeToNewFrame(nf: List[List[Int]]) = {
+  	  val newFrame = nf.dropRight(1) :+ this.frames.last //TODO ugly hack for leaving function to do last agreement
+  	  
   	  val niofs = this.frames.map(_.foldLeft(1)(_ * _)) // num in old frame
   	  val ninfs = newFrame.map(_.foldLeft(1)(_ * _))    // num in new frame
   	  val hmrs  = niofs.scanRight(1)(_ * _).drop(1)     // how many of this dimension

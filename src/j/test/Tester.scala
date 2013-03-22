@@ -93,7 +93,7 @@ object Tester {
     //dyads
     def testPlus() {
       println("\n--Testing plus")
-      val jar1:JArray[JInt] = JArray.auto[JInt, Int](1)
+      val jar1 = JArray.auto[JInt, Int](1)
       val jarRes= conjugatePlus.dyad(jar1, jar1)
       println(jarRes)
       
@@ -110,7 +110,7 @@ object Tester {
       println("yreshaped:\n" + yframed.shapeToNewFrame(sa))
       
       val vmRes = conjugatePlus.dyad(vec, mat)
-      println(vmRes + "\nShape: " + vmRes.shape + "\nRavel: " + vmRes.ravel)
+      println("vec + matrix:\n" + vmRes + "\nShape: " + vmRes.shape + "\nRavel: " + vmRes.ravel)
       println("---Testing associativity")
       println(conjugatePlus.dyad(mat, vec))
       
@@ -126,7 +126,9 @@ object Tester {
       println("\n--Testing shift")
       
       val arr3 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
-      val sh1  = reverseShift.dyad(JArray.auto[JInt, Int](1), arr3)//TODO it's possible J doesn't treat it's ranks uniformly...
+      println("Original Vector:\n" + arr3)
+      
+      val sh1  = reverseShift.dyad(JArray.auto[JInt, Int](1), arr3)
       val sh2  = reverseShift.dyad(JArray.auto[JInt, Int](1,2), arr3)
       val sh3  = reverseShift.dyad(JArray.auto[JInt, Int](1,2,1), arr3)
       

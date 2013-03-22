@@ -44,13 +44,19 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	      val xreframed = jafx.shapeToNewFrame(agree)
 	      val yreframed = jafy.shapeToNewFrame(agree)
 	      
-	      val cellShape = agree.last
+/*	      val cellShape = agree.last
 	      val cellSize  = cellShape.foldLeft(1)(_ * _)
-	      val frameSize = xreframed.shape.foldLeft(1)(_ * _) / cellSize
+	      val frameSize = xreframed.shape.foldLeft(1)(_ * _) / cellSize*/
+	      
+	      val xcellShape = jafx.frames.last
+	      val xcellSize = xcellShape.foldLeft(1)(_ * _)
+	      val ycellShape = jafy.frames.last
+	      val ycellSize  = ycellShape.foldLeft(1)(_ * _)
+	      val frameSize  = agree.init.foldLeft(1)(_ * _.foldLeft(1)(_ * _))
 	      
 	      val newCells = (for (fr <- 0 until frameSize) yield {
-	        dyadImpl(JArray(jafx.jar.jaType, cellShape, xreframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)),
-	        		 JArray(jafy.jar.jaType, cellShape, yreframed.ravel.slice(fr*cellSize, (1+fr)*cellSize)) )
+	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
+	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
 	      })
 	      val newShape = agree.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
 	      JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[DR]())(_ ++ _.ravel))
