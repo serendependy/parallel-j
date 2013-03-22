@@ -87,8 +87,7 @@ class JArray[+T <: JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
         val itemSize = itemShape.foldLeft(1)(_ * _)
         val trueIndex = ind * itemSize
         //new JArray(itemShape, (ind * itemSize).until((ind+1) * itemSize).toList.map(vals))
-        new JArray(flag, jaType, 0, itemShape, (trueIndex).until(trueIndex + itemSize).
-            map(ravel)(breakOut)  )
+        new JArray(flag, jaType, 0, itemShape, ravel.slice(trueIndex, trueIndex+itemSize)  )
         }
     }
   

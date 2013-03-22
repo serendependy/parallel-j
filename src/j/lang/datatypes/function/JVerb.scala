@@ -34,6 +34,28 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
     }
   }
   
+  def insert = {
+    import j.lang.datatypes.array.types.JNumberTypes._
+    
+    val thisotherthing = this
+    new JVerb[D2,D2,D2,D2,D2](
+        rep + "/",
+        ranks :+ JFuncRank(JInfinity),
+        mdomain, d1domain,d2domain
+    ){
+      //TODO this is the final straw. I've lost all shreds of dignity
+      override def monadImpl[T <: D2 : Manifest](y: JArray[T]) = y.numItemz match {
+        case 0 => throw new Exception() //TODO should fetch identity element
+        case 1 => y
+        case n: Int => {
+        	(0 until n).map(y.apply(_)).reduce((y1, y2) => {
+        	  thisotherthing.dyad(y1.asInstanceOf[JArray[D1]], y2).asInstanceOf[JArray[T]]
+        	})
+        }
+      }
+    }
+  }
+  
 	override def dyad[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = {
 	  val jafx = JArrayFrame(ranks.map(_ r2), x)
 	  val jafy = JArrayFrame(ranks.map(_ r3), y)
