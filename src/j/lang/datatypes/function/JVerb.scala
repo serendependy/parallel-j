@@ -33,8 +33,8 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
       override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = thisotherthing.dyadImpl(x, y)
     }
   }
-  
-  def insert = {
+  //TODO leverage (implicit ev1: D1 =:= D2, ev2: D2 =:= DR)
+  def insert(implicit ev1: JArray[D1] =:= JArray[D2], ev2: JArray[DR] =:= JArray[D2], ev3: JArray[D2] =:= JArray[D1]) = {
     import j.lang.datatypes.array.types.JNumberTypes._
     
     val thisotherthing = this
@@ -44,12 +44,12 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         mdomain, d1domain,d2domain
     ){
       //TODO this is the final straw. I've lost all shreds of dignity
-      override def monadImpl[T <: D2 : Manifest](y: JArray[T]) = y.numItemz match {
+      override def monadImpl[T <: D1 : Manifest](y: JArray[T]) = y.numItemz match {
         case 0 => throw new Exception() //TODO should fetch identity element
         case 1 => y
         case n: Int => {
-        	(0 until n).map(y.apply(_)).reduce((y1, y2) => {
-        	  thisotherthing.dyad(y1.asInstanceOf[JArray[D1]], y2).asInstanceOf[JArray[T]]
+        	(0 until n).map(j => ev1(y.apply(j))).reduce((y1, y2) => {
+        	  ev2(thisotherthing.dyad(ev3(y1), y2))
         	})
         }
       }
