@@ -5,8 +5,8 @@ import j.lang.datatypes.JTypeMacros._
 import j.lang.datatypes.array.JArray
 import j.lang.datatypes.array.JArrayType
 import j.lang.datatypes.array.JArrayFrame
-
 import j.lang.datatypes.array.types.JNumberTypes._
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2 <: JArrayType : Manifest,
   MR <: JArrayType : Manifest, DR <: JArrayType : Manifest]
@@ -38,7 +38,7 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
     import j.lang.datatypes.array.types.JNumberTypes._
     
     val thisotherthing = this
-    new JVerb[D2,D2,D2,D2,D2](
+    new JVerb[D1,D1,D1,D1,D1](
         rep + "/",
         ranks :+ JFuncRank(JInfinity),
         mdomain, d1domain,d2domain
@@ -52,6 +52,10 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         	  ev2(thisotherthing.dyad(ev3(y1), y2))
         	})
         }
+      }
+      
+      override def dyadImpl[T1 <: D1 : Manifest, T2 <: D1 : Manifest](x: JArray[T1], y: JArray[T2]) = {
+        throw new NotImplementedException()//TODO implement
       }
     }
   }
