@@ -1,0 +1,54 @@
+% (VA) you seem to begin mid-stream. Why the focus on science & business? You need more context, more clear establishment of the rhetorical situation, the _occasion_ for writing
+
+\chapter{Introduction}
+Many scientific and business computing applications work on large data sets naturally structured in regular, multidimensional collections.
+In many languages, these multidimensional collections are implemted as nested collections; e.g. a 2-dimensional array of integers would be implemented as an array of arrays of integers. % (VA) in order to...
+However, irregular multidimensional collections are also usually implemented as nested collections, with each of the sub-arrays containing a different number of elements. % (VA) designed to...
+Thus, when implemented as such, it can be difficult to distinguish regular from irregular multidimensional collections, especially statically, which may lead to a run-time indexing errors and a program crash. % (VA) "it can be" what is it? and why can it be difficult to distinguish this, especially statically? (CJ) I needed to use this paragraph as a foil to the alternative for multi-dim arrays: a vector with an associated shape vector. (Thanks to Nick for pointing out this paragraph doesn't seem to stand on its own)
+
+\textit{Data parallelism} is an approach to exploiting program concurrency by updating elements or subsections of collections in parallel. % (VA) this does not clearly follow from the previous paragraph
+Frequently, extending existing programs to large collections in a data-parallel fashion leads to what is know as "embarrasingly parallel" problems, that is, problems in which concurrency, and thus gains in performance, are achieved with little programmer effort.%TODO cite embarassing or data parallel or Hillis Steele? TODO fix quotes % (BLM) I'm not sure about using the term "embarrassingly parallel" here -- might need to think about this a bit more
+One such extension is taking existing programs which operate on scalars (dimensionless values) or collections of fixed dimension and applying them to collections of higher dimensions.%(VA) in order to achieve (CJ) maybe answered with this example?
+For example, a function which calculates various statistics (such as mean, median, and mode) of a 1-dimensional collection (vector) of numeric measurements gained from some scientific experiment might be extended to a 2-dimensional collection (table) of measurements, by applying the function to every row, where each row represents a different occurence of the same experiment.
+
+In most imperative languages with regular multidimensional collections, applying functions to elements or sub-collections of a collection means writing the function call within nested looping structures, typically a \textit{for loop}
+This usually means that number of dimensions of the collection determines the number of loops required to do a specific operation.% "This" what? You want to be much more precise
+To put it another way, if an existing function needs to be extended to a collection of higher dimensions, or if the function only operates on scalar values but needs to be extended to some multidimensional collection, the programmer usually must wrap the function in nested for loops. % (VA) "nested for loops" ?
+This activity is tedious in the trivial cases and prone to error when the extension is more complicated. %(VA) support for this claim?
+Above all, it is frequently difficult to do automatically without changing the existing code.%(VA) "it"? avoid vague words like "this" or "it"
+% (VA) "existing code" doesn't lead clearly to the next paragraph
+Functional programming languages allow programmers to view and write programs at a higher level of abstraction.
+When dealing with collections, this usually means that related types of operations can be expressed as \textit{higher-order} functions like \textit{map} and \textit{reduce}, which take functions as their arguments and return functions that operate on collections. %(VA) "this"?
+These higher-order functions often allow programmers to more easily understand what operations are being done to multidimensional collections than if the same operations were done imperatively using for loops. %(VA) how so. (CJ) Nick also said this needs justification - you can't assert it just because functional programming is in vogue
+As a consequence, this also allows programmers to more easily see where there is inherent data-parallelism in the algorithm, such as all calls to \textit{map} or \textit{reduce} on large collections.
+However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, they too must be nested in order to extend existing functions to collections of higher dimension with the same problems mentioned above.
+
+\textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} and implemented in the programming language J, extends the notion of data rank to functions.\begin{comment}TODO cite\end{comment}% (CJ) This was not present in APL % (VA) Again, transistion isn't entirely clear
+Data rank is simply the number of dimensions of a regular dataset - scalar values are said to be collections of rank 0, and an \textit{n}-dimensional array is an array of rank n.
+Thus, the rank of some regular collection is a non-negative integer.%(CJ) When scalars are treated as regular collections, their rank is 0
+Function rank is a collection of each of the associated rank values of a function's expected arguments, usually with some value to represent when the function can take data of any rank for a specific argument.
+In functional languages where the idea of function rank is formalized, extending existing functions to regular collections of higher dimension can be expressed as the application of a higher-ordered function, called in J and in this paper the \textit{rank operator}.%TODO cite J vocab
+This makes it easier for a programmer to make these extensions safely, quickly, and at a higher level of abstraction. % (VA) "This" ?
+In some cases, this is so trivial that the programmer need not modify the code at all, meaning this can also be done automatically.
+Furthermore, since the application of the rank operator is equivalent to nested loops or nested higher-order function applications, it too is inherently data-parallel.
+Consequently, languages with both formalized function rank and a rank-operator allow the programmer to exploit the inherent data parallelism of extending existing operations to collections of higher dimension safely, quickly, and in some cases automatically.% (VA) So what exactly is the problem? what's at issue here?
+
+To demonstrate this, we present a partial parallel implementation of the J programming language, calleld \textit{Parallel-J}, written in the Scala programming language.\begin{comment}TODO cite?\end{comment}
+We believe Scala is an ideal language to both implement and compare with our work, for two reasons:
+\begin{itemize}
+    \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time).% (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library which gives programers some of the functionality of J
+    \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data-parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI that are designed for older imperative languages(C/C++/Fortran) and that require working at a conceptually lower level. % (VA) "use cases" ?
+\end{itemize}
+We compare solutions to a suite of data-parallel problems written in C, Scala, J, and hand-compilied Parallel-J\begin{comment}TODO really should change name\end{comment} and discuss the relative level of abstraction, scalability, and performance of each.
+
+The rest of the paper is organized as follows:
+\begin{itemize}
+	\item Something
+\end{itemize}
+
+% (VA) Chris - this is a solid start. You need an opening paragrpah with more background context and tighter links and transitions among paragraphs. Avoid vague references, esp. "this" and "it". You want to be as clear and precise as possible. You need a much tighter statement of the problem.
+\nocite{rankanduni}
+\nocite{dph}
+
+%For example, a profits report over \it{n} years of 4 quarters of 3 months could be represented as a 3-dimensional array with extents \it{n 4 3};\begin{comment}TODO cite rank\end{comment} cellular automata like Conway's "Game of Life"\begin{comment}TODO cite Conway\end{comment} might be represented on an \it{n} by \it{m} grid - a 2-dimensional array with extents \it{n m}.
+%In C, the profits report might be declared with \begin{verbatim}int report[n][4][3]\end{verbatim}; in Scala, 
