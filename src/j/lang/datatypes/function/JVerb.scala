@@ -15,6 +15,8 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 
   override def monad[T <: JArray[M]](y: T) = { //some testing with types and shape
 	  val jaf = JArrayFrame(ranks.map(_ r1), y)
+	  println("---monad call: frame is:\n" + jaf)
+	  println("   ranks: " + ranks)
 	  val newCells = (for (fr <- 0 until jaf.frameSize) yield {
 	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
 	  })
@@ -29,7 +31,10 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         ranks :+ r,
         mdomain, d1domain, d2domain) {
      
-      override def monadImpl[T <: M : Manifest](y: JArray[T]) = thisotherthing.monadImpl(y)
+      override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
+        println("---addRanks private class\nCalling class's monadImpl")
+        thisotherthing.monadImpl(y)
+      }
       override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = thisotherthing.dyadImpl(x, y)
     }
   }

@@ -92,7 +92,7 @@ object Tester {
     }
     
     def testRavelItems() {
-      println("\n--Testomg ravelItems")
+      println("\n--Testing ravelItems")
       val arr3 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
       println("arr3:\n" + arr3)
       
