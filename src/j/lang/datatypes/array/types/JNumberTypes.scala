@@ -21,7 +21,7 @@ sealed abstract class JNumber(jtype: JTypeMacro) extends JArrayType(jtype){
 	
 	def |(o : JNumber): JNumber
 	
-	def inv = this ** JReal.NOne
+	def recip = JReal.One % this
 	
 	def ==(o: JNumber): Boolean
 	def !=(o: JNumber) = !(this == o) //JReal.One - (this == o)
@@ -283,7 +283,7 @@ final class JInt(val v: Int) extends Finite(jINT) {
     def *(i: JInt): JInt = new JInt(this.v * i.v)
     
     def %~(o: Finite):JNumber = o match {
-      case i: JInt => if (i.v == 0) this * JInfinity else new JFloat(v / i.v)
+      case i: JInt => if (i.v == 0) this * JInfinity else new JFloat(v.toDouble / i.v.toDouble)
       case f: JFloat=>if (f.v == 0.0)this *JInfinity else new JFloat(v / f.v)
     }
     

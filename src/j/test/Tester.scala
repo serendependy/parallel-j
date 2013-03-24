@@ -35,7 +35,38 @@ object Tester {
       testRoot()
     }
 	 
+    {
+    	import ExampleProblems._
+    	import j.lang.datatypes.array.ArrayImplicits._
+    	
+    	testNumericalIntegration(10)
+    }
     
+  }
+  
+  object ExampleProblems {
+    import j.lang.datatypes.array.JArray
+    import j.lang.datatypes.array.ArrayImplicits._
+    import j.lang.primitives.JVerbs._
+    
+    def testNumericalIntegration(numRiemann: JInt) {
+      println("\n--Testing Numerical Integration")
+      val recip = JArray.scalar(numRiemann.recip)
+      val xvals =  signumMultiply.dyad(integersIndex.monad(JArray.scalar(numRiemann)),
+    		  							recip)
+      val yvals = squarerootRoot.monad(negateMinus.dyadImpl(JArray.scalar(JReal.One),
+    		  										 squareNotand.monad(xvals)))
+      val pi = recipricalDivide.dyad(
+          signumMultiply.dyad(
+              (conjugatePlus.insert).monad(yvals),
+              JArray.scalar[JInt,Int](4)),
+          recip)
+      
+      println("PI is: " + pi)
+      println("DONE")
+    }
+    
+
   }
   
   object FunctionTester {

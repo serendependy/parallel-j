@@ -77,7 +77,35 @@ object JVerbs {
     override def dyadImpl[T1 <: JNumber : Manifest, T2 <: JNumber : Manifest](x: JArray[T1], y: JArray[T2]) =
       JArray.scalar(x.ravel(0) - y.ravel(0))
   }
- 
+
+  final object signumMultiply extends JVerb1Type[JNumber](
+      "*",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monadImpl[T <: JNumber : Manifest](y: JArray[T]) = y.ravel(0) match {
+      case r: JReal => JArray.scalar(if (r > JReal.Zero) JReal.One else if (r < JReal.Zero) JReal.NOne else JReal.Zero)
+    }
+    
+    override def dyadImpl[T1 <: JNumber : Manifest, T2 <: JNumber : Manifest](x: JArray[T1], y: JArray[T2]) = {
+      JArray.scalar(x.ravel(0) * y.ravel(0))
+    }
+  }
+  
+  final object recipricalDivide extends JVerb1Type[JNumber](
+      "%",
+      List(JFuncRank(0)),
+      jNUMERIC
+  ){
+    override def monadImpl[T <: JNumber : Manifest](y: JArray[T]) = {
+      JArray.scalar(y.ravel(0).recip)
+    }
+    
+    override def dyadImpl[T1 <: JNumber : Manifest, T2 <: JNumber : Manifest](x: JArray[T1], y: JArray[T2]) = {
+      JArray.scalar(x.ravel(0) % y.ravel(0))
+    }
+  }
+  
   final object integersIndex extends JVerb[JInt, JArrayType, JArrayType, JInt, JInt](
       "i.",
       List(JFuncRank(1, JInfinity, JInfinity)),
@@ -99,7 +127,6 @@ object JVerbs {
       jANY
   ){
     override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = {
-      println("---in ravel\nArgument array is:\n")
       JArray(y.jaType, List(y.numScalars), y.ravel)
     }
     
@@ -211,8 +238,6 @@ object JVerbs {
     }
     
     override def dyadImpl[T1 <: JInt : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
-      println("---in reverseShift, x is: " + x)
-      println("                  , y is: " + y)
       if (x.numScalars > y.rank) throw new Exception() //TODO should be length error
       
       var ret = y.ravel
@@ -307,7 +332,7 @@ object JVerbs {
     }
     
     override def dyadImpl[T1 <: JNumber : Manifest, T2 <: JNumber : Manifest](x: JArray[T1], y: JArray[T2]) = {
-      JArray.scalar(y.ravel(0) ** x.ravel(0).inv)
+      JArray.scalar(y.ravel(0) ** x.ravel(0).recip)
     }
   }
  
