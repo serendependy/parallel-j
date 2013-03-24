@@ -71,11 +71,11 @@ class JArrayFrame[T <: JArrayType : Manifest] private(val frames: List[List[Int]
   	  val hmls  = ninfs.scanLeft(1)(_ * _).drop(1) 		// how many in this dimension
   	  
   	  def helper(ofs: List[List[Int]], nfs: List[List[Int]], hmrs: List[Int], hmls: List[Int], ninfs: List[Int], niofs: List[Int], acc: Vector[T]): Vector[T] = {
-  	    println("---shapeToNewFrame: helper:\n" + ofs)
-  	    println(nfs)
-  	    println(hmrs)
-  	    println(hmls)
-  	    println(acc)
+//  	    println("---shapeToNewFrame: helper:\n" + ofs)
+//  	    println(nfs)
+//  	    println(hmrs)
+//  	    println(hmls)
+//  	    println(acc)
   	    if (ofs.isEmpty) acc
   	    else {
   	      val (of, nf, hmr, hml, ninf, niof) = (ofs.head, nfs.head, hmrs.head, hmls.head, ninfs.head, niofs.head)
