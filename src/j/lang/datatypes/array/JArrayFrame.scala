@@ -13,12 +13,18 @@ object JArrayFrame {
       case inf: JInfinite => jar.rank
       case _ => throw new Exception() //TODO domain error
     })
+    println("---in JArrayFrame, jar is:\n" + jar)
+    println("   shape is: " + jar.shape)
+    println("   frameLevels: " + frameLevels)
+    println("   intFrameLevels: " + intFrameLevels)
 	  val frames = {
 		  var tempShape = jar.shape
     	  (for (r <- intFrameLevels.reverse) yield {
-    	    val rank = if (r >= 0) r else tempShape.length - r
+    	    val rank = if (r >= 0) r else tempShape.length + r
+    	    println("---in JArrayFrame loop, ranks is: " + rank)
     		val frame = tempShape.take(tempShape.length - rank)
     		tempShape = tempShape.drop(tempShape.length - rank)
+    		println("   frame is " + frame)
     		frame
     	}).toList :+ tempShape
   	}

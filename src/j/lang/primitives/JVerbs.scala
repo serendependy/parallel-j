@@ -99,6 +99,7 @@ object JVerbs {
       jANY
   ){
     override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = {
+      println("---in ravel\nArgument array is:\n")
       JArray(y.jaType, List(y.numScalars), y.ravel)
     }
     
