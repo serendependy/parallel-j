@@ -26,6 +26,7 @@ object Tester {
       testNegate()
       testRoll()
       testSquare()
+      testRavelItems()
       
       testPlus()
       testShift()
@@ -88,6 +89,16 @@ object Tester {
       for (i <- 0 to 10)
         println(squareNotand.monad(JArray.scalar[JInt](i)))
       println("Done")
+    }
+    
+    def testRavelItems() {
+      println("\n--Testomg ravelItems")
+      val arr3 = integersIndex.monad(JArray.auto[JInt, Int](2,3,2))
+      println("arr3:\n" + arr3)
+      
+      println(ravelitemsStitch.monad(arr3))
+      
+      println("DONE")
     }
     
     //dyads
@@ -181,6 +192,15 @@ object Tester {
         }
         println()
       }
+    }
+    
+    //higher order
+    def testInsert() {
+      
+    }
+    
+    def testRank() {//TODO the big one
+      
     }
   }
   
