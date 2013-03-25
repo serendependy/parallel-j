@@ -332,13 +332,13 @@ final class JFloat(val v: Double) extends Finite(jFL) {
 	}
 	
 	def -~(o: Finite):JNumber = o match {
-	  case i: JInt => new JFloat(v + i.v)
-	  case f: JFloat=>new JFloat(v + f.v)
+	  case i: JInt => new JFloat(v - i.v)
+	  case f: JFloat=>new JFloat(v - f.v)
 	}
 	
 	def *~(o: Finite):JNumber = o match {
-	  case i: JInt => new JFloat(v + i.v)
-	  case f: JFloat=>new JFloat(v + f.v)
+	  case i: JInt => new JFloat(v * i.v)
+	  case f: JFloat=>new JFloat(v * f.v)
 	}
 	
 	def %~(o: Finite):JNumber = o match {

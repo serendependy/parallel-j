@@ -54,17 +54,18 @@ object Tester {
       val recip = JArray.scalar(numRiemann.recip)
       val xvals =  signumMultiply.dyad(integersIndex.monad(JArray.scalar(numRiemann)),
     		  							recip)
-      val yvals = squarerootRoot.monad(negateMinus.dyadImpl(JArray.scalar(JReal.One),
+      val yvals = squarerootRoot.monad(negateMinus.dyad(JArray.scalar(JReal.One),
     		  										 squareNotand.monad(xvals)))
-      val pi = recipricalDivide.dyad(
+      val pi = signumMultiply.dyad(
           signumMultiply.dyad(
-              (conjugatePlus.insert).monad(yvals),
+              (conjugatePlus insert).monad(yvals),
               JArray.scalar[JInt,Int](4)),
           recip)
       
       println("PI is: " + pi)
       println("DONE")
     }
+    
     
 
   }
@@ -216,6 +217,8 @@ object Tester {
     }
     
     def testRoot() {
+      println("\n--Testing Root")
+      
       
       for (i <- 0 to 4) {
         for (j <- List(0,1,2,4,8,9,64,65,100)) {
@@ -223,6 +226,8 @@ object Tester {
         }
         println()
       }
+      
+      println("DONE")
     }
     
     //higher order
