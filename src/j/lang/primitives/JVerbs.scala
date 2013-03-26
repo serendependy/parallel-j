@@ -1,18 +1,15 @@
 package j.lang.primitives
 
 import j.util.CMacroType
-
 import j.lang.datatypes.JFuncRank
 import j.lang.datatypes.JTypeMacros._
-
 import j.lang.datatypes.function.{JVerb, JVerb1Type, JVerb2Type}
-
 import j.lang.datatypes.array.{JArray, JArrayType}
 import j.lang.datatypes.array.ArrayImplicits._
 import j.lang.datatypes.array.JArrayFlag._
-
 import j.lang.datatypes.array.types.JNumberTypes._
 import j.lang.datatypes.array.types._
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 
 object JVerbs {
@@ -144,7 +141,17 @@ object JVerbs {
       List(JFuncRank(JInfinity, 0, 0)),
       jNUMERIC, jNUMERIC, jNUMERIC
   ) {
-
+	  	protected override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = {
+	  	  this.addRanks(JFuncRank(JInfinity, 0))(y,y)
+	  	}
+	  	
+	  	protected override def dyadImpl[T1 <: JArrayType : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = x.ravel(0) match {
+	  	  case nx: JNumber => y.ravel(0) match {
+	  	    case ny: JNumber => JArray.scalar[JInt, Int](if (nx == ny) 1 else 0)
+	  	  }
+	  	  
+	  	  case _ => throw new NotImplementedException()
+	  	}
   }
   
   final object incrementGreaterthanequal extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
