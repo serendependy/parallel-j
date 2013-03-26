@@ -70,6 +70,11 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
       }
     }
   }
+  
+  		def agenda[MRR <: JArrayType : Manifest, DRR <: JArrayType : Manifest](
+  		    f: JVerb[M,D1,D2,MRR,DRR], t: JVerb[M,D1,D2,MRR,DRR]) = {
+  		  
+  		}
 //TODO for the lolz later
 //  	def reflex(implicit ev1: JArray[D2] =:= JArray[D1], ev2: JArray[D1] =:= JArray[D2]) = {
 //  	  val thisOtherThing = this

@@ -92,8 +92,17 @@ object Tester {
       println("Neighbor higher array:\n" + neighborArray(board))
       println("Neighbor list of board:\n" + listNeighbors(board))
       
+      //TODO advanced function composition still in the works
       val nextState = (y: JArray[JInt]) => {
         val neighbors = listNeighbors(y)
+        board.ravel zip neighbors.ravel map ((x: (JInt, JInt)) => {
+          val (cell, neighb) = x
+          if (cell == JReal.Zero)
+            JArray.scalar[JInt, Int](if (neighb == JInt(3)) JReal.One else JReal.Zero)
+          else {
+            //TODO for later
+          }
+        })
       }
           
       println("DONE")

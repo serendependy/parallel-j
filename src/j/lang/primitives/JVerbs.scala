@@ -139,6 +139,14 @@ object JVerbs {
     }
   }
   
+  final object equal extends JVerb[JArrayType, JArrayType, JArrayType, JInt, JInt](
+      "=",
+      List(JFuncRank(JInfinity, 0, 0)),
+      jNUMERIC, jNUMERIC, jNUMERIC
+  ) {
+
+  }
+  
   final object incrementGreaterthanequal extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
       ">:",
       List(JFuncRank(0)),

@@ -254,6 +254,10 @@ final object JNegativeInfinity extends JInfinite with Ordered[JReal] {
 	override def toString = "__"
 }
 
+object JInt {
+  def apply(i: Int) = new JInt(i)
+}
+
 final class JInt(val v: Int) extends Finite(jINT) {
 
 	import JReal._
