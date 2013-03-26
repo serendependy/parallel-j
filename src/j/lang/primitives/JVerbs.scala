@@ -139,7 +139,7 @@ object JVerbs {
     }
   }
   
-  final object incrementGreaterthan extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
+  final object incrementGreaterthanequal extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
       ">:",
       List(JFuncRank(0)),
       jNUMERIC, jNUMERIC, jNUMERIC
@@ -150,7 +150,7 @@ object JVerbs {
     }
   }
   
-  final object decrementLesserthan extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
+  final object decrementLesserthanequal extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
       "<:",
       List(JFuncRank(0)),
       jNUMERIC, jNUMERIC, jNUMERIC
@@ -245,7 +245,8 @@ object JVerbs {
       for ((shift, r) <- x.ravel.zip(y.rank to (y.rank - x.numScalars) by -1)) {
     	  val numAt = y.numItemsAt(r)
     	  val sizeAt= y.sizeItemAt(r)
-    	  val toDrop = r % y.shape(r-1)
+    	  val toDrop = if (shift >= JReal.Zero) shift.v % y.shape(r-1) else (shift.v % y.shape(r-1))+y.shape(r-1)
+/*    	  val toDrop = r % y.shape(r-1)*/
     	  
     	  val distinctionsAtThisRank = Vector() ++ (for (i <- 0 until y.numAtRank(r)) yield {
     	    val start = i * y.sizeAtRank(r)
@@ -258,7 +259,6 @@ object JVerbs {
     	      Vector[T2]())(_ ++ _)).foldLeft(
     	          Vector[T2]())(_ ++ _)
       }
-      
       JArray(y.jaType, y.shape, ret)
     }
   }

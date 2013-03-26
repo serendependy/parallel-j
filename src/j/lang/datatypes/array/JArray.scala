@@ -49,6 +49,10 @@ object JArray {
       JArray[JInt, Int](afNONE, jINT, 0, List(2), Vector(a,b))
     }
     
+    def vec2(a: JInt, b: JInt) = {
+      new JArray(afNONE, jINT, 0, List(2), Vector(a,b))
+    }
+    
     def vec1(a: Int) = {
       JArray[JInt,Int](afNONE, jINT, 0, List(1), Vector(a))
     }

@@ -13,6 +13,8 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   (rep: String, val ranks: List[JFuncRank], mdomain: JTypeMacro, d1domain: JTypeMacro, d2domain: JTypeMacro) extends 
   JFunc[JArray[M], JArray[D1], JArray[D2], JArray[MR], JArray[DR]](rep, jVERB, mdomain, d1domain, d2domain) {
 
+  def apply[T <: JArray[M]](y: T) = monad(y)
+  
   override def monad[T <: JArray[M]](y: T) = { //some testing with types and shape
 	  val jaf = JArrayFrame(ranks.map(_ r1), y)
 	  println("---monad call for " + rep + ": frame is:\n" + jaf)
@@ -57,11 +59,9 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         case 0 => throw new Exception() //TODO should fetch identity element
         case 1 => y
         case n: Int => {
-        	val thing = (0 until n).map(j => ev1(y(j))).reduce((y1, y2) => {
+        	 (0 until n).map(j => ev1(y(j))).reduce((y1, y2) => {
         	  ev2(thisotherthing.dyad(ev3(y1), y2))
         	})
-        	
-        	thing
         }
       }
       
@@ -70,7 +70,15 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
       }
     }
   }
+//TODO for the lolz later
+//  	def reflex(implicit ev1: JArray[D2] =:= JArray[D1], ev2: JArray[D1] =:= JArray[D2]) = {
+//  	  val thisOtherThing = this
+//  	  
+//  	  new JVerb[D2, D2, D1, DR, DR](
+//  	      rep + )
+//  	}
   
+  	def apply[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = dyad(x,y)
 	override def dyad[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = {
 	  val jafx = JArrayFrame(ranks.map(_ r2), x)
 	  val jafy = JArrayFrame(ranks.map(_ r3), y)
