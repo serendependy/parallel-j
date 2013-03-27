@@ -61,13 +61,22 @@ We compare solutions to a suite of data parallel problems written in C, Scala, J
 
 The rest of the paper is organized as follows:
 \begin{itemize}
-    \item Chapter \ref{back} develops the idea of function rank more thoroughly, comparing it to nesting with loops or \textit{map} and \textit{reduce}, explaining how it can be used to extend functions to regular collections of higher dimension, sometimes automatically, and how it makes it easier for the programmer to exploit the inherent data parallelism on such extensions. 
-    \item Chapter \ref{probs} gives the listing of our selection of example data parallel problems, giving for each a brief description, an explanation of how to exploit concurrency, and a discussion of how to possibly extend the problem to higher dimensions.
-    \item Chapter \ref{res} compares example solutions to the problems listed in Section 3 in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses relative level of abstraction, scalability and performance of each solution. 
+	\item The remaining sections of this chapter give the design plan (\ref{desp}) and implementation (\ref{imp}) of our research. 
+	Unfortunately, the latter did not quite fulfill the expectations we had in the former, so we include both a description of what we wanted to accomplish and what we were actually able to accomplish given the time constraints. 
+	\item Chapter ref{back} gives teh neccessary background information for understanding this work, 
+	including a brief description of function rank and how it is equivalent to nested loops or nested calls to \textit{map} and \textit{reduce},
+	a discussion of relevant parallel design patterns for the example problem set, 
+	and a literature review of other attempts to solve the same or similiar problems, including a top-level summary of Scala's parallel collections library.
+    \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a description how to possibly extend the problem to higher dimensions.
+    \item Chapter \ref{res} compares example solutions to the problems listed in Section 3 in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work.
 \end{itemize}
 
-\section{Implementation Plan}
+\section{Design Plan}
+\label{desp}
+
+\section{Implementation}
+\label{imp}
 
 \nocite{rankanduni}
 \nocite{dph}
