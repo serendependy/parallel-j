@@ -45,38 +45,57 @@ Consequently, languages with both formalized function rank and a rank-operator a
 exploit the inherent data parallelism of extending existing operations to collections of higher dimension safely, quickly, and in some cases automatically.
 
 Unfortunately, currently the languages that meet these criteria, such as J, Dialog APL, and others from the APL language family, are not in common use.
-One often-cited reason for this \begin{comment}TODO cite\end{comment} is that these languages are difficult to read, 
+One often-cited reason for this is that these languages are difficult to read, % TODO cite
 because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments. %TODO cite J Vocab, APL cheat sheet
 However, these language design choices are not required in order for a language to support function rank.
 It seems to us that what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language.
 
-\section{Design Plan}
-To demonstrate that function rank can be used to exploit data parallelism on , we present a partial parallel implementation of the J programming language, calleld \textit{Parallel-J}, written in the Scala programming language.\begin{comment}TODO cite?\end{comment}
-We believe Scala is an ideal language to both implement and compare with our work, for two reasons.
-\begin{itemize}
-    \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time). % (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library that gives programers some of the functionality of J
-    \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI which are designed for older imperative languages(C/C++/Fortran) and which require working at a conceptually lower level.
-\end{itemize}
-We compare solutions to a suite of data parallel problems written in C, Scala, J, and hand-compilied Parallel-J\begin{comment}TODO really should change name\end{comment} and discuss the relative level of abstraction, scalability, and performance of each.
 
 The rest of the paper is organized as follows:
 \begin{itemize}
 	\item The remaining sections of this chapter give the design plan (\ref{desp}) and implementation (\ref{imp}) of our research. 
 	Unfortunately, the latter did not quite fulfill the expectations we had in the former, so we include both a description of what we wanted to accomplish and what we were actually able to accomplish given the time constraints. 
-	\item Chapter ref{back} gives teh neccessary background information for understanding this work, 
+	\item Chapter \ref{back} gives the neccessary background information for understanding this work, 
 	including a brief description of function rank and how it is equivalent to nested loops or nested calls to \textit{map} and \textit{reduce},
 	a discussion of relevant parallel design patterns for the example problem set, 
-	and a literature review of other attempts to solve the same or similiar problems, including a top-level summary of Scala's parallel collections library.
-    \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a description how to possibly extend the problem to higher dimensions.
-    \item Chapter \ref{res} compares example solutions to the problems listed in Section 3 in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
+	and a literature review of other attempts to solve the same or similiar problems
+    \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a descritpion of how possibly to extend the problem to higher dimensions.
+    \item Chapter \ref{res} compares example solutions to the problems listed in Chapter \ref{probs} in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses the relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work.
 \end{itemize}
 
 \section{Design Plan}
 \label{desp}
+Our goal was to implement a parallel subset of the programming language J.
+This would require a J language lexer and parser, limited memory management, a look-up table for predefined and user defined functions, a read-evaluate-print-loop (\textit{REPL}), and a subset of the J primitives.
+To be included in this subset of primitives would be: global variable assignment; 
+most array operations (creating, indexing, restructuring) and all of the basic arithmetic and logical operations; 
+a small selection of higher-ordered functions, such as function composition (including J's tacit function composition rules for sequences of functions or \textit{trains}), conditionals, reduction;
+and, of course, the rank operator and function rank. %TODO cite J Vocab (?)
+
+We excluded from the design of the parallel language subset the following language features: 
+namespaces (called \textit{locales});
+all existing environment-altering functions (the \textit{foreign} function);
+explicit scripts with imperative-style execution and control structures;
+and the J primitives which calculated complex algorithms, such as prime factorization and derivatives polynomial equations.
+
+Our choices were motivated by the desire to present solutions to our sample problems in as simple and "idiomatic" J as possible, 
+so as to illustrate clearly the advantages approaching parallel problems with function rank.
+
+% (CJ) TODO add discusson of new operator 111 !: to be included in subset
+% TODO also parallelisation techniques.
+% TODO also Scala
 
 \section{Implementation}
 \label{imp}
+To demonstrate that function rank can be used to exploit data parallelism on regular collections, we present a partial parallel implementation of the J programming language, calleld \textit{Parallel-J}, written in the Scala programming language.\begin{comment}TODO cite?\end{comment}
+We believe Scala is an ideal language to both implement and compare with our work, for two reasons.
+\begin{itemize}
+    \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time). % (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library that gives programers some of the functionality of J
+    \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI which are designed for older imperative languages(C/C++/Fortran) and which require working at a conceptually lower level.
+\end{itemize}
+We compare solutions to a suite of data parallel problems written in C, Scala, J, and hand-compilied Parallel-J %(CJ) TODO really should change name
+and discuss the relative level of abstraction, scalability, and performance of each.
 
 \nocite{rankanduni}
 \nocite{dph}
