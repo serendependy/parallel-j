@@ -17,11 +17,11 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   
   override def monad[T <: JArray[M]](y: T) = { //some testing with types and shape
 	  val jaf = JArrayFrame(ranks.map(_ r1), y)
-	  println("---monad call for " + rep + ": frame is:\n" + jaf)
-	  println("   ranks: " + ranks)
-	  println("   frameSize: " + jaf.frameSize)
+//	  println("---monad call for " + rep + ": frame is:\n" + jaf)
+//	  println("   ranks: " + ranks)
+//	  println("   frameSize: " + jaf.frameSize)
 	  val newCells = (for (fr <- 0 until jaf.frameSize) yield {
-	    println("   " + fr + "-slice is " + jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize))
+//	    println("   " + fr + "-slice is " + jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize))
 	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
 	  })
 	  val newShape = jaf.frames.dropRight(ranks.length).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
@@ -71,10 +71,6 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
     }
   }
   
-  		def agenda[MRR <: JArrayType : Manifest, DRR <: JArrayType : Manifest](
-  		    f: JVerb[M,D1,D2,MRR,DRR], t: JVerb[M,D1,D2,MRR,DRR]) = {
-  		  
-  		}
 //TODO for the lolz later
 //  	def reflex(implicit ev1: JArray[D2] =:= JArray[D1], ev2: JArray[D1] =:= JArray[D2]) = {
 //  	  val thisOtherThing = this
@@ -88,10 +84,10 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	  val jafx = JArrayFrame(ranks.map(_ r2), x)
 	  val jafy = JArrayFrame(ranks.map(_ r3), y)
 	  
-	  println("---dyad call for " + rep)
+/*	  println("---dyad call for " + rep)
 	  println("   xframe: " + jafx)
 	  println("   yframe: " + jafy)
-	  println("   ranks: " + ranks)
+	  println("   ranks: " + ranks)*/
 	  
 	  jafx.shapeAgreement(jafy) match {
 	    case None => throw new Exception() //TODO shape error
@@ -118,7 +114,28 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	    }
 	  }
 	}
-	
+
+  	def agenda(f: JVerb[M, D1, D2, MR, DR], t: JVerb[M, D1, D2, MR, DR]) = {
+  	  
+  	  val tref = this
+  	  
+  	  new JVerb[M, D1, D2, MR, DR](
+  	      f.rep + " ` " + t.rep + "@. " + tref.rep,
+  	      List(JFuncRank(JReal.Zero)),
+  	      tref.mdomain, tref.d1domain, tref.d2domain){
+  	    
+  	    override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
+  	    	if (tref(y) == JReal.Zero) f(y)
+  	    	else t(y)
+  	    }
+  	    
+  	    override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = {
+  	      if (tref(x,y) == JReal.Zero) f(x,y)
+  	      else t(x,y)
+  	    }
+  	  }
+  	}
+  	
 	protected def monadImpl[T <: M : Manifest](y: JArray[T]): JArray[MR]
 	protected def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]): JArray[DR]
 }
