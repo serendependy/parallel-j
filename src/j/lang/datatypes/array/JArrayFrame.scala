@@ -38,11 +38,11 @@ object JArrayFrame {
     (JArrayFrame(rs.map(_ r2), jar1), JArrayFrame(rs.map(_ r3), jar2))
   }
 }
-
+//looks like this only needs to be applied one at a time, instead of all at once
 class JArrayFrame[T <: JArrayType : Manifest] private(val frames: List[List[Int]], val jar: JArray[T]) {
-  lazy val cellShape = frames.last
+  lazy val cellShape = frames.tail.foldLeft(List[Int]())(_ ++ _)
   lazy val cellSize = cellShape.foldLeft(1)(_ * _)
-  lazy val frameSize = jar.shape.foldLeft(1)(_ * _) / cellSize
+  lazy val frameSize = /*jar.shape.foldLeft(1)(_ * _) / cellSize*/ frames(0).foldLeft(1)(_ * _)
 
   def shapeAgreement(other: JArrayFrame[_]):Option[List[List[Int]]] = {
   	  if (this.frames.length != other.frames.length) None

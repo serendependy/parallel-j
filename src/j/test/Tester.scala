@@ -40,6 +40,7 @@ object Tester {
     	import j.lang.datatypes.array.ArrayImplicits._
     	
     	testNumericalIntegration(10)
+    	testGameOfLife(5,5,0.5, 10)
     }
     
   }
@@ -52,13 +53,13 @@ object Tester {
     def testNumericalIntegration(numRiemann: JInt) {
       println("\n--Testing Numerical Integration")
       val recip = JArray.scalar(numRiemann.recip)
-      val xvals =  signumMultiply.dyad(integersIndex.monad(JArray.scalar(numRiemann)),
+      val xvals =  signumMultiply(integersIndex(JArray.scalar(numRiemann)),
     		  							recip)
-      val yvals = squarerootRoot.monad(negateMinus.dyadImpl(JArray.scalar(JReal.One),
-    		  										 squareNotand.monad(xvals)))
-      val pi = recipricalDivide.dyad(
-          signumMultiply.dyad(
-              (conjugatePlus.insert).monad(yvals),
+      val yvals = squarerootRoot(negateMinus(JArray.scalar(JReal.One),
+    		  								 squareNotand(xvals)))
+      val pi = signumMultiply(
+          signumMultiply(
+              (conjugatePlus insert).monad(yvals),
               JArray.scalar[JInt,Int](4)),
           recip)
       
@@ -66,6 +67,46 @@ object Tester {
       println("DONE")
     }
     
+    def testGameOfLife(x: JInt, y: JInt, ratioAliveDead: JFloat, steps: Int) = {
+      println("\n--Testing Game of Life")
+      val boardShape = JArray.vec2(x, y)
+      val numCells = (signumMultiply insert).monad(boardShape).asInstanceOf[JArray[JInt]]
+      val lifeThreshold = signumMultiply(JArray.scalar(ratioAliveDead),
+    		  							 numCells).asInstanceOf[JArray[JReal]]
+      val board = shapeReshape(
+          boardShape,
+    	  incrementGreaterthanequal(
+    	      lifeThreshold,
+    	      rollDeal[JArray[JInt],JArray[JInt]](
+    	          numCells,
+    	          numCells))).asInstanceOf[JArray[JInt]]
+      
+      val shiftBy = shapeReshape(
+          JArray.vec2(8, 2),//    DR	  D		 DL	   R      L     UR     UL
+          JArray.auto[JInt, Int](-1,-1,  -1,0,  -1,1,  0,-1,  0,1,  1,-1,  1,0,  1,1)).asInstanceOf[JArray[JInt]]
+      
+      val neighborArray = (y: JArray[JInt]) => reverseShift(shiftBy, y).asInstanceOf[JArray[JInt]]
+      val listNeighbors = (y: JArray[JInt]) => (conjugatePlus insert).monad(neighborArray(y)).asInstanceOf[JArray[JInt]]
+
+      println("Board:\n" + board)
+      println("Neighbor higher array:\n" + neighborArray(board))
+      println("Neighbor list of board:\n" + listNeighbors(board))
+      
+      //TODO advanced function composition still in the works
+      val nextState = (y: JArray[JInt]) => {
+        val neighbors = listNeighbors(y)
+        board.ravel zip neighbors.ravel map ((x: (JInt, JInt)) => {
+          val (cell, neighb) = x
+          if (cell == JReal.Zero)
+            JArray.scalar[JInt, Int](if (neighb == JInt(3)) JReal.One else JReal.Zero)
+          else {
+            //TODO for later
+          }
+        })
+      }
+          
+      println("DONE")
+    }
 
   }
   
@@ -173,11 +214,13 @@ object Tester {
       val sh1  = reverseShift.dyad(JArray.auto[JInt, Int](1), arr3)
       val sh2  = reverseShift.dyad(JArray.auto[JInt, Int](1,2), arr3)
       val sh3  = reverseShift.dyad(JArray.auto[JInt, Int](1,2,1), arr3)
+      val sh4  = reverseShift(JArray.auto[JInt, Int](-1, -2, -1), arr3)
       
       println(arr3 + "\n--")
       println(sh1 + "\n--")
       println(sh2 + "\n--")
       println(sh3 + "\n--")
+      println(sh4 + "\n--")
       
       println("Done")
     }
@@ -216,6 +259,8 @@ object Tester {
     }
     
     def testRoot() {
+      println("\n--Testing Root")
+      
       
       for (i <- 0 to 4) {
         for (j <- List(0,1,2,4,8,9,64,65,100)) {
@@ -223,6 +268,8 @@ object Tester {
         }
         println()
       }
+      
+      println("DONE")
     }
     
     //higher order

@@ -254,6 +254,10 @@ final object JNegativeInfinity extends JInfinite with Ordered[JReal] {
 	override def toString = "__"
 }
 
+object JInt {
+  def apply(i: Int) = new JInt(i)
+}
+
 final class JInt(val v: Int) extends Finite(jINT) {
 
 	import JReal._
@@ -332,13 +336,13 @@ final class JFloat(val v: Double) extends Finite(jFL) {
 	}
 	
 	def -~(o: Finite):JNumber = o match {
-	  case i: JInt => new JFloat(v + i.v)
-	  case f: JFloat=>new JFloat(v + f.v)
+	  case i: JInt => new JFloat(v - i.v)
+	  case f: JFloat=>new JFloat(v - f.v)
 	}
 	
 	def *~(o: Finite):JNumber = o match {
-	  case i: JInt => new JFloat(v + i.v)
-	  case f: JFloat=>new JFloat(v + f.v)
+	  case i: JInt => new JFloat(v * i.v)
+	  case f: JFloat=>new JFloat(v * f.v)
 	}
 	
 	def %~(o: Finite):JNumber = o match {

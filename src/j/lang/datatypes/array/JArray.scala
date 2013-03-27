@@ -49,6 +49,10 @@ object JArray {
       JArray[JInt, Int](afNONE, jINT, 0, List(2), Vector(a,b))
     }
     
+    def vec2(a: JInt, b: JInt) = {
+      new JArray(afNONE, jINT, 0, List(2), Vector(a,b))
+    }
+    
     def vec1(a: Int) = {
       JArray[JInt,Int](afNONE, jINT, 0, List(1), Vector(a))
     }
@@ -66,7 +70,7 @@ class JArray[+T <: JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
   lazy val rank = shape.length
   lazy val tally = shape(0)
   lazy val itemSize = shape.drop(1).foldLeft(1)(_ * _)
-  lazy val numItemz = shape(0)
+  lazy val numItemz = if (shape isEmpty) 0 else shape(0)
   
   lazy val rankSizes = shape.scanRight(1)(_ * _).reverse
   lazy val rankItems = shape.scanLeft(1)(_ * _).reverse
