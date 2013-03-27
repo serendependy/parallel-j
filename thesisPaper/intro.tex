@@ -5,17 +5,19 @@ Many scientific and business computing applications must work on large data sets
 In order for these applications to achieve good performance, it is often the case that programers must exploit any and all concurrency in the application through different approaches to parallel programming.
 One approach frequently used to exploit concurrency on large collections is \textit{data-parallelism}, in which programs update elements or subsections of collections in parallel.
 Many tools have already been developed to help programmers exploit data-parallelism easily and safely. %TODO citation
-However, we believe that many of these tool are not as helpful for exploiting data-parallelism on regular, multidimensional collections as they could be, for two reasons: 
-1) the implementation of such collections in most languages can make it more difficult to view and manipulate their structure; and 
-2) in many use cases applying functions to such collections leads to boiler-plate code, which can be tedious and error prone.
+However, we believe that many of these tool are not as helpful for exploiting data-parallelism on regular, multidimensional collections as they could be, for two reasons.
+%1) the implementation of such collections in most languages can make it more difficult to view and manipulate their structure; and 
+%2) in many use cases applying functions to such collections leads to boiler-plate code, which can be tedious and error prone.
 
-To the first point, many programming languages, implement regular multidimensional collections as nested collections; 
+First, many programming languages implement regular multidimensional collections as nested collections;
 e.g. a 2-dimensional, 2 by 3 array of integers would be implemented as an array of 2 arrays, with each of these containing 3 integers.
 However, in such languages irregular multidimensional collections are also usually implemented as nested collections, with each of the sub-arrays possibly containing a different number of elements from each other.
-Since they are implemented the same way, if a function requires that one or more of its arguments is a regular collection, programmers must either write code to ensure this requirement is met or risk run-time indexing errors and program crashes.
+Since both regular and irregular collections are implemented the same way,
+it can be difficult for programmers to view, manipulate, and verify any important properties of the structure of these collections.
+For example, if a function requires that one or more of its arguments is a regular collection, programmers must either write code to ensure this requirement is met or risk run-time indexing errors and program crashes.
 
-To the second point, in most imperative languages with regular multidimensional collections, applying functions to elements or sub-collections of a collection means writing the function call within nested looping structures, typically a \textit{for-loop}
-Using this method to apply functions on these collections usually means that the number of dimensions or\textit{rank} of the collection determines the number of loops required to do a specific operation.
+Second, in most imperative languages with regular multidimensional collections, applying functions to elements or sub-collections of a collection means writing the function call within nested looping structures, typically a \textit{for-loop}
+Using this method to apply functions on these collections usually means that the number of dimensions or the \textit{data rank} of the collection determines the number of loops required to do a specific operation.
 To put it another way, if an existing function which operates on a multidimensional collectios needs to be extended to a collection of higher dimensions, 
 or if the function only operates on scalar values but needs to be extended to some multidimensional collection, 
 the programmer usually must wrap the function in nested for-loops.
@@ -33,18 +35,18 @@ As a consequence, this also allows programmers to more easily see where there is
 However, since these higher-order functions are usually designed to return functions which operate on only one dimension at a time, 
 they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
-\textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} and implemented in the programming language J, is a functional abstraction which extends the notion of data rank to functions.
+\textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} and implemented in the programming language J, is a functional abstraction which extends the notion of data rank to functions. %(CJ) defined earlier in the paper
 In functional languages where the idea of function rank is formalized, extending existing functions to regular collections of higher dimension can be expressed as the application of a higher-ordered function, 
-called in J and in this paper the \textit{rank operator}.%TODO cite J vocab
+called in J and in this paper the \textit{rank operator}. %TODO cite J vocab
 Expressing these extensions as a higher-order function makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
-In some cases, these extensions are so trivial that they can be done automatically, meaning the programmer need not modify the code at all.%TODO cite J shape agreement
+In some cases, these extensions are so trivial that they can be done automatically, meaning the programmer need not modify the code at all. %TODO cite J shape agreement
 Furthermore, since multiple applications of the rank operator are equivalent to nested loops or nested higher-order function applications, it too is inherently data-parallel.
 Consequently, languages with both formalized function rank and a rank-operator allow the programmer to 
 exploit the inherent data parallelism of extending existing operations to collections of higher dimension safely, quickly, and in some cases automatically.
 
 Unfortunately, currently the languages which meet these criteria, such as J, Dialog APL, and others from the APL language family, are not in common use.
 One often-cited reason for this \begin{comment}TODO cite\end{comment} is that these languages are difficult to read, 
-because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments.%TODO cite J Vocab, APL cheat sheet
+because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments. %TODO cite J Vocab, APL cheat sheet
 However, these language design choices are not required in order for a language to support function rank.
 It seems to us that what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language.
 
@@ -52,7 +54,7 @@ It seems to us that what is needed is a proof-of-concept that the notion of func
 To demonstrate this, we present a partial parallel implementation of the J programming language, calleld \textit{Parallel-J}, written in the Scala programming language.\begin{comment}TODO cite?\end{comment}
 We believe Scala is an ideal language to both implement and compare with our work, for two reasons.
 \begin{itemize}
-    \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time).% (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library which gives programers some of the functionality of J
+    \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time). % (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library which gives programers some of the functionality of J
     \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data-parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI which are designed for older imperative languages(C/C++/Fortran) and which require working at a conceptually lower level.
 \end{itemize}
 We compare solutions to a suite of data-parallel problems written in C, Scala, J, and hand-compilied Parallel-J\begin{comment}TODO really should change name\end{comment} and discuss the relative level of abstraction, scalability, and performance of each.
@@ -62,7 +64,7 @@ The rest of the paper is organized as follows:
     \item Chapter 2 develops the idea of function rank more thoroughly, comparing it to nesting with loops or \textit{map} and \textit{reduce}, explaining how it can be used to extend functions to regular collections of higher dimension, sometimes automatically, and how it makes it easier for the programmer to exploit the inherent data-parallelism on such extensions. 
     \item Chapter 3 gives the listing of our selection of example data-parallel problems, giving for each a brief description, an explanation of how to exploit concurrency, and a discussion of how to possibly extend the problem to higher dimensions.
     \item Chapter 4 compares example solutions to the problems listed in Section 3 in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses relative level of abstraction, scalability and performance of each solution. 
-    \item Section 5 presents our conclusions of this research.
+    \item Chapter 5 presents our conclusions of this research and discusses future work.
 \end{itemize}
 
 \nocite{rankanduni}
