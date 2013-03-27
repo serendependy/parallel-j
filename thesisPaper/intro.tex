@@ -46,7 +46,7 @@ exploit the inherent data parallelism of extending existing operations to collec
 
 Unfortunately, currently the languages that meet these criteria, such as J, Dialog APL, and others from the APL language family, are not in common use.
 One often-cited reason for this is that these languages are difficult to read, % TODO cite
-because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments. %TODO cite J Vocab, APL cheat sheet
+because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments.\cite{jvocab} %TODO cite APL cheat sheet
 However, these language design choices are not required in order for a language to support function rank.
 It seems to us that what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language.
 
@@ -66,7 +66,7 @@ The rest of the paper is organized as follows:
 
 \section{Design Plan}
 \label{desp}
-Our goal was to implement a parallel subset of the programming language J.
+Our goal was to implement a parallel subset of the programming language J, called \textit{Parallel-J}.
 This would require a J language lexer and parser, limited memory management, a look-up table for predefined and user defined functions, a read-evaluate-print-loop (\textit{REPL}), and a subset of the J primitives.
 To be included in this subset of primitives would be: global variable assignment; 
 most array operations (creating, indexing, restructuring) and all of the basic arithmetic and logical operations; 
@@ -79,12 +79,38 @@ all existing environment-altering functions (the \textit{foreign} function);
 explicit scripts with imperative-style execution and control structures;
 and the J primitives which calculated complex algorithms, such as prime factorization and derivatives polynomial equations.
 
-Our choices were motivated by the desire to present solutions to our sample problems in as simple and "idiomatic" J as possible, 
-so as to illustrate clearly the advantages approaching parallel problems with function rank.
+These choices were motivated by the desire to present solutions to our sample problems in as simple and "idiomatic" J as possible.
+This would allow us to directly address the involved computations, as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
+without getting distracted with a discussion of J's more advanced or nuanced language features.
 
-% (CJ) TODO add discusson of new operator 111 !: to be included in subset
+Also to be included was a proposal and implementation of a new \textit{foreign} operator, spelled\ttfamily (111 !:)\normalfont , 
+that would allow the programmer to set environmental parameters for parallelizing code.
+For example, this operator could be used to specify the number of threads to use in executing a piece of code, 
+or to set thread scheduling schemes.
+Although not entirely related to function rank, such controls are to be expected from any serious parallel computing environment.
+
+To implement this parallel subset of J, we chose the Scala programming language. % TODO cite website, api?
+Scala has many features that make it desireable for this task, including: 
+\begin{itemize}
+	\item support for multiple programming paradigms, such as
+	\begin{itemize}
+		\item imperative, for the tasks of memory management and object creation,
+		\item object oriented, for more structured encapsulation of the rank associated with each function 
+			and data associated with arrays, and
+		\item functional, to more easily capture J's functional paradigm in the implementation and thus facilitate development
+	\end{itemize}
+	\item a feature-rich library for collections, including
+	\begin{itemize}
+		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, 
+			common to many solutions to data parallel problems, and
+		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,
+			which, being similiar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
+	\end{itemize}
+\end{itemize}
+
+We would then compare solutions to a suite of data parallel problems written in C, Scala and Parallel-J,
+and discuss the relative level of abstraction, scalability to similiar problems of higher dimension, and performance of each.
 % TODO also parallelisation techniques.
-% TODO also Scala
 
 \section{Implementation}
 \label{imp}
