@@ -54,12 +54,12 @@ object Tester {
       println("\n--Testing Numerical Integration")
       val recip = JArray.scalar(numRiemann.recip)
       val xvals =  signumMultiply(integersIndex(JArray.scalar(numRiemann)),
-    		  							recip)
+    		  					  recip)
       val yvals = squarerootRoot(negateMinus(JArray.scalar(JReal.One),
     		  								 squareNotand(xvals)))
       val pi = signumMultiply(
           signumMultiply(
-              (conjugatePlus insert).monad(yvals),
+              (conjugatePlus insert).apply(yvals),
               JArray.scalar[JInt,Int](4)),
           recip)
       
