@@ -89,7 +89,7 @@ For example, this operator could be used to specify the number of threads to use
 or to set thread scheduling schemes.
 Although not entirely related to function rank, such controls are to be expected from any serious parallel computing environment.
 
-To implement this parallel subset of J, we chose the Scala programming language. % TODO cite website, api?
+To implement this parallel subset of J, we chose the Scala programming language.\cite{scala} 
 Scala has many features that make it desireable for this task, including: 
 \begin{itemize}
 	\item support for multiple programming paradigms, such as
@@ -99,11 +99,11 @@ Scala has many features that make it desireable for this task, including:
 			and data associated with arrays, and
 		\item functional, to more easily capture J's functional paradigm in the implementation and thus facilitate development
 	\end{itemize}
-	\item a feature-rich library for collections, including
+	\item a feature-rich library for collections, including 
 	\begin{itemize}
-		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, 
+		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, % TODO cite Scala 2.8 collections
 			common to many solutions to data parallel problems, and
-		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,
+		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,\cite{pc}
 			which, being similiar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
 	\end{itemize}
 \end{itemize}
