@@ -1,6 +1,7 @@
 package j.test
 
 import j.lang.datatypes.array.types.JNumberTypes._
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 object Tester {
   
@@ -47,8 +48,15 @@ object Tester {
   
   object ExampleProblems {
     import j.lang.datatypes.array.JArray
+    import j.lang.datatypes.array.JArrayType
     import j.lang.datatypes.array.ArrayImplicits._
+    
     import j.lang.primitives.JVerbs._
+    
+    import j.lang.datatypes.JTypeMacros._
+    
+    import j.lang.datatypes.function.JVerb1Type
+    import j.lang.datatypes.JFuncRank
     
     def testNumericalIntegration(numRiemann: JInt) {
       println("\n--Testing Numerical Integration")
@@ -91,20 +99,62 @@ object Tester {
       println("Board:\n" + board)
       println("Neighbor higher array:\n" + neighborArray(board))
       println("Neighbor list of board:\n" + listNeighbors(board))
+   
+      val nextState = leftIdentity agenda(
+          new JVerb1Type[JArrayType](
+              "(3 = ])",
+              List(JFuncRank(0)),
+              jINT){
+            override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = throw new NotImplementedException()
+            
+            override def dyadImpl[T1 <: JArrayType : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
+            	equal(JArray.scalar[JInt,Int](3),
+            	      y)
+            }
+          },
+          
+      new JVerb1Type[JArrayType](
+          "([: +./ 2 3 = ])",
+          List(JFuncRank(0)),
+          jINT){
+            override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = throw new NotImplementedException()
+            
+            override def dyadImpl[T1 <: JArrayType : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
+              (realOr insert).apply(equal(
+            		  				JArray.vec2(2,3),
+            		  				y))
+            }            
+          })
       
+      println("board:\n" + board)
+      println("next :\n" + nextState(board, listNeighbors(board)).asInstanceOf[JArray[JInt]])
+      
+      var boardvar = board
+      
+      for (i <- 0 until steps) {
+        println("step " + ":\n" + boardvar)
+        boardvar = nextState(boardvar, listNeighbors(boardvar)).asInstanceOf[JArray[JInt]]
+      }
       //TODO advanced function composition still in the works
-      val nextState = (y: JArray[JInt]) => {
+/*      val nextState = (y: JArray[JInt]) => {
         val neighbors = listNeighbors(y)
-        board.ravel zip neighbors.ravel map ((x: (JInt, JInt)) => {
+
+        val res = (board.ravel zip neighbors.ravel map ((x: (JInt, JInt)) => {
           val (cell, neighb) = x
           if (cell == JReal.Zero)
             JArray.scalar[JInt, Int](if (neighb == JInt(3)) JReal.One else JReal.Zero)
           else {
-            //TODO for later
+            (realOr insert).monad(equal(
+                JArray.vec2(2, 3),
+                JArray.scalar(neighb)))
           }
-        })
-      }
-          
+        }))*/
+        
+        /*JArray(jINT, y.shape, res)*/
+   //   }
+      
+ //     val nextBoard = nextState(board)
+      
       println("DONE")
     }
 
