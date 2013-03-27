@@ -29,9 +29,9 @@ Functional programming languages, in contrast to imperative programming language
 When dealing with collections, this higer level of abstraction usually means that related types of operations can be expressed as \textit{higher-order} functions 
 like \textit{map} and \textit{reduce} that take functions as their arguments and return functions that operate on collections.
 These higher-order functions can allow programmers to more easily understand what operations are being done to multidimensional collections 
-than if the same operations were done imperatively using for-loops 
+than if the same operations were done imperatively using for loops 
 because they capture the essence of what the operations \textit{are}, more than how the operations are \textit{implemented}.
-As a consequence, this also allows programmers to more easily see where there is inherent data-parallelism in the algorithm, such as all calls to \textit{map} or \textit{reduce} on large collections.
+As a consequence, this also allows programmers to more easily see where there is inherent data parallelism in the algorithm, such as all calls to \textit{map} or \textit{reduce} on large collections.
 However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, 
 they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
@@ -40,7 +40,7 @@ In functional languages where the idea of function rank is formalized, extending
 called in J and in this paper the \textit{rank operator}. %TODO cite J vocab
 Expressing these extensions as a higher-order function makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
 In some cases, these extensions are so trivial that they can be done automatically, meaning the programmer need not modify the code at all. %TODO cite J shape agreement
-Furthermore, since multiple applications of the rank operator are equivalent to nested loops or nested higher-order function applications, it too is inherently data-parallel.
+Furthermore, since multiple applications of the rank operator are equivalent to nested loops or nested higher-order function applications, it too is inherently data parallel.
 Consequently, languages with both formalized function rank and a rank-operator allow the programmer to 
 exploit the inherent data parallelism of extending existing operations to collections of higher dimension safely, quickly, and in some cases automatically.
 
@@ -55,14 +55,14 @@ To demonstrate that function rank can be used to exploit data parallelism on , w
 We believe Scala is an ideal language to both implement and compare with our work, for two reasons.
 \begin{itemize}
     \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time). % (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library that gives programers some of the functionality of J
-    \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data-parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI which are designed for older imperative languages(C/C++/Fortran) and which require working at a conceptually lower level.
+    \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI which are designed for older imperative languages(C/C++/Fortran) and which require working at a conceptually lower level.
 \end{itemize}
-We compare solutions to a suite of data-parallel problems written in C, Scala, J, and hand-compilied Parallel-J\begin{comment}TODO really should change name\end{comment} and discuss the relative level of abstraction, scalability, and performance of each.
+We compare solutions to a suite of data parallel problems written in C, Scala, J, and hand-compilied Parallel-J\begin{comment}TODO really should change name\end{comment} and discuss the relative level of abstraction, scalability, and performance of each.
 
 The rest of the paper is organized as follows:
 \begin{itemize}
-    \item Chapter \ref{back} develops the idea of function rank more thoroughly, comparing it to nesting with loops or \textit{map} and \textit{reduce}, explaining how it can be used to extend functions to regular collections of higher dimension, sometimes automatically, and how it makes it easier for the programmer to exploit the inherent data-parallelism on such extensions. 
-    \item Chapter \ref{probs} gives the listing of our selection of example data-parallel problems, giving for each a brief description, an explanation of how to exploit concurrency, and a discussion of how to possibly extend the problem to higher dimensions.
+    \item Chapter \ref{back} develops the idea of function rank more thoroughly, comparing it to nesting with loops or \textit{map} and \textit{reduce}, explaining how it can be used to extend functions to regular collections of higher dimension, sometimes automatically, and how it makes it easier for the programmer to exploit the inherent data parallelism on such extensions. 
+    \item Chapter \ref{probs} gives the listing of our selection of example data parallel problems, giving for each a brief description, an explanation of how to exploit concurrency, and a discussion of how to possibly extend the problem to higher dimensions.
     \item Chapter \ref{res} compares example solutions to the problems listed in Section 3 in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses relative level of abstraction, scalability and performance of each solution. 
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work.
 \end{itemize}
