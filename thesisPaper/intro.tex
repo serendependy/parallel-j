@@ -31,7 +31,7 @@ like \textit{map} and \textit{reduce} that take functions as their arguments and
 These higher-order functions can allow programmers to more easily understand what operations are being done to multidimensional collections 
 than if the same operations were done imperatively using for loops 
 because they capture the essence of what the operations \textit{are}, more than how the operations are \textit{implemented}.
-As a consequence, this also allows programmers to more easily see where there is inherent data parallelism in the algorithm, such as all calls to \textit{map} or \textit{reduce} on large collections.
+As a consequence, this also allows programmers to more easily see where there is inherent data parallelism in the algorithm, such as all calls to \textit{map}, or calls to \textit{reduce} with associative operations, on large collections.
 However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, 
 they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
@@ -83,7 +83,7 @@ These choices were motivated by the desire to present solutions to our sample pr
 This would allow us to directly address the involved computations, as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
 without getting distracted with a discussion of J's more advanced or nuanced language features.
 
-Also to be included was a proposal and implementation of a new \textit{foreign} operator, spelled\ttfamily (111 !:)\normalfont , 
+Also to be included was a proposal and implementation of a new \textit{foreign} operator, called the \textit{parallel operator} and spelled\ttfamily (111 !:)\normalfont , 
 that would allow the programmer to set environmental parameters for parallelizing code.
 For example, this operator could be used to specify the number of threads to use in executing a piece of code, 
 or to set thread scheduling schemes.
@@ -108,23 +108,24 @@ Scala has many features that make it desireable for this task, including:
 	\end{itemize}
 \end{itemize}
 
-We would then compare solutions to a suite of data parallel problems written in C, Scala and Parallel-J,
+We would then compare solutions to a suite of data parallel problems written in C with OpenMP, Scala and Parallel-J,
 and discuss the relative level of abstraction, scalability to similiar problems of higher dimension, and performance of each.
 % TODO also parallelisation techniques.
 
 \section{Implementation}
 \label{imp}
-
 Unfortunately, during the the development of this research it became clear that the given time constraints would not allow for such an ambitious project.
+This has lead to a change of focus in the research. 
+Rather than finishing a parallel subset of J, the J system libraries developed 
+are instead used as a prototype for a Scala regular collections library which supports function rank.
+Taking the same set of parallel problems, we show both how this library allows for easily extending these problems into higher dimensions and 
+how with future work it would be able to automatically parallelize solutions in the given and in higher dimensions.
+We also compare our solutions with solutions in J and in C with OpenMP, discussing relative level of abstraction, scalability, and performance of each.
 
-To demonstrate that function rank can be used to exploit data parallelism on regular collections, we present a partial parallel implementation of the J programming language, calleld \textit{Parallel-J}, written in the Scala programming language.\begin{comment}TODO cite?\end{comment}
-We believe Scala is an ideal language to both implement and compare with our work, for two reasons.
-\begin{itemize}
-    \item Scala is a multi-paradigm language with a library of collections supporting many higher-order operations such as \textit{map} and \textit{reduce} on fixed data rank (usually one dimension at a time). % (CJ) I guess the fact that it's JVM isn't important for this discussion. It is if I want to present a Scala library that gives programers some of the functionality of J
-    \item Scala's parallel collections library\cite{pc}, written to exploit the concurrency in inherrently data parallel operations, is a good fit for our own use cases and made parallelizing our implementation relatively easy, as opposed to using more established parallel environments like OpenMP or MPI which are designed for older imperative languages(C/C++/Fortran) and which require working at a conceptually lower level.
-\end{itemize}
-We compare solutions to a suite of data parallel problems written in C, Scala, J, and hand-compilied Parallel-J %(CJ) TODO really should change name
-and discuss the relative level of abstraction, scalability, and performance of each.
+The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented.
+
+Finally, some work completed with the idea of implementing a subset of J did not contribute to developing a regular collections library in Scala that supports function rank.
+This is given in the appendix, and includes a partial lexer for the J programming language written in Scala. % TODO add appendix
 
 \nocite{rankanduni}
 \nocite{dph}
