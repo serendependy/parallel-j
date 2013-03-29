@@ -137,7 +137,17 @@ the following steps give a high level description of how $f$ to its arguments.\c
 	\item Reassemble the result cells of the previous step using the agreed frame shape.
 \end{enumerate}
 
-
+While quite a few of these steps have some exploitable concurrency, 
+step \ref{dataparstep} has the most potential for performance increases through parallelism.
+It is inherently data parallel because each of the cells of $x$ and $y$ are operated on completely independently of each other.
+For large computations, it is also the most computationally complex 
+since these cells can themselves be large regular collections, 
+as well as the recursive nature of the step itself.
+Finally, one consequence of having this common set of steps for applying all functions with function rank is
+that all such functions can be parallelized in the library code.
+This means that applications which uses a parallelized function rank library 
+can automatically exploit the inherrent concurrency of their problem, 
+provided this problem can be expressed naturally in terms of function rank.
 
 \section{Other Solutions}
 \subsection{Single Assignment C}
