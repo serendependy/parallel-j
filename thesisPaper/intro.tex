@@ -37,7 +37,7 @@ they too must be nested in order to extend existing functions to collections of 
 
 \textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} and implemented in the programming language J, is a functional abstraction that extends the notion of data rank to functions. %(CJ) defined earlier in the paper
 In functional languages where the idea of function rank is formalized, extending existing functions to regular collections of higher dimension can be expressed as the application of a higher-ordered function, 
-called in J and in this paper the \textit{rank operator}. %TODO cite J vocab
+called in J and in this paper the \textit{rank operator}. \cite{jvocab}
 Expressing these extensions as a higher-order function makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
 In some cases, these extensions are so trivial that they can be done automatically, meaning the programmer need not modify the code at all. %TODO cite J shape agreement
 Furthermore, since multiple applications of the rank operator are equivalent to nested loops or nested higher-order function applications, it too is inherently data parallel.
@@ -101,7 +101,7 @@ Scala has many features that make it desireable for this task, including:
 	\end{itemize}
 	\item a feature-rich library for collections, including 
 	\begin{itemize}
-		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, % TODO cite Scala 2.8 collections
+		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, \cite{scala28col}
 			common to many solutions to data parallel problems, and
 		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,\cite{pc}
 			which, being similiar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
@@ -125,7 +125,7 @@ We also compare our solutions with solutions in J and in C with OpenMP, discussi
 The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented.
 
 Finally, some work completed with the idea of implementing a subset of J did not contribute to developing a regular collections library in Scala that supports function rank.
-This is given in the appendix, and includes a partial lexer for the J programming language written in Scala. % TODO add appendix
+Most of this work consisted of implementing a lexer for the J programming language, and is listed in Appendix \ref{jlex}
 
 \nocite{rankanduni}
 \nocite{dph}
