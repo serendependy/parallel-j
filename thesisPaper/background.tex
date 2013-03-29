@@ -1,5 +1,32 @@
-%
-% FIX THIS -- remove/change, just some examples of things
-%
 \chapter{Background}
 \label{back}
+
+This chapter gives the background information necessary to understand what advantages function rank has in exploiting data parallelism over other approaches.
+
+\section{Function Rank}
+\subsection{History and Definition}
+\textit{Function rank} was first developed and described by K. Iverson in a series of research reports written at IBM. % TODO cite
+In one such report, Iverson described it as 
+``the most important notion needed to provide a simple and systematic basis for the uniform treatment of all `mixed' or non-scalar functions.''\cite{rapl} % TODO footnote of next comment
+Since that time, the idea of function rank has matured and found its way into many dialects of APL, including J.
+
+J's model of function rank is slightly different from what was first presented by Iverson. \cite{rankanduni} \cite{jvocab}
+The rank of a function \textit{f} in J is a vector \textit{v} of three values representing the data rank of \textit{f}'s expected arguments.
+Since in J functions take either one or two arguments, the first value of \textit{v} represents the expected data rank of \textit{f}'s one-argument case (in J referred to as the \textit{monadic} case);
+the second and third values in \textit{v} represent the expected data rank of \textit{f's} two-argument (\textit{dyadic}) case.
+If \textit{f} has no restrictions on some or all of its arguments, this is represented in \textit{v} with the value for infinity, spelled \ttfamily \_ \normalfont ;
+if \textit{f} operates on scalar values, this is represented as an entry in \textit{v} of 0 (in J, scalars are collections of rank 0 and an empty extent). % TODO make footnote
+
+So, for example, most arithmetic functions, such as addition, fundamentally operate on scalar values and must be extended to operate on collections of rank \textit{n} $\ge$ 1.
+On the other hand, most collective operations, such as indexing, operate on whole collections at once.
+
+\subsection{Rank Operator}
+
+\subsection{Shape Agreement}
+
+\section{Other Solutions}
+\subsection{Single Assignment C}
+
+\subsection{MATLAB}
+
+\subsection{Regular Extent Parallel Arrays in Haskel}
