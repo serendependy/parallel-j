@@ -21,7 +21,8 @@ So, for example, most arithmetic functions, such as addition, fundamentally oper
 On the other hand, most collective operations, such as indexing, operate on whole collections at once.
 
 \subsection{Shape Agreement}
-In the trivial cases, where a function \textit{f} is given arguments with ranks matching \textit{f}'s function rank, J behaves much like any programming language without function rank.
+In the trivial cases, where a function \textit{f} is given arguments with ranks matching \textit{f}'s function rank, 
+J behaves much like any programming language without function rank. % TODO make single spaces
 \begin{verbatim}
    1 + 1
 2
@@ -30,7 +31,7 @@ In the trivial cases, where a function \textit{f} is given arguments with ranks 
 3 4 5
    1 (from =: {) mat2_3
 3 4 5
-\end{verbatim} % TODO make single spaces
+\end{verbatim}
 
 In some cases, when the arguments to \textit{f} do not match its function rank, \textit{f} is automatically extended to the appropriate dimensions.
 For example, if $x$ is a scalar, addition can always be extended so that \textit{x} is added to every element of a collection \textit{c} 
@@ -99,7 +100,7 @@ In order to accomplish this and many similiar use cases where the desired extens
 J also includes a \textit{rank operator} which is spelled \ttfamily"\normalfont.
 The rank operator is a higher order function which takes as its first argument a regular function 
 and as its second argument a vector of 1, 2, or 3 numeric values, 
-and returns a function which performs the same operation as the argument function but on the specified data rank.
+and returns a function which performs the same operation as the argument function but on the specified data rank.\cite{rankanduni}
 
 Therefore, the following command, 
 
@@ -116,6 +117,27 @@ Because the frame at rank 1 of $vec3$ prefixes the same frame $mat2\_3$ (the emp
 the shapes now agree, and there is an implicit map on the vector elements of $vec3$ expanding to a matrix of two vectors.
 
 \subsection{Inherrent Data Parallelism}
+For any function $f$ with function rank $r$ and arguments $x$ and $y$, 
+the following steps give a high level description of how $f$ to its arguments.\cite{rankanduni}
+\begin{enumerate}
+	\item Calculate the cell shape at rank $r$ of $x$ and $y$ 
+		by taking the $r$ smallest dimensions of the shape vector of each.
+		E.g., the cell shape of $mat2\_3$ at rank 1 is 3, since each vector contains 3 items.
+	\item Calculate the frame shape at rank $r$ of $x$ and $y$ 
+		by removing from the shape vector of each their repsective cell shapes.
+		E.g, at rank 1, the frame shape of $mat2\_3$ is $2$,
+		the frame shape of $arr2\_3\_2$ is $2$ $3$, 
+		and the frame shape of $vec3$ is an empty frame.
+	\item If the frame shape of $x$ and $y$ do not agree, then return with an error.
+		Otherwise, extend the argument with the smaller frame shape via an implicit map on its cells at rank $r$.
+		If the frame shape of $x$ and $y$ are the same, do nothing.
+	\item \label{dataparstep}Apply $f$ to every cell at rank $r$ of $x$ and $y$.
+		If $f$ is a user defined function $u$ with function rank $r_1$ given with the rank operator, 
+		repeat this process with each of the cells of $x$ and $y$, $u$, and $r_1$
+	\item Reassemble the result cells of the previous step using the agreed frame shape.
+\end{enumerate}
+
+
 
 \section{Other Solutions}
 \subsection{Single Assignment C}
