@@ -30,21 +30,25 @@ In the trivial cases, where a function \textit{f} is given arguments with ranks 
 3 4 5
    1 (from =: {) mat2_3
 3 4 5
-\end{verbatim}
+\end{verbatim} % TODO make single spaces
 
 In some cases, when the arguments to \textit{f} do not match its function rank, \textit{f} is automatically extended to the appropriate dimensions.
-For example, \textit{x} is a scalar, addition can always be extended so that \textit{x} is added to every element of a collection \textit{c}, not matter \textit{c}'s rank or extent. % TODO use math mode
+For example, if $x$ is a scalar, addition can always be extended so that \textit{x} is added to every element of a collection \textit{c} 
+no matter \textit{c}'s rank or extent. % TODO use math mode
 \begin{verbatim}
    1 + mat2_3
 1 2 3
 4 5 6
 \end{verbatim}
 
-In general, addition (and all other scalar functions) can be extended over two regular collections $x$ and $y$ of numeric values if the shape of one collection \textit{prefixes} the other.
+In general, addition (and all other scalar functions) can be extended over two regular collections $x$ and $y$ 
+if the shape of one collection \textit{prefixes} the other.
 This is called \textit{prefix shape agreement}, or just \textit{shape agreement},\cite{rankanduni} 
 and in this paper we will say when this happens that ``the shapes of $x$ and $y$ agree under addition.''
+We also say that this prefix is the \textit{frame} for the two collections,
+and the remaining suffixes the shape of $x$ and $y$ are their respective \textit{cells}.
 
-Going back to the above example: a scalar, a vector of 2, and another 2 by 3 matrix will aggree with $mat2\_3$ under addition, since the shape of these prefixes the shape of $mat2\_3$; 
+Going back to the above example: a scalar, a vector of 2 elements, and another 2 by 3 matrix will aggree with $mat2\_3$ under addition, since the shape of these prefixes the shape of $mat2\_3$; 
 any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also aggree with $mat2\_3$ under addition, since $mat2\_3$ would prefix it.
 
 \begin{verbatim}
@@ -72,9 +76,46 @@ any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also aggre
 15 16
 \end{verbatim}
 
-\subsection{Rank Operator}
+In this last example, every scalar of $mat2\_3$ was added to both scalars of each vector in $arr2\_3\_2$. 
+Another way to conceptualize this is that J made an implicit \textit{map} on the scalar elements of $mat2\_3$, 
+expanding each into a vector of 2 scalars.
+J knew to do this because with a \textit{frame} of $2$ $3$, $mat2\_3$'s \textit{cells} were scalars and 
+$arr2\_3\_2$'s \textit{cells} were vectors of two scalars.
 
-\subection{Inherrent Data Parallelism}
+\subsection{Rank Operator}
+With what we have developed so far, we are still unable to perform the operation of 
+adding a vector $vec3$ of 3 scalars to $mat2\_3$, since there is no prefix between shapes $3$ and $2$ $3$.
+
+\begin{verbatim}
+   ] vec3=: i. 3
+0 1 2
+  vec3 + mat2_3
+|length error
+|   vec3    +mat2_3
+\end{verbatim}
+
+However, it should be possible to add $vec3$ to each of the vectors of $mat2\_3$, since each vector has the same length.
+In order to accomplish this and many similiar use cases where the desired extension of a function is not the default extension, 
+J also includes a \textit{rank operator} which is spelled \ttfamily"\normalfont.
+The rank operator is a higher order function which takes as its first argument a regular function 
+and as its second argument a vector of 1, 2, or 3 numeric values, 
+and returns a function which performs the same operation as the argument function but on the specified data rank.
+
+Therefore, the following command, 
+
+\begin{verbatim}
+   vec3 +"1 mat2_3
+0 2 4
+3 5 7
+\end{verbatim}
+
+is read ``add the rank 1 items of $vec3$ to the rank 1 items of $mat2\_3$.''
+In terms of \textit{frames}, \textit{cells}, and implicit \textit{maps}, we say that
+the frames of the rank 1 items in $mat2\_3$ and $vec3$ are $2$ and an empty frame, respectively, and they share a common cell size of $3$.
+Because the frame at rank 1 of $vec3$ prefixes the same frame $mat2\_3$ (the empty frame prefixes every frame), 
+the shapes now agree, and there is an implicit map on the vector elements of $vec3$ expanding to a matrix of two vectors.
+
+\subsection{Inherrent Data Parallelism}
 
 \section{Other Solutions}
 \subsection{Single Assignment C}
