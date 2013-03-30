@@ -73,15 +73,15 @@ most array operations (creating, indexing, restructuring) and all of the basic a
 a small selection of higher-ordered functions, such as function composition (including J's tacit function composition rules for sequences of functions or \textit{trains}), conditionals, reduction;
 and, 
 of course, 
-the rank operator and function rank. %TODO cite J Vocab (?)
+the rank operator and function rank. %TODO cite J Vocab (?) TODO itemize? TODO footnote for tacit
 
 We excluded from the design of the parallel language subset the following language features: 
 namespaces (called \textit{locales});
 all existing environment-altering functions (the \textit{foreign} function);
 explicit scripts with imperative-style execution and control structures;
 and the J primitives which calculated complex algorithms, such as prime factorization and derivatives polynomial equations.
-
-These choices were motivated by the desire to present solutions to our sample problems in as simple and "idiomatic" J as possible.
+% TODO itemize?
+These choices were motivated by the desire to present solutions to our sample problems in as simple and ``idiomatic'' J as possible.
 This would allow us to directly address the involved computations, as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
 without getting distracted with a discussion of J's more advanced or nuanced language features.
 
@@ -124,7 +124,7 @@ Taking the same set of parallel problems, we show both how this library allows f
 how with future work it would be able to automatically parallelize solutions in the given and in higher dimensions.
 We also compare our solutions with solutions in J and in C with OpenMP, discussing relative level of abstraction, scalability, and performance of each.
 
-The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented.
+The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented in the time available.
 
 Finally, some work completed with the idea of implementing a subset of J did not contribute to developing a regular collections library in Scala that supports function rank.
-Most of this work consisted of implementing a lexer for the J programming language, and is listed in Appendix \ref{jlex}
+Most of this work consisted of implementing a lexer for the J programming language, which is listed in Appendix \ref{jlex}

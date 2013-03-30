@@ -11,17 +11,17 @@ In one such report, Iverson described it as
 Since that time, the idea of function rank has matured and found its way into many dialects of APL, including J.
 
 J's model of function rank is slightly different from what was first presented by Iverson. \cite{rankanduni} \cite{jvocab}
-The rank of a function \textit{f} in J is a vector \textit{v} of three values representing the data rank of \textit{f}'s expected arguments.
-Since in J functions take either one or two arguments, the first value of \textit{v} represents the expected data rank of \textit{f}'s one-argument case (in J referred to as the \textit{monadic} case);
-the second and third values in \textit{v} represent the expected data rank of \textit{f's} two-argument (\textit{dyadic}) case.
-If \textit{f} has no restrictions on some or all of its arguments, this is represented in \textit{v} with the value for infinity, spelled \ttfamily \_ \normalfont ;
-if \textit{f} operates on scalar values, this is represented as an entry in \textit{v} of 0 (in J, scalars are collections of rank 0 and an empty extent). % TODO make footnote
+The rank of a function $f$ in J is a vector $v$ of three values representing the data rank of $f$'s expected arguments.
+Since in J functions take either one or two arguments, the first value of $v$ represents the expected data rank of $f$'s one-argument case (in J referred to as the \textit{monadic} case);
+the second and third values in $v$ represent the expected data rank of $f$'s two-argument (\textit{dyadic}) case.
+If $f$ has no restrictions on some or all of its arguments, this is represented in $v$ with the value for infinity, spelled \ttfamily \_ \normalfont ;
+if $f$ operates on scalar values, this is represented as an entry in $v$ of 0 (in J, scalars are collections of rank 0 and an empty extent). % TODO make footnote
 
-So, for example, most arithmetic functions, such as addition, fundamentally operate on scalar values and must be extended to operate on collections of rank \textit{n} $\ge$ 1.
+So, for example, most arithmetic functions, such as addition, fundamentally operate on scalar values and must be extended to operate on collections of rank $n \ge 1$.
 On the other hand, most collective operations, such as indexing, operate on whole collections at once.
 
 \subsection{Shape Agreement}
-In the trivial cases, where a function \textit{f} is given arguments with ranks matching \textit{f}'s function rank, 
+In the trivial cases, where a function $f$ is given arguments with ranks matching $f$'s function rank, 
 J behaves much like any programming language without function rank. % TODO make single spaces
 \begin{verbatim}
    1 + 1
@@ -33,9 +33,9 @@ J behaves much like any programming language without function rank. % TODO make 
 3 4 5
 \end{verbatim}
 
-In some cases, when the arguments to \textit{f} do not match its function rank, \textit{f} is automatically extended to the appropriate dimensions.
-For example, if $x$ is a scalar, addition can always be extended so that \textit{x} is added to every element of a collection \textit{c} 
-no matter \textit{c}'s rank or extent. % TODO use math mode
+In some cases, when the arguments to $f$  do not match its function rank, $f$  is automatically extended to the appropriate dimensions.
+For example, if $x$ is a scalar, addition can always be extended so that $x$ is added to every element of a collection $c$ 
+no matter $c$'s rank or extent. 
 \begin{verbatim}
    1 + mat2_3
 1 2 3
@@ -118,7 +118,7 @@ the shapes now agree, and there is an implicit map on the vector elements of $ve
 
 \subsection{Inherrent Data Parallelism}
 For any function $f$ with function rank $r$ and arguments $x$ and $y$, 
-the following steps give a high level description of how $f$ to its arguments.\cite{rankanduni}
+the following steps give a high level description of how $f$ is applied to its arguments.\cite{rankanduni}
 \begin{enumerate}
 	\item Calculate the cell shape at rank $r$ of $x$ and $y$ 
 		by taking the $r$ smallest dimensions of the shape vector of each.
@@ -132,7 +132,8 @@ the following steps give a high level description of how $f$ to its arguments.\c
 		Otherwise, extend the argument with the smaller frame shape via an implicit map on its cells at rank $r$.
 		If the frame shape of $x$ and $y$ are the same, do nothing.
 	\item \label{dataparstep}Apply $f$ to every cell at rank $r$ of $x$ and $y$.
-		If $f$ is a user defined function $u$ with function rank $r_1$ given with the rank operator, 
+		If $f$ is a user defined function $u$ with function rank $r_1$ given with the rank operator,
+		(i.e., $f =: u"r_1$)
 		repeat this process with each of the cells of $x$ and $y$, $u$, and $r_1$
 	\item Reassemble the result cells of the previous step using the agreed frame shape.
 \end{enumerate}
@@ -141,8 +142,8 @@ While quite a few of these steps have some exploitable concurrency,
 step \ref{dataparstep} has the most potential for performance increases through parallelism.
 It is inherently data parallel because each of the cells of $x$ and $y$ are operated on completely independently of each other.
 For large computations, it is also the most computationally complex 
-since these cells can themselves be large regular collections, 
-as well as the recursive nature of the step itself.
+because not only is this step itself recursive, but
+since these cells can themselves be large regular collections.
 Finally, one consequence of having this common set of steps for applying all functions with function rank is
 that all such functions can be parallelized in the library code.
 This means that applications which uses a parallelized function rank library 
@@ -150,8 +151,8 @@ can automatically exploit the inherrent concurrency of their problem,
 provided this problem can be expressed naturally in terms of function rank.
 
 \section{Other Solutions}
-\subsection{Regular Parallel Arrays in Haskel}\cite{dph}
-In 2010, Keller et. al. published a paper 
+\subsection{Regular Parallel Arrays in Haskel}
+In 2010, Keller et. al. published a paper\cite{dph} 
 describing work they had done on a Haskell library, which they named \textit{Repa}, that implements and parallelizes regular arrays.
 There is much to commend about their work, including ``that it (1) is purely
 functional, (2) supports reuse through shape polymorphism, (3)
@@ -161,13 +162,13 @@ and that it is a library for a functional language with relatively wide use.
 
 Most impressively, they were able to statically capture some of the effects functions have on the shapes of their arguments.
 For example, the type signature of \textit{sum} shows that, given a numeric array of rank $n$, 
-it returns an array of rank $n-1$.
+it returns an array of rank $n-1$ which has the same shape as the argument array except for the rightmost axis.
 Consequently, passing \textit{sum} a rank 0 array is a compile-time error.
 In general, this library ``enables [the user] to track the rank of each array in its type,
 guaranteeing the absence of rank-related runtime errors.''
 
 Repa's static capturing of the rank of a function's arguments is equivalent to J's notion of function rank, 
-in the same way that Church's numerals are equivalent to the arabic numerals. 
+in the same way that Church's numerals are equivalent to the arabic numerals. % TODO this only gets justification later
 It is implemented as a list of types and uses Haskell's pattern-matching capabilities and some language extensions 
 to analyze the structure of this list.
 However, unlike J, Repa appears to lack a rank operator, at least as of our understanding of the research.
@@ -190,14 +191,14 @@ it is necessary to mention other influential work in the subject of data paralle
 Our analysis is mostly in agreement with the developers of Repa.\cite{dph}
 
 Single-Assignment C (\textit{SA-C}) is a functional, C-like language 
-that has many of the same advantages as Repa.\cite{dph}, % TODO cite SA-C
+that has many of the same advantages as Repa.\cite{dph}, \cite{sac}
 Unfortunately, this also means that it has the same limitations, most notably the lack of a rank operator.
 Additionally, unlike Repa and our own research (but like J), 
 it is a special purpose array programming language and 
 not an extension to an existing, general purpose programming with a broad user base and 
 with access to large and well developed libraries.
 
-In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language. % TODO cite
+In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language. \cite{boost}
 However, its ability to analyize and operate on the structure of regular collections is limited compared to SA-C or Repa.
 Furthermore, it does not benefit from a naturally parallel implementation, 
 its arrays are operated on in a conceptually lower (imperative) level, 
