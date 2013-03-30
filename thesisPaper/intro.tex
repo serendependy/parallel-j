@@ -14,6 +14,16 @@ Since both regular and irregular collections are implemented the same way,
 it can be difficult for programmers to view, manipulate, and verify any important properties of the structure of regular collections.
 For example, if a function requires that one or more of its arguments is a regular collection, programmers must either write code to ensure this requirement is met or risk run-time indexing errors and program crashes.
 
+Alternatively, regular collections can be implemented as vectors which have an associated shape vector. 
+Making the structure of a regular collection a field which can be viewed and manipulated 
+allows the programer greater transparency and control when writing programs to operate on them.
+Unfortunately, most statically-typed languages do not have type systems advanced enough 
+to capture all of the structural information of regular collections statically, even though this is theoretically possible. % TODO cite dependent types (xi probably)
+However, some languages are able to capture some of this structure statically, \cite{boost} \cite{sac} \cite{dph}
+enabling programmers to reduce or eliminate the need for manual verification, 
+such as the fact that the arguments to a function are in fact regular collections.
+Writing effective parallel code is an already conceptually difficult task without adding manual checks for program correctness.
+
 Second, in most imperative languages with regular collections, applying functions to elements or sub-collections of a collection means writing the function call within nested looping structures, typically a \textit{for loop}
 Using this method to apply functions on these collections usually means that the number of dimensions (also called \textit{data rank}) of the collection determines the number of loops required to do a specific operation.
 To put it another way, if an existing function that operates on a multidimensional collections needs to be extended to a collection of higher dimensions, 
