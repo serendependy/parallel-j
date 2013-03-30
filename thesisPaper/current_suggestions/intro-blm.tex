@@ -1,0 +1,150 @@
+\chapter{Introduction}
+
+\section{Motivation}
+Many scientific and business computing applications must work on large data sets naturally structured in regular, multidimensional collections.
+In order for these applications to achieve good performance, it is often the case that programers must exploit any and all concurrency in the application through different approaches to parallel programming.
+One approach frequently used to exploit concurrency on large collections is \textit{data parallelism}, in which programs update elements or subsections of collections in parallel.
+Many tools have already been developed to help programmers exploit data parallelism easily and safely. %TODO citation
+However, we believe that many of these tool are not as helpful for exploiting data parallelism on regular collections as they could be, for two reasons.
+%1) the implementation of such collections in most languages can make it more difficult to view and manipulate their structure; and 
+%2) in many use cases applying functions to such collections leads to boiler-plate code, which can be tedious and error prone.
+
+First, many programming languages implement regular collections as nested collections;
+e.g. a 2-dimensional, 2 by 3 array (or rank 2 array with extent 2 3) 
+% (BLM) a "+1"(?) here for taking this opportunity to introduce "your" terminology (rank, extent).
+of integers would be implemented as an array of 2 arrays, with each of these containing 3 integers.
+However, in such languages irregular collections are also usually implemented as nested collections, with each of the sub-collections possibly containing a different number of elements from each other.
+Since both regular and irregular collections are implemented the same way,
+it can be difficult for programmers to view, manipulate, and verify any important properties of the structure of regular collections.
+For example, if a function requires that one or more of its arguments is a regular collection, programmers must either write code to ensure this requirement is met or risk run-time indexing errors and program crashes.
+
+Second, in most imperative languages with regular collections, applying functions to elements or sub-collections of a collection means writing the function call within nested looping structures, typically a \textit{for loop}
+Using this method to apply functions on these collections usually means that the number of dimensions (also called \textit{data rank}) of the collection determines the number of loops required to do a specific operation.
+To put it another way, if an existing function that operates on a multidimensional collections needs to be extended to a collection of higher dimensions, 
+or if the function only operates on scalar values but needs to be extended to some multidimensional collection, 
+the programmer usually must wrap the function in nested for loops.
+This activity is tedious in the trivial cases and prone to uneccesary error because programmers must write boilerplate code in order to accomplish it.
+Moreover, even though in some cases these extensions are inherently data parallel, and can theoretically be done automatically and without changing existing code (such as applying a function on scalars), 
+without abstractions in the language to deal with the general cases of such extensions, the programer must make changes to existing code.
+% (BLM) the mention of inherent data parallelism here seems like not quite what's wanted in context??  Maybe you want two sentences??  one about how lack of functional-language abstractions means you can't easily extend to higher dimensions, and another about how having to use for loops hides the inherent data parallelism?  
+
+Functional programming languages, in contrast to imperative programming languages, allow programmers to view and write programs at a higher level of abstraction.
+When dealing with collections, this higer level of abstraction usually means that related types of operations can be expressed as \textit{higher-order} functions 
+like \textit{map} and \textit{reduce} that take functions as their arguments and return functions that operate on collections.
+These higher-order functions can allow programmers to more easily understand what operations are being done to multidimensional collections 
+than if the same operations were done imperatively using for loops 
+because they capture the essence of what the operations \textit{are}, more than how the operations are \textit{implemented}.
+As a consequence, this also allows programmers to more easily see where there is inherent data parallelism in the algorithm, such as all calls to \textit{map}, or calls to \textit{reduce} with associative operations, on large collections.
+However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, 
+they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
+
+\textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} and implemented in the programming language J, is a functional abstraction that extends the notion of data rank to functions. %(CJ) defined earlier in the paper
+% (BLM) so it is -- my mistake.
+In functional languages where the idea of function rank is formalized, extending existing functions to regular collections of higher dimension can be expressed as the application of a higher-ordered function, 
+called in J and in this paper the \textit{rank operator}. \cite{jvocab}
+Expressing these extensions as a higher-order function makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
+In some cases, these extensions are so trivial that they can be done automatically, meaning the programmer need not modify the code at all. %TODO cite J shape agreement
+Furthermore, since multiple applications of the rank operator are equivalent to nested loops or nested higher-order function applications, it too is inherently data parallel.
+Consequently, languages with both formalized function rank and a rank-operator allow the programmer to 
+exploit the inherent data parallelism of extending existing operations to collections of higher dimension safely, quickly, and in some cases automatically.
+
+Unfortunately, currently the languages that meet these criteria, such as J, Sharp APL, and some others from the APL language family, are not in common use.
+One often-cited reason for this is that these languages are difficult to read, % TODO cite
+because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments.\cite{jvocab} %TODO cite APL cheat sheet
+However, these language design choices are not required in order for a language to support function rank.
+It seems to us that what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language.
+
+
+The rest of the paper is organized as follows:
+\begin{itemize}
+	\item The remaining sections of this chapter give the design plan (\ref{desp}) and implementation (\ref{imp}) of our research. 
+	Unfortunately, the latter did not quite fulfill the expectations we had in the former, so we include both a description of what we wanted to accomplish and what we were actually able to accomplish given the time constraints. 
+	\item Chapter \ref{back} gives the neccessary background information for understanding this work, 
+	including a brief description of function rank and how it is equivalent to nested loops or nested calls to \textit{map} and \textit{reduce},
+	a discussion of relevant parallel design patterns for the example problem set, 
+	and a literature review of other attempts to solve the same or similiar problems
+    \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a descritpion of how possibly to extend the problem to higher dimensions.
+    \item Chapter \ref{res} compares example solutions to the problems listed in Chapter \ref{probs} in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses the relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
+    \item Chapter \ref{conc} presents our conclusions of this research and discusses future work.
+\end{itemize}
+
+\section{Design Plan}
+\label{desp}
+Our goal was to implement a parallel subset of the programming language J, called \textit{Parallel-J}.
+This would require a J language lexer and parser, limited memory management, a look-up table for predefined and user defined functions, a read-evaluate-print-loop (\textit{REPL}), and a subset of the J primitives.
+To be included in this subset of primitives would be: global variable assignment; 
+most array operations (creating, indexing, restructuring) and all of the basic arithmetic and logical operations; 
+a small selection of higher-ordered functions, such as function composition (including J's tacit function composition rules for sequences of functions or \textit{trains}), conditionals, reduction;
+and, of course, the rank operator and function rank. %TODO cite J Vocab (?)
+% (BLM) Maybe the previous sentence would work better as an itemized list -- makes it clearer what the individual elements are?  I don't feel strongly about it though.
+% (BLM) ALSO -- I think you need a footnote or something about "tacit" so readers understand that in the J world it has a specific technical meaning.  A brief footnote giving a short definition plus a reference to J documentation should do it, I think.
+
+We excluded from the design of the parallel language subset the following language features: 
+namespaces (called \textit{locales});
+all existing environment-altering functions (the \textit{foreign} function);
+explicit scripts with imperative-style execution and control structures;
+and the J primitives which calculated complex algorithms, such as prime factorization and derivatives polynomial equations.
+% (BLM) Here too I wonder whether an itemized list would work well?
+
+These choices were motivated by the desire to present solutions to our sample problems in as simple and "idiomatic" J as possible.
+This would allow us to directly address the involved computations, as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
+without getting distracted with a discussion of J's more advanced or nuanced language features.
+
+Also to be included was a proposal and implementation of a new \textit{foreign} operator, called the \textit{parallel operator} and spelled\ttfamily (111 !:)\normalfont , 
+that would allow the programmer to set environmental parameters for parallelizing code.
+For example, this operator could be used to specify the number of threads to use in executing a piece of code, 
+or to set thread scheduling schemes.
+Although not entirely related to function rank, such controls are to be expected from any serious parallel computing environment.
+
+To implement this parallel subset of J, we chose the Scala programming language.\cite{scala} 
+Scala has many features that make it desireable for this task, including: 
+\begin{itemize}
+	\item support for multiple programming paradigms, such as
+	\begin{itemize}
+		\item imperative, for the tasks of memory management and object creation,
+		\item object oriented, for more structured encapsulation of the rank associated with each function 
+			and data associated with arrays, and
+		\item functional, to more easily capture J's functional paradigm in the implementation and thus facilitate development
+	\end{itemize}
+	\item a feature-rich library for collections, including 
+	\begin{itemize}
+		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, \cite{scala28col}
+			common to many solutions to data parallel problems, and
+		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,\cite{pc}
+			which, being similiar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
+	\end{itemize}
+\end{itemize}
+
+We would then compare solutions to a suite of data parallel problems written in C with OpenMP, Scala and Parallel-J,
+and discuss the relative level of abstraction, scalability to similiar problems of higher dimension, and performance of each.
+% (BLM) You might say here something about how we realized that it might not be very meaningful to compare raw performance of C versus parallel-J but that we thought it *would* be meaningful to explore how parallel-J performance scales relative to number of threads -- as a way of finding out whether the implementation actual does effectively exploit potential concurrency.
+% TODO also parallelisation techniques.
+
+\section{Implementation}
+\label{imp}
+Unfortunately, during the the development of this research it became clear that the given time constraints would not allow for such an ambitious project.
+This has lead to a change of focus in the research. 
+Rather than finishing a parallel subset of J, the J system libraries developed 
+are instead used as a prototype for a Scala regular collections library which supports function rank.
+% (BLM) The above is new to me, but -- yes, that *IS* what you're doing, in some sense, and I like making that explicit!
+Taking the same set of parallel problems, we show both how this library allows for uniformly extending these problems into higher dimensions and 
+how with future work it would be able to automatically parallelize solutions in the given and in higher dimensions.
+We also compare our solutions with solutions in J and in C with OpenMP, discussing relative level of abstraction, scalability, and performance of each.
+
+The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented.
+% (BLM) "in the time available"?  otherwise it seems like it can't be done at all.
+
+Finally, some work completed with the idea of implementing a subset of J did not contribute to developing a regular collections library in Scala that supports function rank.
+Most of this work consisted of implementing a lexer for the J programming language, and is listed in Appendix \ref{jlex}
+
+\nocite{rankanduni}
+\nocite{dph}
+
+\begin{comment}
+Data rank is simply the rank of a collection, and scalar values are considered to be collections of rank 0.
+Thus, the rank of some regular collection is a non-negative integer.%(CJ) When scalars are treated as regular collections, their rank is 0
+Function rank is a rank 1 collection of each of the associated data rank values of a function's expected arguments, usually with some value to represent when the function can take data of any rank for a specific argument.
+\end{comment}
+
+%For example, a profits report over \it{n} years of 4 quarters of 3 months could be represented as a 3-dimensional array with extents \it{n 4 3};\begin{comment}TODO cite rank\end{comment} cellular automata like Conway's "Game of Life"\begin{comment}TODO cite Conway\end{comment} might be represented on an \it{n} by \it{m} grid - a 2-dimensional array with extents \it{n m}.
+%In C, the profits report might be declared with \begin{verbatim}int report[n][4][3]\end{verbatim}; in Scala, 
