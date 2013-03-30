@@ -46,11 +46,11 @@ Unfortunately, currently the languages that meet these criteria, such as J, Shar
 One often-cited reason for this is that these languages are difficult to read, % TODO cite
 because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments.\cite{jvocab} %TODO cite APL cheat sheet
 However, these language design choices are not required in order for a language to support function rank.
-It seems to us that 
-what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language. 
+It seems to us that % (VA) strike
+what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language. % (VA) begin w/ the subject & rewrite sentence for clarity
 
 The rest of the paper is organized as follows:
-\begin{itemize} 
+\begin{itemize} % (VA) items 1 & 2 seem to be in reverse order, but if this is the required format then follow it
 	\item The remaining sections of this chapter give the design plan (\ref{desp}) and implementation (\ref{imp}) of our research. 
 	Unfortunately, the latter did not quite fulfill the expectations we had in the former, so we include both a description of what we wanted to accomplish and what we were actually able to accomplish given the time constraints. 
 	\item Chapter \ref{back} gives the neccessary background information for understanding this work, 
@@ -59,23 +59,23 @@ The rest of the paper is organized as follows:
 	and a literature review of other attempts to solve the same or similiar problems
     \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a descritpion of how possibly to extend the problem to higher dimensions.
     \item Chapter \ref{res} compares example solutions to the problems listed in Chapter \ref{probs} in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses the relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
-    \item Chapter \ref{conc} presents our conclusions of this research and discusses future work. 
+    \item Chapter \ref{conc} presents our conclusions of this research and discusses future work. % (VA) how will this not repeat the close of Ch. 1 (see comments on page 4)
 \end{itemize}
 
 \section{Design Plan}
 \label{desp}
-Our goal was 
+Our goal was % (VA) the goal of this research was
 to implement a parallel subset of the programming language J, called \textit{Parallel-J}.
-This 
+This % (VA) such as...?
 would require a J language lexer and parser, limited memory management, a look-up table for predefined and user defined functions, a read-evaluate-print-loop (\textit{REPL}), and a subset of the J primitives.
 To be included in this subset of primitives would be: global variable assignment; 
 most array operations (creating, indexing, restructuring) and all of the basic arithmetic and logical operations; 
 a small selection of higher-ordered functions, such as function composition (including J's tacit function composition rules for sequences of functions or \textit{trains}), conditionals, reduction;
 and, 
-of course, 
+of course, % (VA) strike
 the rank operator and function rank. %TODO cite J Vocab (?)
 
-We excluded from the design of the parallel language subset the following language features: 
+We excluded from the design of the parallel language subset the following language features: % (VA) reason (CJ) I added more justification after I handed the paper to her, but before I got back her comments.
 namespaces (called \textit{locales});
 all existing environment-altering functions (the \textit{foreign} function);
 explicit scripts with imperative-style execution and control structures;
@@ -93,7 +93,7 @@ Although not entirely related to function rank, such controls are to be expected
 
 To implement this parallel subset of J, we chose the Scala programming language.\cite{scala} 
 Scala has many features that make it desireable for this task, including: 
-\begin{itemize} 
+\begin{itemize} % (VA) enumerate, not itemize % (CJ) this is _clearly_ not what she said. I'm just translating :)
 	\item support for multiple programming paradigms, such as
 	\begin{itemize}
 		\item imperative, for the tasks of memory management and object creation,
@@ -128,3 +128,15 @@ The proposal for the \textit{parallel operator} is still given but it unfortunat
 
 Finally, some work completed with the idea of implementing a subset of J did not contribute to developing a regular collections library in Scala that supports function rank.
 Most of this work consisted of implementing a lexer for the J programming language, and is listed in Appendix \ref{jlex}
+
+\nocite{rankanduni}
+\nocite{dph}
+
+\begin{comment}
+Data rank is simply the rank of a collection, and scalar values are considered to be collections of rank 0.
+Thus, the rank of some regular collection is a non-negative integer.%(CJ) When scalars are treated as regular collections, their rank is 0
+Function rank is a rank 1 collection of each of the associated data rank values of a function's expected arguments, usually with some value to represent when the function can take data of any rank for a specific argument.
+\end{comment}
+
+%For example, a profits report over \it{n} years of 4 quarters of 3 months could be represented as a 3-dimensional array with extents \it{n 4 3};\begin{comment}TODO cite rank\end{comment} cellular automata like Conway's "Game of Life"\begin{comment}TODO cite Conway\end{comment} might be represented on an \it{n} by \it{m} grid - a 2-dimensional array with extents \it{n m}.
+%In C, the profits report might be declared with \begin{verbatim}int report[n][4][3]\end{verbatim}; in Scala, 
