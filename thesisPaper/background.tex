@@ -150,10 +150,6 @@ can automatically exploit the inherrent concurrency of their problem,
 provided this problem can be expressed naturally in terms of function rank.
 
 \section{Other Solutions}
-\subsection{Single Assignment C}
-
-\subsection{MATLAB}
-
 \subsection{Regular Parallel Arrays in Haskel}\cite{dph}
 In 2010, Keller et. al. published a paper 
 describing work they had done on a Haskell library, which they named \textit{Repa}, that implements and parallelizes regular arrays.
@@ -187,3 +183,22 @@ it is $+/ " 1$, which in English reads rather intuitively as ``apply sum to the 
 Finally, although both J and Repa support function rank, 
 in the same way that the arabic numeral system is more convenient to work with than Church's numerals, 
 we believe that it is conceptually easier to understand, for example, that $(" 3)$ means ``operate on the rank 3 items'', than it is to understand Repa's equivalent, $(sh.:Int.:Int.:Int)$.
+
+\subsection{SA-C, Boost MultiArray}
+While we believe that Repa is the best of the solutions we have found so far, 
+it is necessary to mention other influential work in the subject of data parallelism on regular collections.
+Our analysis is mostly in agreement with the developers of Repa.\cite{dph}
+
+Single-Assignment C (\textit{SA-C}) is a functional, C-like language 
+that has many of the same advantages as Repa.\cite{dph}, % TODO cite SA-C
+Unfortunately, this also means that it has the same limitations, most notably the lack of a rank operator.
+Additionally, unlike Repa and our own research (but like J), 
+it is a special purpose array programming language and 
+not an extension to an existing, general purpose programming with a broad user base and 
+with access to large and well developed libraries.
+
+In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language. % TODO cite
+However, its ability to analyize and operate on the structure of regular collections is limited compared to SA-C or Repa.
+Furthermore, it does not benefit from a naturally parallel implementation, 
+its arrays are operated on in a conceptually lower (imperative) level, 
+and it also does not have an equivalent to the rank operator. 

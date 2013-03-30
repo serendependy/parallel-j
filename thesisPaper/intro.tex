@@ -6,11 +6,9 @@ In order for these applications to achieve good performance, it is often the cas
 One approach frequently used to exploit concurrency on large collections is \textit{data parallelism}, in which programs update elements or subsections of collections in parallel.
 Many tools have already been developed to help programmers exploit data parallelism easily and safely. %TODO citation
 However, we believe that many of these tool are not as helpful for exploiting data parallelism on regular collections as they could be, for two reasons.
-%1) the implementation of such collections in most languages can make it more difficult to view and manipulate their structure; and 
-%2) in many use cases applying functions to such collections leads to boiler-plate code, which can be tedious and error prone.
 
 First, many programming languages implement regular collections as nested collections;
-e.g. a 2-dimensional, 2 by 3 array (or rank 2 array with extent 2 3) of integers would be implemented as an array of 2 arrays, with each of these containing 3 integers.
+e.g. a 2-dimensional, 2 by 3 array (or rank 2 array with extent 2 3) of integers would be implemented as an array of 2 arrays, with each of these containing 3 integers. % TODO mention alternative of shape vector associated
 However, in such languages irregular collections are also usually implemented as nested collections, with each of the sub-collections possibly containing a different number of elements from each other.
 Since both regular and irregular collections are implemented the same way,
 it can be difficult for programmers to view, manipulate, and verify any important properties of the structure of regular collections.
@@ -44,7 +42,7 @@ Furthermore, since multiple applications of the rank operator are equivalent to 
 Consequently, languages with both formalized function rank and a rank-operator allow the programmer to 
 exploit the inherent data parallelism of extending existing operations to collections of higher dimension safely, quickly, and in some cases automatically.
 
-Unfortunately, currently the languages that meet these criteria, such as J, Sharp APL, and some others from the APL language family, are not in common use.
+Unfortunately, currently the languages that meet these criteria, such as J, Sharp APL, and some others from the APL language family, are not in common use. % TODO cite lack of parallelism
 One often-cited reason for this is that these languages are difficult to read, % TODO cite
 because, in order to use them effectively, a programmer must memorize dozens of 1 or 2 character functions each with different, sometimes unrelated use cases depending on whether the function takes one or two arguments.\cite{jvocab} %TODO cite APL cheat sheet
 However, these language design choices are not required in order for a language to support function rank.
