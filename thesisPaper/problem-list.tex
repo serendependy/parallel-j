@@ -1,5 +1,47 @@
-%
-% FIX THIS -- remove/change, just some examples of things
-%
 \chapter{Example Parallel Problems}
 \label{probs}
+
+\section{Rationale}
+Each of the following problems was selected to illustrate 
+both the advantages in approaching different forms of exploitable concurrency with the notion of function rank, 
+as well as to illustrate how extensions of these problems to higher dimensions can be done easily, safely, 
+and in an automatically data parallel fashion.
+
+To demonstrate this, the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
+\textit{Design Patterns} are general, reusable solutions to a common class of problems. % TODO cite? (from Wikipedia)
+Software design patterns were first made popular for object-oriented programming through the work of the "Gang of Four," % TODO cite
+and are now seeing interest for applications in parallel computing. % TODO cite Massingill, Berkely work 
+This research has chosen to focus on the pattern language developed by Mattson et. al. 
+presented in their book, "Patterns for Parallel Programming." % TODO justify?
+Using parallel design patterns to guide the choices and discussion of these problems 
+should allow this limited selection of problems to better represent families of parallel problems.
+
+\section{Calculating Pi with Numerical Integration}
+\subsection{Description}
+One method of calculating $\pi$ is find the area of the unit circle. 
+To do this, one can choose to calculate the area top right quandrant of the unit circle in the Cartesian plane, 
+then multiply this area by 4. 
+This is done with the following equation:
+
+\[\pi = 4 \cdot \int_0^1 \sqrt{1 - x^2} \; dx\]
+
+One way to approximate this formula is to use a right-handed Riemann sum:
+
+\[\frac{4}{n} \\cdot \sum_{i=0}^n \sqrt{1 - x^2} \]
+
+where $x = \frac{i}{n}$
+
+\subsection{Relevant Design Pattern}
+This problem was chosen to represent the \textit{Task Parallelism} pattern, 
+in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' % TODO cite
+In this problem, the concurrent tasks are calculating $\sqrt{1 - x^2}$ for the different values of $x$. 
+There is also a task dependency: the multiplication of $\frac{4}{n}$ and the sum of the values produced by each task 
+cannot occur until all tasks have finished. 
+Each individual task takes roughly the same amount of time, as well, 
+meaning no sophisticated scheduling is required in order to exploit concurrency effectively for large $n$.
+
+\subsection{Solutions}
+
+
+
+\section{Game of Life}
