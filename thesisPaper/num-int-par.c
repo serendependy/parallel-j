@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     double sum = 0.0;
     double step = 1.0/(double) NUM_STEPS;
 
-	#pragma omp parallel for private(x) reduction(+:sum) schedule(static)
+	#pragma omp parallel for private(x) reduction(+:sum)
 	for (int i=NUM_STEPS-1; i >= 0; --i) {
 		x = i*step;
 		sum = sum + 4.0/(1.0+x*x);

@@ -33,7 +33,7 @@ where $x = \frac{i}{n}$
 
 \subsection{Relevant Design Pattern}
 This problem was chosen to represent the \textit{Task Parallelism} pattern, 
-in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' % TODO cite
+in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' % TODO \cite{ppp}
 In this problem, the concurrent tasks are calculating $\sqrt{1 - x^2}$ for the different values of $x$. 
 There is also a task dependency: the multiplication of $\frac{4}{n}$ and the sum of the values produced by each task 
 cannot occur until all tasks have finished. 
@@ -41,6 +41,18 @@ Each individual task takes roughly the same amount of time, as well,
 meaning no sophisticated scheduling is required in order to exploit concurrency effectively for large $n$.
 
 \subsection{Solutions}
+\subsubsection{C with OpenMP}
+A parallel solution to this problem using C with the OpenMP libraries is given below. 
+It is based off of the solution given in Appendix A of Mattson et. al. % TODO \cite{ppp}
+
+\verbatiminput{num-int-par.c}
+
+This solution parallelizes each of the iterations of the for loop 
+and specifies both that $x$ is a temporary work variable and so should not be shared among threads, 
+and that there is to be a reduction on the variable $sum$ with addition. 
+Since the entire body of the for loop is parallelized, including the update of $sum$, 
+the annotation notifying the compiler of the reduction is critical; 
+otherwise, there could very well be race conditions.
 
 
 
