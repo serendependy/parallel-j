@@ -38,7 +38,7 @@ The proposed parallel rank operator is a conjunction
 whose first argument is a function 
 and whose second argument is the ranks to both apply the function and to parallelize it. 
 It would be functionally equivalent to the rank operator, i.e. 
-\[f\;\;"::r\;y \Leftrightarrow f\;"r\;y\] and \[x f"::r y \Leftrightarrow x f"r y\] for all $f, r, x,$ and $y$.
+\[f\;\;(``::r)\;y\;\;\Leftrightarrow\;\;f\;(``r)\;y\] and \[x\;\;f(``::r)\;y\;\;\Leftrightarrow\;\;x\;f(``r)\;y\] for all $f, r, x,$ and $y$.
 
 Its purpose would be to override other parallel system defaults 
 to guarantee that the resulting function would parallelize operations on subarrays of the given rank 
@@ -54,16 +54,16 @@ To illustrate, consider the following examples:
 1 2 3
 4 5 6
    (increment"0 link increment"1 (link =: ;) increment"2) mat2_3
-┌─────┬─────┬─────┐
-│1 2 3│1 2 3│1 2 3│
-│4 5 6│4 5 6│4 5 6│
-└─────┴─────┴─────┘
++-----+-----+-----+
+|1 2 3|1 2 3|1 2 3|
+|4 5 6|4 5 6|4 5 6|
++-----+-----+-----+
 \end{verbatim}
 
 Incrementing numeric values always applies to scalars, so it always gives the same result, 
 regardless of which rank it is applied. 
 Using the parallel rank operate, this behavior would still remain; 
-however, each of the cases of $increment"::0$, $increment"::1$ and $increment"2"$ 
+however, each of the cases of $increment(``::0)$, $increment(``::1)$ and $increment(``::2)$ 
 would result in the environment attempting to parallelize for the scalar, row, and whole matrix, respectively.
 E.g., if no limit is set on the number of threads available, 
 then the system might use 6 threads for parallelizing the scalars, 
@@ -94,30 +94,30 @@ as well as repeated applications of the rank operator.
  6  8 10
 12 14 16
    mat2_3 link"2 arr2_2_3
-┌─────┬───────┐
-│0 1 2│0 1 2  │
-│3 4 5│3 4 5  │
-├─────┼───────┤
-│0 1 2│6  7  8│
-│3 4 5│9 10 11│
-└─────┴───────┘
++-----+-------+
+|0 1 2|0 1 2  |
+|3 4 5|3 4 5  |
++-----+-------+
+|0 1 2|6  7  8|
+|3 4 5|9 10 11|
++-----+-------+
    mat2_3 link("1)("2) arr2_2_3
-┌─────┬───────┐
-│0 1 2│0 1 2  │
-├─────┼───────┤
-│3 4 5│3 4 5  │
-└─────┴───────┘
++-----+-------+
+|0 1 2|0 1 2  |
++-----+-------+
+|3 4 5|3 4 5  |
++-----+-------+
 
-┌─────┬───────┐
-│0 1 2│6 7 8  │
-├─────┼───────┤
-│3 4 5│9 10 11│
-└─────┴───────┘
++-----+-------+
+|0 1 2|6 7 8  |
++-----+-------+
+|3 4 5|9 10 11|
++-----+-------+
 \end{verbatim}
 
 Using the parallel rank operator, 
-$mat2\_3 +"::2 arr2\_2\_3$ would parallelize addition on each of the two matrices, whereas
-$mat2\_3 +("::1)("2) arr2\_2\_3$ would parallelize addition on each of the vector elements.
+$mat2\_3\;+(``::2)\;arr2\_2\_3$ would parallelize addition on each of the two matrices, whereas
+$mat2\_3\;+(``::1)(``2)\;arr2\_2\_3$ would parallelize addition on each of the vector elements.
 
 Some open questions remain, most notably 
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
@@ -128,20 +128,22 @@ This is left as a question for future research to investigate.
 \subsection{Preliminaries: Conventions of the Foreign Operator}
 In addition to the parallel rank operator, 
 programmers may wish to change the parallel environment settings.
-We believe this is best done using the already existing foreign operator, spelled $!:$.
+We believe this is best done using the already existing foreign operator, spelled ``$!:$''.
 This is because the foreign operator was designed for functions which change system parameters, 
 such as print precision, file IO, etc.\cite{jvocab} 
 
 The foreign operator is a two-argument higher order function, or in J a \textit{conjunction}, 
 whose arguments are always numeric.
-Conceptually, this argument serves as an index into system libraries.
+Conceptually, these arguments serve as an index into system libraries and functions.
+The left argument indexes the desired library.
 E.g., $2$ indexes the library for functions which affect the host machine, 
 $9$ indexes the library for viewing and setting global J parameters (such as print precision), and etc.
-The second argument is used to index a specific function.
+The second argument indexes a specific function.
 E.g., $9!:6$ is the function which displays the print characters for J's box type.
 
 The numeric encoding for the parallel environment library 
-was chosen to be $111$, again for mnemonic reasons.
+was chosen to be $111$, again for mnemonic reasons; 
+$111$ looks like three parallel lines ($11$ was already taken).
 
 \subsection{Usage}
 This section requires more research before a full suite of library functions is proposed.
@@ -155,3 +157,26 @@ They are:
     \item Getting and setting the thread scheduling schemes (such as static, round-robin, etc).
         These would be encoded as numeric values, in keeping with the conventions of the foreign libraries.
 \end{enumerate}
+
+The following is not an actual session with any existing J REPL, 
+but an example of how one would use this proposed library.
+
+\begin{verbatim}
+   (111 !: 0) '' NB. Get number of threads.
+1
+   (111 !: 1) 4 NB. Set number of available threads to 4.
+
+   (111 !: 2) '' NB. Get numeric encoding of thread scheduling scheme.
+0
+   (111 !: 3) 1 NB. Set thread scheduling to, for example, round robin.
+
+   mat2_3 +("::1)("2) arr2_2_3
+0  2  4
+6  8 10
+
+6  8 10
+12 14 16
+\end{verbatim}
+
+The above example would parallelize addition on the row elements of $mat2\_3$ and $arr2\_2\_3$ 
+with 4 threads using a round-robin thread scheduling scheme.
