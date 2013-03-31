@@ -167,22 +167,21 @@ Consequently, passing \textit{sum} a rank 0 array is a compile-time error.
 In general, this library ``enables [the user] to track the rank of each array in its type,
 guaranteeing the absence of rank-related runtime errors.''
 
-Repa's static capturing of the rank of a function's arguments is equivalent to J's notion of function rank, 
-in the same way that Church's numerals are equivalent to the arabic numerals. % TODO this only gets justification later
-It is implemented as a list of types and uses Haskell's pattern-matching capabilities and some language extensions 
+Repa's static capturing of the rank of a function's arguments is equivalent to J's notion of function rank.
+It is implemented as a list of the type \textit{Int} and uses Haskell's pattern-matching capabilities and some language extensions 
 to analyze the structure of this list.
 However, unlike J, Repa appears to lack a rank operator, at least as of our understanding of the research.
 Instead, functions must be extended manually in order to operate of arrays of higher rank.
 
 For example, while in J the idiom for \textit{sum} (spelled $+/$) automatically operates on the rank $n-1$ items of a rank $n$ array, 
 in Repa, \textit{sum} by default operates only on scalar values in each vector of a collection.
-In order to scale the existing \textit{sum} function in Repa to any array of rank $n > 2$, 
+In order to scale the existing \textit{sum} function in Repa to any array of rank $n > 1$, 
 a new function must be written for each dimension which manually extends \textit{sum}.
 In contrast, in order to get the same behavior in J of Repa's \textit{sum} function, no manual extension is required; 
 it is $+/ " 1$, which in English reads rather intuitively as ``apply sum to the vector elements of its argument.''
 
 Finally, although both J and Repa support function rank, 
-in the same way that the arabic numeral system is more convenient to work with than Church's numerals, 
+in the same way that the arabic numeral system is more convenient to work with than Church's numerals, % TODO cite?
 we believe that it is conceptually easier to understand, for example, that $(" 3)$ means ``operate on the rank 3 items'', than it is to understand Repa's equivalent, $(sh.:Int.:Int.:Int)$.
 
 \subsection{SA-C, Boost MultiArray}

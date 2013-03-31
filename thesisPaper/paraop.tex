@@ -1,0 +1,141 @@
+\chapter{Proposals for a Parallel Implementation of J} % TODO change everything mentioning the 111 !:
+
+\section{Rationale}
+Ideally, it would be the case that a program would automatically perform better using a parallel library 
+without requiring the programmer to write a single line of parallelizing code. 
+However, this is often not the case. % TODO cite?
+Frequently, programmers must use domain knowledge of the problem or platform to achieve good results. 
+
+In order to grant this flexibility in future parallel implementations of J, 
+we propose introducing a new operator, called the \textit{parallel rank operator}, 
+which would allow the programmer to specify the ranks on which to parallelize code, 
+described in section \ref{prank}.
+Additionally, we propse a new system library
+which would allow the programmer to give annotations or force changes in the underlying parallel environment,
+described in section \ref{prank}
+
+\section{Parallel Rank Operator: "::}
+\label{prank}
+
+\subsection{Spelling}
+The spelling $"::$ was chosen for mnemonic and legacy reasons. 
+Mnemonically, it uses the same base character as the rank operator, 
+as well as two ``parallel'' colons, which makes it easier to remember its function.
+It also requires no changes be made to the existing J lexer\cite{ioj}, 
+as demonstrated below.
+
+\begin{verbatim}
+   jlexer =: ;:
+   jlexer 'mat2_3 +("::1)("2) arr2_2_3'
+┌──────┬─┬─┬───┬─┬─┬─┬─┬─┬─┬────────┐
+│mat2_3│+│(│"::│1│)│(│"│2│)│arr2_2_3│
+└──────┴─┴─┴───┴─┴─┴─┴─┴─┴─┴────────┘
+\end{verbatim}
+
+\subsection{Usage}
+The proposed parallel rank operator is a conjunction 
+whose first argument is a function 
+and whose second argument is the ranks to both apply the function and to parallelize it. 
+It would be functionally equivalent to the rank operator, i.e. 
+\[f"::r y \Leftrightarrow f"r y\] and \[x f"::r y \Leftrightarrow x f"r y\] for all $f, r, x,$ and $y$.
+
+Its purpose would be to override other parallel system defaults 
+to guarantee that the resulting function would parallelize operations on subarrays of the given rank 
+using the available threads.
+
+To illustrate, consider the following examples:
+
+\begin{verbatim}
+   (increment =: >:) mat2_3
+1 2 3
+4 5 6
+   increment"0 mat2_3
+1 2 3
+4 5 6
+   (increment"0 link increment"1 (link =: ;) increment"2) mat2_3
+┌─────┬─────┬─────┐
+│1 2 3│1 2 3│1 2 3│
+│4 5 6│4 5 6│4 5 6│
+└─────┴─────┴─────┘
+\end{verbatim}
+
+Incrementing numeric values always applies to scalars, so it always gives the same result, 
+regardless of which rank it is applied. 
+Using the parallel rank operate, this behavior would still remain; 
+however, each of the cases of $increment"::0$, $increment"::1$ and $increment"2"$ 
+would result in the environment attempting to parallelize for the scalar, row, and whole matrix, respectively.
+E.g., if no limit is set on the number of threads available, 
+then the system might use 6 threads for parallelizing the scalars, 
+2 threads for parallelizing the vectors, 
+and only 1 thread for parallelizing the entire matrix 
+(which, since the example computation is so trivial, would probably lead to the best performance).
+
+Here's a more complex exmample involving functions of two arguments 
+as well as repeated applications of the rank operator.
+
+\begin{verbatim}
+   ] arr2_2_3 =: integers 2 2 3
+0  1  2
+3  4  5
+
+6  7  8
+9 10 11
+   mat2_3 +"2 arr2_2_3
+0  2  4
+6  8 10
+
+6  8 10
+12 14 16
+   mat2_3 +("1)("2) arr2_2_3
+0  2  4
+6  8 10
+
+ 6  8 10
+12 14 16
+   mat2_3 link"2 arr2_2_3
+┌─────┬───────┐
+│0 1 2│0 1 2  │
+│3 4 5│3 4 5  │
+├─────┼───────┤
+│0 1 2│6  7  8│
+│3 4 5│9 10 11│
+└─────┴───────┘
+   mat2_3 link("1)("2) arr2_2_3
+┌─────┬───────┐
+│0 1 2│0 1 2  │
+├─────┼───────┤
+│3 4 5│3 4 5  │
+└─────┴───────┘
+
+┌─────┬───────┐
+│0 1 2│6 7 8  │
+├─────┼───────┤
+│3 4 5│9 10 11│
+└─────┴───────┘
+\end{verbatim}
+
+Using the parallel rank operator, 
+$mat2\_3 +"::2 arr2\_2\_3$ would parallelize addition on each of the two matrices, whereas
+$mat2\_3 +("::1)("2) arr2\_2\_3$ would parallelize addition on each of the vector elements.
+
+Some open questions remain, most notably 
+the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
+This is left as a question for future research to investigate.
+
+\section{Parallel Environment Library}
+\label{pfor}
+\subsection{Preliminaries: Conventions of the Foreign Operator}
+The foreign operator is a two-argument higher order function, or in J a \textit{conjunction}, 
+whose arguments are always numeric.
+Conceptually, this argument serves as an index into system libraries.
+E.g., $2$ indexes the library for functions which affect the host machine, 
+$9$ indexes the library for viewing and setting global J parameters (such as print precision), and etc.
+The second argument is used to index a specific function.
+
+We believe this is best done using the already existing foreign operator, spelled $!:$.
+This is because the foreign operator was designed for functions which change system parameters, 
+such as print precision, file IO, and others,\cite{jvocab} 
+which is exactly what this proposed operator would do.
+
+
+\subsection{Usage}

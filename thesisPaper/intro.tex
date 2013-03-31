@@ -23,8 +23,9 @@ Unfortunately, most statically-typed languages do not have type systems advanced
 to capture all of the structural information of regular collections statically, even though this is theoretically possible. % TODO cite dependent types (xi probably)
 However, some languages are able to capture some of this structure statically, \cite{boost} \cite{sac} \cite{dph}
 enabling programmers to reduce or eliminate the need for manual verification, 
-such as the fact that the arguments to a function are in fact regular collections.
-Writing effective parallel code is an already conceptually difficult task without adding manual checks for program correctness.
+such as the fact that the arguments to a function are in fact regular collections or lower bounds to the ranks of a function's argument.
+Even when these properties of regular collections cannot be captured statically, making this information more transparent at run time 
+should allow programmers to more easily verify that the required properties hold.
 
 Second, in most imperative languages with regular collections, 
 applying functions to elements or sub-collections of a collection means 
@@ -54,15 +55,17 @@ As a consequence, this also allows programmers to more easily see where there is
 However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, 
 they too must be nested in order to extend existing functions to collections of higher dimension, with the same problems mentioned above.
 
-\textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} and implemented in the programming language J, 
+\textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} 
+and implemented in the programming language J, 
 is a functional abstraction that extends the notion of data rank to functions. 
 In functional languages where the idea of function rank is formalized, 
-extending existing functions to regular collections of higher dimension can be expressed as the application of a higher-ordered function, 
+extending existing functions to regular collections of higher dimension 
+can be expressed as the application of a higher-ordered function, 
 called in J and in this paper the \textit{rank operator}. \cite{jvocab}
 Expressing these extensions as a higher-order function 
 makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
-In some cases, these extensions are so trivial that they can be done automatically, 
-meaning the programmer need not modify the code at all. %TODO cite J shape agreement
+In some cases, these extensions are so trivial that they can be done automatically,\cite{jvocab} \cite{rankanduni} 
+meaning the programmer need not modify the code at all. 
 Furthermore, since multiple applications of the rank operator 
 are equivalent to the cases where nested loops or nested higher-order function applications are inherrently parallel, 
 it too is inherently data parallel.
@@ -78,15 +81,16 @@ because, in order to use them effectively, a programmer must memorize
 dozens of 1 or 2 character functions each with different, sometimes unrelated use cases 
 depending on whether the function takes one or two arguments.\cite{jvocab} %TODO cite APL cheat sheet
 However, these language design choices are not required in order for a language to support function rank.
-It seems to us that 
-what is needed is a proof-of-concept that the notion of function rank is still very helpful in exploiting data parallelism on regular multidimensional arrays in a more modern, more popularly supported language. 
+A proof-of-concept is needed to demonstrate that the notion of function rank % TODO what to call shape vectored arrays?
+is still very helpful for exploiting data parallelism on regular collections 
+when available in a more modern, more popularly supported language.
 
 The rest of the paper is organized as follows:
 \begin{itemize} 
 	\item The remaining sections of this chapter give the design plan (\ref{desp}) and implementation (\ref{imp}) of our research. 
 	Unfortunately, the latter did not quite fulfill the expectations we had in the former, so we include both a description of what we wanted to accomplish and what we were actually able to accomplish given the time constraints. 
 	\item Chapter \ref{back} gives the neccessary background information for understanding this work, 
-	including a brief description of function rank and how it is equivalent to nested loops or nested calls to \textit{map} and \textit{reduce},
+	including a brief description of function rank and how it is equivalent to nested loops or nested calls to \textit{map},
 	a discussion of relevant parallel design patterns for the example problem set, 
 	and a literature review of other attempts to solve the same or similiar problems
     \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a descritpion of how possibly to extend the problem to higher dimensions.
@@ -96,25 +100,36 @@ The rest of the paper is organized as follows:
 
 \section{Design Plan}
 \label{desp}
-Our goal was 
+The goal of this research was
 to implement a parallel subset of the programming language J, called \textit{Parallel-J}.
-This 
-would require a J language lexer and parser, limited memory management, a look-up table for predefined and user defined functions, a read-evaluate-print-loop (\textit{REPL}), and a subset of the J primitives.
-To be included in this subset of primitives would be: global variable assignment; 
-most array operations (creating, indexing, restructuring) and all of the basic arithmetic and logical operations; 
-a small selection of higher-ordered functions, such as function composition (including J's tacit function composition rules for sequences of functions or \textit{trains}), conditionals, reduction;
-and, 
-of course, 
-the rank operator and function rank. %TODO cite J Vocab (?) TODO itemize? TODO footnote for tacit
+This language subset would require:\cite{ioj} 
+\begin{itemize}
+	\item a J language lexer and parser
+	\item limited memory management
+	\item a look-up table for predefined and user functions
+	\item a read-evaluate-print-loop (REPL), and
+	\item a subset of the J primitives, including: 
+	\begin{itemize}
+		\item global variable assignment
+		\item most array operations (creating, indexing, restructuring)
+		\item all of the basic arithmetic and logical operations
+		\item a limited selection of higher-ordered functions (composition, conditional, reduction)
+		\item J's function composition rules for sequences of functions (\textit{trains}), and
+		\item the rank operator and function rank
+	\end{itemize}
+\end{itemize}
 
 We excluded from the design of the parallel language subset the following language features: 
-namespaces (called \textit{locales});
-all existing environment-altering functions (the \textit{foreign} function);
-explicit scripts with imperative-style execution and control structures;
-and the J primitives which calculated complex algorithms, such as prime factorization and derivatives polynomial equations.
-% TODO itemize?
+\begin{itemize}
+	\item namespaces (\textit{locales})
+	\item all existing environment-altering functions (the \textit{foreign} operator, spelled \ttfamily!:\normalfont)
+	\item explicit scripts with imperative-style execution and control structure, and
+	\item the J primitives which calculate complex algorithms (prime factorization, derivatives of polynomial equations, etc)
+\end{itemize}
+
 These choices were motivated by the desire to present solutions to our sample problems in as simple and ``idiomatic'' J as possible.
-This would allow us to directly address the involved computations, as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
+This would allow us to directly address the involved computations, 
+as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
 without getting distracted with a discussion of J's more advanced or nuanced language features.
 
 Also to be included was a proposal and implementation of a new \textit{foreign} operator, called the \textit{parallel operator} and spelled\ttfamily (111 !:)\normalfont , 
@@ -125,7 +140,7 @@ Although not entirely related to function rank, such controls are to be expected
 
 To implement this parallel subset of J, we chose the Scala programming language.\cite{scala} 
 Scala has many features that make it desireable for this task, including: 
-\begin{itemize} 
+\begin{enumerate} 
 	\item support for multiple programming paradigms, such as
 	\begin{itemize}
 		\item imperative, for the tasks of memory management and object creation,
@@ -140,10 +155,13 @@ Scala has many features that make it desireable for this task, including:
 		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,\cite{pc}
 			which, being similiar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
 	\end{itemize}
-\end{itemize}
+\end{enumerate}
 
 We would then compare solutions to a suite of data parallel problems written in C with OpenMP, Scala and Parallel-J,
-and discuss the relative level of abstraction, scalability to similiar problems of higher dimension, and performance of each.
+and discuss the relative level of abstraction, scalability to similiar problems of higher dimension, and performance of each. 
+It was not expected that Parallel-J would compare favorably to the raw performance of C or the current implementation of J; 
+the hoped for result was to show that the performance Paralle-J scales relative to the number of threads, 
+showing that this implementation does effectively exploit potential concurrency.
 % TODO also parallelisation techniques.
 
 \section{Implementation}
