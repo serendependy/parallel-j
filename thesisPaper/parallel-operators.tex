@@ -1,4 +1,4 @@
-\chapter{Proposals for a Parallel Implementation of J} % TODO change everything mentioning the 111 !:
+\chapter{Proposed Operators for a Parallel Implementation of J} % TODO change everything mentioning the 111 !:
 \label{paraop}
 
 \section{Rationale}
@@ -28,9 +28,9 @@ as demonstrated below.
 \begin{verbatim}
    jlexer =: ;:
    jlexer 'mat2_3 +("::1)("2) arr2_2_3'
-┌──────┬─┬─┬───┬─┬─┬─┬─┬─┬─┬────────┐
-│mat2_3│+│(│"::│1│)│(│"│2│)│arr2_2_3│
-└──────┴─┴─┴───┴─┴─┴─┴─┴─┴─┴────────┘
++------+-+-+---+-+-+-+-+-+-+--------+
+|mat2_3|+|(|"::|1|)|(|"|2|)|arr2_2_3|
++------+-+-+---+-+-+-+-+-+-+--------+
 \end{verbatim}
 
 \subsection{Usage}
@@ -38,7 +38,7 @@ The proposed parallel rank operator is a conjunction
 whose first argument is a function 
 and whose second argument is the ranks to both apply the function and to parallelize it. 
 It would be functionally equivalent to the rank operator, i.e. 
-\[f"::r y \Leftrightarrow f"r y\] and \[x f"::r y \Leftrightarrow x f"r y\] for all $f, r, x,$ and $y$.
+\[f\;\;"::r\;y \Leftrightarrow f\;"r\;y\] and \[x f"::r y \Leftrightarrow x f"r y\] for all $f, r, x,$ and $y$.
 
 Its purpose would be to override other parallel system defaults 
 to guarantee that the resulting function would parallelize operations on subarrays of the given rank 
@@ -123,20 +123,35 @@ Some open questions remain, most notably
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
 This is left as a question for future research to investigate.
 
-\section{Parallel Environment Library}
+\section{Parallel Environment Library: 111 !:} 
 \label{pfor}
 \subsection{Preliminaries: Conventions of the Foreign Operator}
+In addition to the parallel rank operator, 
+programmers may wish to change the parallel environment settings.
+We believe this is best done using the already existing foreign operator, spelled $!:$.
+This is because the foreign operator was designed for functions which change system parameters, 
+such as print precision, file IO, etc.\cite{jvocab} 
+
 The foreign operator is a two-argument higher order function, or in J a \textit{conjunction}, 
 whose arguments are always numeric.
 Conceptually, this argument serves as an index into system libraries.
 E.g., $2$ indexes the library for functions which affect the host machine, 
 $9$ indexes the library for viewing and setting global J parameters (such as print precision), and etc.
 The second argument is used to index a specific function.
+E.g., $9!:6$ is the function which displays the print characters for J's box type.
 
-We believe this is best done using the already existing foreign operator, spelled $!:$.
-This is because the foreign operator was designed for functions which change system parameters, 
-such as print precision, file IO, and others,\cite{jvocab} 
-which is exactly what this proposed operator would do.
-
+The numeric encoding for the parallel environment library 
+was chosen to be $111$, again for mnemonic reasons.
 
 \subsection{Usage}
+This section requires more research before a full suite of library functions is proposed.
+This would likely be done by reviewing the functionality of other shared-memory parallel libraries, such as OpenMP. % TODO cite
+However, two types of functionality would almost certainly be required.
+They are:
+
+\begin{enumerate}
+    \item Getting and setting the total number of threads available in the paralle environment,
+        with an extension for J's value for infinity to mean no user-specified limit on the number of threads, and
+    \item Getting and setting the thread scheduling schemes (such as static, round-robin, etc).
+        These would be encoded as numeric values, in keeping with the conventions of the foreign libraries.
+\end{enumerate}
