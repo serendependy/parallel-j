@@ -3,7 +3,7 @@
 // TODO this is the wrong method!
 
 def testNumericalIntegration(numRiemann: JArray[JInt]) {
-   val recip =  reciprocalDivide(numRiemann)//JArray.scalar(numRiemann.recip)
+   val recip =  reciprocalDivide(numRiemann)
    val xvals =  signumMultiply(integersIndex(numRiemann),
                                recip)
    val yvals = squarerootRoot(negateMinus(JArray.scalar(JReal.One),

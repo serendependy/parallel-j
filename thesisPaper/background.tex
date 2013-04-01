@@ -22,7 +22,10 @@ On the other hand, most collective operations, such as indexing, operate on whol
 
 \subsection{Shape Agreement}
 In the trivial cases, where a function $f$ is given arguments with ranks matching $f$'s function rank, 
-J behaves much like any programming language without function rank. % TODO make single spaces
+J behaves much like any programming language without function rank. 
+
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    1 + 1
 2
@@ -32,15 +35,23 @@ J behaves much like any programming language without function rank. % TODO make 
    1 (from =: {) mat2_3
 3 4 5
 \end{verbatim}
+\end{small}
+\end{singlespacing}
+
 
 In some cases, when the arguments to $f$  do not match its function rank, $f$  is automatically extended to the appropriate dimensions.
 For example, if $x$ is a scalar, addition can always be extended so that $x$ is added to every element of a collection $c$ 
 no matter $c$'s rank or extent. 
+
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    1 + mat2_3
 1 2 3
 4 5 6
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 In general, addition (and all other scalar functions) can be extended over two regular collections $x$ and $y$ 
 if the shape of one collection \textit{prefixes} the other.
@@ -52,6 +63,8 @@ and the remaining suffixes the shape of $x$ and $y$ are their respective \textit
 Going back to the above example: a scalar, a vector of 2 elements, and another 2 by 3 matrix will aggree with $mat2\_3$ under addition, since the shape of these prefixes the shape of $mat2\_3$; 
 any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also aggree with $mat2\_3$ under addition, since $mat2\_3$ would prefix it.
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    3.141 2.718 + mat2_3
 3.141 4.141 5.141
@@ -76,6 +89,8 @@ any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also aggre
 12 13
 15 16
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 In this last example, every scalar of $mat2\_3$ was added to both scalars of each vector in $arr2\_3\_2$. 
 Another way to conceptualize this is that J made an implicit \textit{map} on the scalar elements of $mat2\_3$, 
@@ -87,6 +102,8 @@ $arr2\_3\_2$'s \textit{cells} were vectors of two scalars.
 With what we have developed so far, we are still unable to perform the operation of 
 adding a vector $vec3$ of 3 scalars to $mat2\_3$, since there is no prefix between shapes $3$ and $2$ $3$.
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    ] vec3=: i. 3
 0 1 2
@@ -94,6 +111,8 @@ adding a vector $vec3$ of 3 scalars to $mat2\_3$, since there is no prefix betwe
 |length error
 |   vec3    +mat2_3
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 However, it should be possible to add $vec3$ to each of the vectors of $mat2\_3$, since each vector has the same length.
 In order to accomplish this and many similiar use cases where the desired extension of a function is not the default extension, 
@@ -104,11 +123,15 @@ and returns a function which performs the same operation as the argument functio
 
 Therefore, the following command, 
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    vec3 +"1 mat2_3
 0 2 4
 3 5 7
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 is read ``add the rank 1 items of $vec3$ to the rank 1 items of $mat2\_3$.''
 In terms of \textit{frames}, \textit{cells}, and implicit \textit{maps}, we say that

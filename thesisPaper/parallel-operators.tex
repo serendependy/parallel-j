@@ -25,6 +25,8 @@ as well as two ``parallel'' colons, which makes it easier to remember its functi
 It also requires no changes be made to the existing J lexer\cite{ioj}, 
 as demonstrated below.
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    jlexer =: ;:
    jlexer 'mat2_3 +("::1)("2) arr2_2_3'
@@ -32,6 +34,8 @@ as demonstrated below.
 |mat2_3|+|(|"::|1|)|(|"|2|)|arr2_2_3|
 +------+-+-+---+-+-+-+-+-+-+--------+
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 \subsection{Usage}
 The proposed parallel rank operator is a conjunction 
@@ -46,6 +50,8 @@ using the available threads.
 
 To illustrate, consider the following examples:
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    (increment =: >:) mat2_3
 1 2 3
@@ -59,6 +65,8 @@ To illustrate, consider the following examples:
 |4 5 6|4 5 6|4 5 6|
 +-----+-----+-----+
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 Incrementing numeric values always applies to scalars, so it always gives the same result, 
 regardless of which rank it is applied. 
@@ -74,6 +82,8 @@ and only 1 thread for parallelizing the entire matrix
 Here's a more complex exmample involving functions of two arguments 
 as well as repeated applications of the rank operator.
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    ] arr2_2_3 =: integers 2 2 3
 0  1  2
@@ -114,6 +124,9 @@ as well as repeated applications of the rank operator.
 |3 4 5|9 10 11|
 +-----+-------+
 \end{verbatim}
+\end{small}
+\end{singlespacing}
+
 
 Using the parallel rank operator, 
 $mat2\_3\;+(``::2)\;arr2\_2\_3$ would parallelize addition on each of the two matrices, whereas
@@ -161,6 +174,8 @@ They are:
 The following is not an actual session with any existing J REPL, 
 but an example of how one would use this proposed library.
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    (111 !: 0) '' NB. Get number of threads.
 1
@@ -177,6 +192,8 @@ but an example of how one would use this proposed library.
 6  8 10
 12 14 16
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 The above example would parallelize addition on the row elements of $mat2\_3$ and $arr2\_2\_3$ 
 with 4 threads using a round-robin thread scheduling scheme.
