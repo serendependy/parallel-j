@@ -23,19 +23,19 @@ To do this, one can choose to calculate the area top right quandrant of the unit
 then multiply this area by 4. 
 This is done with the following equation:
 
-\[\pi = 4 \cdot \int_0^1 \frac{1}{1 + x^2} \; dx\]
+\[\pi = \int_0^1 \frac{4}{1 + x^2} \; dx\]
 
 One way to approximate this formula is to use a right-handed Riemann sum:
 
-\[\frac{4}{n} \\cdot \sum_{i=0}^n \sqrt{1 - x^2} \]
+\[\frac{1}{n} \cdot \sum_{i=0}^n \frac{4}{1 + x^2} \]
 
 where $x = \frac{i}{n}$
 
 \subsection{Relevant Design Pattern}
 This problem was chosen to represent the \textit{Task Parallelism} pattern, 
 in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' % TODO \cite{ppp}
-In this problem, the concurrent tasks are calculating $\sqrt{1 - x^2}$ for the different values of $x$. 
-There is also a task dependency: the multiplication of $\frac{4}{n}$ and the sum of the values produced by each task 
+In this problem, the concurrent tasks are calculating $\frac{4}{1 + x^2}$ for the different values of $x$. 
+There is also a task dependency: the multiplication of $\frac{1}{n}$ and the sum of the values produced by each task 
 cannot occur until all tasks have finished. 
 Each individual task takes roughly the same amount of time, as well, 
 meaning no sophisticated scheduling is required in order to exploit concurrency effectively for large $n$.
@@ -76,5 +76,10 @@ by giving compiler annotations,
 in the J solution this was never a risk.
 Either the $sum$ operation would be safely parallel with $/::$ or 
 it would be sequential with $/$.
+
+\subsubsection{Scala using Parallel-J System as a Library}
+
+
+\verbatiminput{num_int_pi.scala}
 
 \section{Game of Life}
