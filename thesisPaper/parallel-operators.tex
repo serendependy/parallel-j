@@ -8,34 +8,40 @@ However, this is often not the case. % TODO cite?
 Frequently, programmers must use domain knowledge of the problem or platform to achieve good results. 
 
 In order to grant this flexibility in future parallel implementations of J, 
-we propose introducing a new operator, called the \textit{parallel rank operator}, 
-which would allow the programmer to specify the ranks on which to parallelize code, 
-described in section \ref{prank}.
+we propose introducing two new operators, called the \textit{parallel rank operator} 
+and the \textit{parallel insert operator}.
+The \textit{parallel rank operator}, described in Section \ref{prank}, 
+would allow the programmer to specify the ranks on which to parallelize code.
+The \textit{parallel insert operator}, described in Section \ref{pins}, 
+would allow the programmer to parallelize reduction operations with associative functions.
 Additionally, we propse a new system library
 which would allow the programmer to give annotations or force changes in the underlying parallel environment,
-described in section \ref{prank}
+described in section \ref{pfor}
 
-\section{Parallel Rank Operator: "::}
-\label{prank}
+The spellings $``::$ and $\::$ for the two parallel operators were chosen for mnemonic and compliance reasons.
+Mnemonically, each uses the same base character as their sequential analogs, ($``$ and $/$), 
+as well as two ``parallel'' colons, making it easier to remember their functions.
+They also require no changes be made to the existing J lexer\cite{ioj}, 
+as demonstrated below:
 
-\subsection{Spelling}
-The spelling $"::$ was chosen for mnemonic and legacy reasons. 
-Mnemonically, it uses the same base character as the rank operator, 
-as well as two ``parallel'' colons, which makes it easier to remember its function.
-It also requires no changes be made to the existing J lexer\cite{ioj}, 
-as demonstrated below.
-
-\begin{singlespacing}
-\begin{small}
 \begin{verbatim}
    jlexer =: ;:
-   jlexer 'mat2_3 +("::1)("2) arr2_2_3'
-+------+-+-+---+-+-+-+-+-+-+--------+
-|mat2_3|+|(|"::|1|)|(|"|2|)|arr2_2_3|
-+------+-+-+---+-+-+-+-+-+-+--------+
+   jlexer '/:: mat2_2 +("::1)("2) arr2_2_3'
++---+------+-+-+---+-+-+-+-+-+-+--------+
+|/::|mat2_2|+|(|"::|1|)|(|"|2|)|arr2_2_3|
++---+------+-+-+---+-+-+-+-+-+-+--------+
 \end{verbatim}
-\end{small}
-\end{singlespacing}
+
+For the parallel environment library, 
+it seemed best to augment the existing ``foreign'' operator, which is spelled $!:$ .
+This is because the foreign operator was designed to 
+allow the programmer to change environmental parameters 
+such as print precision, file I/O, etc. \cite{jvocab}
+We chose $111$ as the numeric encoding for the parallel environment library, again for mnemonic reasons; 
+$111$ looks like three parallel lines ($11$ was already taken).
+
+\section{Parallel Rank Operator: \ttfamily"::\normalfont}
+\label{prank}
 
 \subsection{Usage}
 The proposed parallel rank operator is a conjunction 
@@ -136,15 +142,57 @@ Some open questions remain, most notably
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
 This is left as a question for future research to investigate.
 
+\section{Parallel Insert Operator: \ttfamily \:: \normalfont}
+\label{pins}
+\subsection{Rationale}
+Frequently, programmers need to perform some sort of reduction operation on an entire collection, 
+for example finding the sum, product, maximum, minimum, etc, of a collection of numbers.
+It's well known that when the reducing operation $f$ is associative, i.e. that $f(x,y) = f(y,x)$ for all $f, x, y$, 
+then the reduction can be carried out in a parallel fashion with little effort on the programmer's part.
+It is expedient, therefore, that future parallel implementations of J allow the programmer 
+to explicitly state that the reducing operation should be done in parallel.
+
+\subsection{Usage}
+As a unary, higher ordered function (\textit{adverb}), 
+the parallel insert operator would be equivalent to its sequential equivalent 
+for all associative operations. 
+Thus, the following J session would be the same, 
+regardless of whether \ttfamily insert\normalfont was assigned to be $/::$ or $/$ .
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   ] vec10 =: integers 10
+0 1 2 3 4 5 6 7 8 9
+   + insert vec10
+45
+   (greaterOf =: >.) vec10
+0 1 2 3 4 5 6 7 8 9
+   (greaterOf =: >.) insert vec10
+9
+   + insert mat2_3
+3 5 7
+   + insert (flatten =: ,) mat2_3
+15
+   + insert ("1) mat2_3
+3 12
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+It remains an open question how the parallel insert operator should behave on non-associative functions.
+One possibilitiy is to define its domain to be only the associative primitives. 
+This would prevent logical errors such as radically different results for the same calculations on the same data, 
+depending on the thread scheduling scheme. 
+However, this approach would exclude the possibility of 
+user-defined functions which are associative benefiting from parallelization.
+Alternatively, the programmer may choose to toggle this restriction using the parallel environment library, 
+discussed below.
+
 \section{Parallel Environment Library: 111 !:} 
 \label{pfor}
-\subsection{Preliminaries: Conventions of the Foreign Operator}
-In addition to the parallel rank operator, 
-programmers may wish to change the parallel environment settings.
-We believe this is best done using the already existing foreign operator, spelled ``$!:$''.
-This is because the foreign operator was designed for functions which change system parameters, 
-such as print precision, file IO, etc.\cite{jvocab} 
 
+\subsection{Conventions of the Foreign Operator}
 The foreign operator is a two-argument higher order function, or in J a \textit{conjunction}, 
 whose arguments are always numeric.
 Conceptually, these arguments serve as an index into system libraries and functions.
@@ -153,10 +201,6 @@ E.g., $2$ indexes the library for functions which affect the host machine,
 $9$ indexes the library for viewing and setting global J parameters (such as print precision), and etc.
 The second argument indexes a specific function.
 E.g., $9!:6$ is the function which displays the print characters for J's box type.
-
-The numeric encoding for the parallel environment library 
-was chosen to be $111$, again for mnemonic reasons; 
-$111$ looks like three parallel lines ($11$ was already taken).
 
 \subsection{Usage}
 This section requires more research before a full suite of library functions is proposed.
@@ -170,6 +214,10 @@ They are:
     \item Getting and setting the thread scheduling schemes (such as static, round-robin, etc).
         These would be encoded as numeric values, in keeping with the conventions of the foreign libraries.
 \end{enumerate}
+
+Additionally, as discussed above, it may be desirable to change 
+the default behavior of the parallel insert operator, 
+in order to parallelize on user-defined associative operators.
 
 The following is not an actual session with any existing J REPL, 
 but an example of how one would use this proposed library.
@@ -185,15 +233,17 @@ but an example of how one would use this proposed library.
 0
    (111 !: 3) 1 NB. Set thread scheduling to, for example, round robin.
 
-   mat2_3 +("::1)("2) arr2_2_3
-0  2  4
-6  8 10
+   (111 !: 4) '' NB. Get parallel insert restriction flag
+0
+   (111 !: 5) 1 NB. Enable restrictions on insert
 
-6  8 10
-12 14 16
+   +/::("1) mat2_3 +("::1)("2) arr2_2_3
+ 6 24
+24 42
 \end{verbatim}
 \end{small}
 \end{singlespacing}
 
-The above example would parallelize addition on the row elements of $mat2\_3$ and $arr2\_2\_3$ 
-with 4 threads using a round-robin thread scheduling scheme.
+The above example would parallelize addition on the row elements of $mat2\_3$ and $arr2\_2\_3$,
+then parallelize the sum operation on each of the vectors of the resulting array, 
+using 4 threads with a round-robin scheduling scheme.
