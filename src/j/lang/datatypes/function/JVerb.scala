@@ -17,20 +17,12 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   
   override def monad[T <: JArray[M]](y: T) = { //some testing with types and shape
 	  val jaf = JArrayFrame(ranks.map(_ r1), y)
-//	  println("---monad call for " + rep + ": frame is:\n" + jaf)
-//	  println("   ranks: " + ranks)
-//	  println("   frameSize: " + jaf.frameSize)
-	  // parallelized
+
 	   val newCells = (0 until jaf.frameSize).par map { fr =>
 	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
 	  }
-/*	  val newCells = (for (fr <- 0 until jaf.frameSize) yield {
-//	    println("   " + fr + "-slice is " + jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize))
-	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
-	  })*/
+
 	  val newShape = jaf.frames.dropRight(ranks.length).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-//TODO ugly hack is ugly. Make sure to do one at a time, instead of all at once
-//	  val newShape = jaf.frames.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
 	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[MR]())(_ ++ _.ravel))
 	}
 	
@@ -42,12 +34,43 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         mdomain, d1domain, d2domain) {
      
       override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
-//        println("---addRanks private class\nCalling class's monadImpl")
-        thisotherthing.monadImpl(y)
+        thisotherthing(y)
       }
-      override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = thisotherthing.dyadImpl(x, y)
+      override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = 
+        thisotherthing(x, y)
     }
   }
+  
+//TODO reflex
+  
+  	def apply[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = dyad(x,y)
+	override def dyad[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = {
+	  val jafx = JArrayFrame(ranks.map(_ r2), x)
+	  val jafy = JArrayFrame(ranks.map(_ r3), y)
+
+	  jafx.shapeAgreement(jafy) match {
+	    case None => throw new Exception() //TODO shape error
+	    case Some(agree) => {
+	      val xreframed = jafx.shapeToNewFrame(agree)
+	      val yreframed = jafy.shapeToNewFrame(agree)
+
+	      val xcellShape = jafx.frames.last
+	      val xcellSize = xcellShape.foldLeft(1)(_ * _)
+	      val ycellShape = jafy.frames.last
+	      val ycellSize  = ycellShape.foldLeft(1)(_ * _)
+	      val frameSize  = agree.init.foldLeft(1)(_ * _.foldLeft(1)(_ * _))
+	      
+	      val newCells = (0 until frameSize).par map { fr =>
+	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
+	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
+	      }
+
+	      val newShape = agree.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
+	      JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[DR]())(_ ++ _.ravel))
+	    }
+	  }
+	}
+  	
   //TODO leverage (implicit ev1: D1 =:= D2, ev2: D2 =:= DR)
   def insert(implicit ev1: JArray[D1] =:= JArray[D2], ev2: JArray[DR] =:= JArray[D2], ev3: JArray[D2] =:= JArray[D1]) = {
     import j.lang.datatypes.array.types.JNumberTypes._
@@ -75,55 +98,6 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
     }
   }
   
-//TODO for the lolz later
-//  	def reflex(implicit ev1: JArray[D2] =:= JArray[D1], ev2: JArray[D1] =:= JArray[D2]) = {
-//  	  val thisOtherThing = this
-//  	  
-//  	  new JVerb[D2, D2, D1, DR, DR](
-//  	      rep + )
-//  	}
-  
-  	def apply[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = dyad(x,y)
-	override def dyad[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = {
-	  val jafx = JArrayFrame(ranks.map(_ r2), x)
-	  val jafy = JArrayFrame(ranks.map(_ r3), y)
-	  
-/*	  println("---dyad call for " + rep)
-	  println("   xframe: " + jafx)
-	  println("   yframe: " + jafy)
-	  println("   ranks: " + ranks)*/
-	  
-	  jafx.shapeAgreement(jafy) match {
-	    case None => throw new Exception() //TODO shape error
-	    case Some(agree) => {
-	      val xreframed = jafx.shapeToNewFrame(agree)
-	      val yreframed = jafy.shapeToNewFrame(agree)
-	      
-/*	      val cellShape = agree.last
-	      val cellSize  = cellShape.foldLeft(1)(_ * _)
-	      val frameSize = xreframed.shape.foldLeft(1)(_ * _) / cellSize*/
-	      
-	      val xcellShape = jafx.frames.last
-	      val xcellSize = xcellShape.foldLeft(1)(_ * _)
-	      val ycellShape = jafy.frames.last
-	      val ycellSize  = ycellShape.foldLeft(1)(_ * _)
-	      val frameSize  = agree.init.foldLeft(1)(_ * _.foldLeft(1)(_ * _))
-	      
-	      val newCells = (0 until frameSize).par map { fr =>
-	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
-	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
-	      }
-	      
-/*	      val newCells = (for (fr <- 0 until frameSize) yield {
-	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
-	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
-	      })*/
-	      val newShape = agree.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
-	      JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[DR]())(_ ++ _.ravel))
-	    }
-	  }
-	}
-
   	def agenda(f: JVerb[M, D1, D2, MR, DR], t: JVerb[M, D1, D2, MR, DR]) = {
   	  
   	  val tref = this
