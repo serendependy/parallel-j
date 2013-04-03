@@ -18,22 +18,26 @@ Additionally, we propse a new system library
 which would allow the programmer to give annotations or force changes in the underlying parallel environment,
 described in section \ref{pfor}
 
-The spellings $``::$ and $\::$ for the two parallel operators were chosen for mnemonic and compliance reasons.
+The spellings $``::$ and $/::$ for the two parallel operators were chosen for mnemonic and compliance reasons.
 Mnemonically, each uses the same base character as their sequential analogs, ($``$ and $/$), 
 as well as two ``parallel'' colons, making it easier to remember their functions.
 They also require no changes be made to the existing J lexer\cite{ioj}, 
 as demonstrated below:
 
+\begin{singlespacing}
+\begin{small}
 \begin{verbatim}
    jlexer =: ;:
-   jlexer '/:: mat2_2 +("::1)("2) arr2_2_3'
-+---+------+-+-+---+-+-+-+-+-+-+--------+
-|/::|mat2_2|+|(|"::|1|)|(|"|2|)|arr2_2_3|
-+---+------+-+-+---+-+-+-+-+-+-+--------+
+   jlexer '+/::("1) mat2_3 +("::1)("2) arr2_2_3'
++-+---+-+-+-+-+------+-+-+---+-+-+-+-+-+-+--------+
+|+|/::|(|"|1|)|mat2_3|+|(|"::|1|)|(|"|2|)|arr2_2_3|
++-+---+-+-+-+-+------+-+-+---+-+-+-+-+-+-+--------+
 \end{verbatim}
+\end{small}
+\end{singlespacing}
 
 For the parallel environment library, 
-it seemed best to augment the existing ``foreign'' operator, which is spelled $!:$ .
+it seemed best to augment the existing ``foreign'' operator (spelled $!:$).
 This is because the foreign operator was designed to 
 allow the programmer to change environmental parameters 
 such as print precision, file I/O, etc. \cite{jvocab}
@@ -142,7 +146,7 @@ Some open questions remain, most notably
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
 This is left as a question for future research to investigate.
 
-\section{Parallel Insert Operator: \ttfamily \:: \normalfont}
+\section{Parallel Insert Operator: \ttfamily /:: \normalfont}
 \label{pins}
 \subsection{Rationale}
 Frequently, programmers need to perform some sort of reduction operation on an entire collection, 
