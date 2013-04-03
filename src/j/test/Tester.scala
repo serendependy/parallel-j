@@ -135,25 +135,6 @@ object Tester {
         println("step " + ":\n" + boardvar)
         boardvar = nextState(boardvar, listNeighbors(boardvar)).asInstanceOf[JArray[JInt]]
       }
-      //TODO advanced function composition still in the works
-/*      val nextState = (y: JArray[JInt]) => {
-        val neighbors = listNeighbors(y)
-
-        val res = (board.ravel zip neighbors.ravel map ((x: (JInt, JInt)) => {
-          val (cell, neighb) = x
-          if (cell == JReal.Zero)
-            JArray.scalar[JInt, Int](if (neighb == JInt(3)) JReal.One else JReal.Zero)
-          else {
-            (realOr insert).monad(equal(
-                JArray.vec2(2, 3),
-                JArray.scalar(neighb)))
-          }
-        }))*/
-        
-        /*JArray(jINT, y.shape, res)*/
-   //   }
-      
- //     val nextBoard = nextState(board)
       
       println("DONE")
     }

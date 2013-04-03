@@ -20,10 +20,14 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 //	  println("---monad call for " + rep + ": frame is:\n" + jaf)
 //	  println("   ranks: " + ranks)
 //	  println("   frameSize: " + jaf.frameSize)
-	  val newCells = (for (fr <- 0 until jaf.frameSize) yield {
+	  // parallelized
+	   val newCells = (0 until jaf.frameSize).par map { fr =>
+	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
+	  }
+/*	  val newCells = (for (fr <- 0 until jaf.frameSize) yield {
 //	    println("   " + fr + "-slice is " + jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize))
 	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
-	  })
+	  })*/
 	  val newShape = jaf.frames.dropRight(ranks.length).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
 //TODO ugly hack is ugly. Make sure to do one at a time, instead of all at once
 //	  val newShape = jaf.frames.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
@@ -105,10 +109,15 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	      val ycellSize  = ycellShape.foldLeft(1)(_ * _)
 	      val frameSize  = agree.init.foldLeft(1)(_ * _.foldLeft(1)(_ * _))
 	      
-	      val newCells = (for (fr <- 0 until frameSize) yield {
+	      val newCells = (0 until frameSize).par map { fr =>
 	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
 	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
-	      })
+	      }
+	      
+/*	      val newCells = (for (fr <- 0 until frameSize) yield {
+	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
+	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
+	      })*/
 	      val newShape = agree.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
 	      JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[DR]())(_ ++ _.ravel))
 	    }
