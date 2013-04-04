@@ -50,6 +50,29 @@ object JVerbs {
     } //TODO modulo is slow
   }
 
+  final object tallyCopies extends JVerb[JArrayType, JInt, JArrayType, JInt, JArrayType](
+      "#",
+      List(JFuncRank(JInfinity, 1, JInfinity)),
+      jANY, jINT, jANY
+  ){
+    override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = {
+      JArray.scalar[JInt, Int](y.numItemz)
+    }
+    
+    override def dyadImpl[T1 <: JInt : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
+      println("---in copies, x is " + x)
+      println("   y is\n" + y)
+      if (x.numItemz != y.numItemz) throw new Exception() //length error
+      else {
+        JArray(y.jaType, 
+          x.ravel.foldLeft(0)(_ + _.v) +: y.shape.drop(1),
+          ((0 until x.numItemz).map { i =>
+          Vector.tabulate(x.ravel(i).v)(j => y(i)).foldLeft(Vector[T2]())(_ ++ _.ravel)
+        }).foldLeft(Vector[T2]())(_ ++ _))
+      }
+    }
+  }
+  
   final object conjugatePlus extends JVerb1Type[JNumber](
       "+",
       List(JFuncRank(0)),

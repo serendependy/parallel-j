@@ -35,6 +35,7 @@ object Tester {
       testDeal()
       testLogical()
       testRoot()
+      testCopies()
     }
 	 
     {
@@ -55,6 +56,7 @@ object Tester {
     import j.lang.datatypes.array.ArrayImplicits._
     
     import j.lang.primitives.JVerbs._
+    import j.lang.primitives.cheating.JCheating._
     
     import j.lang.datatypes.JTypeMacros._
     
@@ -145,13 +147,39 @@ object Tester {
     
     
     def testMergeSort(y: JArray[JInt]) {
-      
       println("\n--Testing MergeSort")
+      
+      val jtwo = JArray.scalar(JInt(2))
+      
       val intReverse = reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]]
       val sort2 = (decrementLesserthanequal insert) agenda(
           reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]],
           rightIdentity.asInstanceOf[JVerb1Type[JInt]])
-          
+       
+      val divide = (y: JArray[JInt]) => {
+        shapeReshape(
+        	tallyCopies(
+        		naturalLog(
+        			jtwo,
+        			tallyCopies(y)).asInstanceOf[JArray[JInt]],
+        		jtwo).asInstanceOf[JArray[JInt]],
+        	y).asInstanceOf[JArray[JInt]]
+      }
+      
+      val dim = (y: JArray[JInt]) => {
+        tallyCopies(shapeReshape(y))
+      }
+      
+      def mergeSort = (y: JArray[JInt]) => {
+        val repeatedMerge = (merge insert) addRanks(JFuncRank(2)) power( negateMinus(
+            dim(y),
+            JArray.scalar(JInt(1))).asInstanceOf[JArray[JInt]] )
+        
+        val sortBase = (sort2 addRanks(JFuncRank(1)) )
+        
+        repeatedMerge(sortBase(divide(y)))
+      }
+      
        val test = JArray.auto[JInt, Int](-1, -2)
        println(sort2(test))
        
@@ -319,6 +347,18 @@ object Tester {
       }
       
       println("DONE")
+    }
+    
+    def testCopies() {
+      println("\n--Testing Copies")
+      val choose = JArray.auto[JInt,Int](0, 1, 0, 2, 0, 1, 2, 0, 0, 3, 1, 2)
+      val t1 = integersIndex(JArray.scalar[JInt,Int](12))
+      val t2 = integersIndex(JArray.auto[JInt, Int](12, 3))
+      
+      println(tallyCopies(choose, t1) + "\n----")
+      println(tallyCopies(choose, t2))
+      
+      println("Done")
     }
     
     //higher order
