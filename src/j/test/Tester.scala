@@ -106,8 +106,8 @@ object Tester {
       println("Neighbor higher array:\n" + neighborArray(board))
       println("Neighbor list of board:\n" + listNeighbors(board))
    
-      val nextState = leftIdentity agenda(
-          new JVerb1Type[JArrayType](
+      val nextState = leftIdentity.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]] agenda(
+          new JVerb1Type[JInt](
               "(3 = ])",
               List(JFuncRank(0)),
               jINT){
@@ -119,16 +119,16 @@ object Tester {
             }
           },
           
-      new JVerb1Type[JArrayType](
+      new JVerb1Type[JInt](
           "([: +./ 2 3 = ])",
           List(JFuncRank(0)),
           jINT){
-            override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = throw new NotImplementedException()
+            override def monadImpl[T <: JInt : Manifest](y: JArray[T]) = throw new NotImplementedException()
             
-            override def dyadImpl[T1 <: JArrayType : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
+            override def dyadImpl[T1 <: JInt : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
               (realOr insert).apply(equal(
             		  				JArray.vec2(2,3),
-            		  				y))
+            		  				y)).asInstanceOf[JArray[JInt]]
             }            
           })
       
@@ -150,10 +150,11 @@ object Tester {
       println("\n--Testing MergeSort")
       
       val jtwo = JArray.scalar(JInt(2))
+      val j16  = JArray.scalar(JInt(16))
       
       val intReverse = reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]]
       val sort2 = (decrementLesserthanequal insert) agenda(
-          reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]],
+          reverse,
           rightIdentity.asInstanceOf[JVerb1Type[JInt]])
        
       val divide = (y: JArray[JInt]) => {
@@ -161,7 +162,7 @@ object Tester {
         	tallyCopies(
         		naturalLog(
         			jtwo,
-        			tallyCopies(y)).asInstanceOf[JArray[JInt]],
+        			tallyCopies(y)).asInstanceOf[JArray[JFloat]].toJInt,
         		jtwo).asInstanceOf[JArray[JInt]],
         	y).asInstanceOf[JArray[JInt]]
       }
@@ -170,19 +171,34 @@ object Tester {
         tallyCopies(shapeReshape(y))
       }
       
-      def mergeSort = (y: JArray[JInt]) => {
-        val repeatedMerge = (merge insert) addRanks(JFuncRank(2)) power( negateMinus(
+      val sortBase = (sort2 addRanks(JFuncRank(1)) )
+      
+      val repeatedMerge = (merge insert) addRanks(JFuncRank(2)) power( negateMinus(
             dim(y),
             JArray.scalar(JInt(1))).asInstanceOf[JArray[JInt]] )
-        
-        val sortBase = (sort2 addRanks(JFuncRank(1)) )
-        
+      
+      def mergeSort = (y: JArray[JInt]) => {
         repeatedMerge(sortBase(divide(y)))
       }
       
-       val test = JArray.auto[JInt, Int](-1, -2)
-       println(sort2(test))
+       val test1 = JArray.auto[JInt, Int](-1, -2)
+       val test2 = rollDeal(j16, j16)
        
+       println("test1: " + test1)
+       println("test2: " + test2)
+       
+       println("divide test1: " + divide(test1) + "\n--")
+       println("divide test2:\n" + divide(test2) + "\n----")
+       
+       println("sortBase divide test1: " + sortBase(divide(test1)))
+       println("sortBase divide test2:\n" + sortBase(divide(test2))+"\n--")
+       
+       println(sort2(test1) + "\n--")
+       println("<:/ test1: " + 
+       (decrementLesserthanequal insert).apply(test1))
+       
+       println(sortBase(test1) + "\n--")
+
        println("DONE")
     }
   }

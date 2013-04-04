@@ -60,8 +60,7 @@ object JVerbs {
     }
     
     override def dyadImpl[T1 <: JInt : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {
-      println("---in copies, x is " + x)
-      println("   y is\n" + y)
+
       if (x.numItemz != y.numItemz) throw new Exception() //length error
       else {
         JArray(y.jaType, 

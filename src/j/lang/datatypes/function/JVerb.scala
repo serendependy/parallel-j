@@ -100,21 +100,30 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
     }
   }
   
-  	def agenda(f: JVerb[M, D1, D2, MR, DR], t: JVerb[M, D1, D2, MR, DR]) = {
+  	def agenda(f: JVerb1Type[JInt], t: JVerb1Type[JInt])(
+  	    implicit ev1: JVerb[M,D1,D2,MR,DR] =:= JVerb[JInt, JInt, JInt, JInt, JInt]) = {
   	  
-  	  val tref = this
+  	  val tref: JVerb[JInt, JInt, JInt, JInt, JInt] = ev1(this)
   	  
-  	  new JVerb[M, D1, D2, MR, DR](
+  	  new JVerb1Type[JInt](
   	      f.rep + " ` " + t.rep + "@. " + tref.rep,
   	      tref.ranks :+ JFuncRank(JInfinity),
-  	      tref.mdomain, tref.d1domain, tref.d2domain){
+  	      jINT){
   	    
-  	    override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
-  	    	if (tref(y) == JReal.Zero) f(y)
+  	    override def monadImpl[T <: JInt : Manifest](y: JArray[T]) = {
+  	      println("---in agenda, y is: " + y)
+  	      println("   predicate: " + tref.rep)
+  	      println("   false:     " + f.rep)
+  	      println("   true:      " + t.rep)
+  	      println("   p(y): " + tref(y))
+  	    	if (tref(y).ravel(0) == JReal.Zero) {
+  	    	  println("   p(y) was false; f(y) is " + f(y))
+  	    	  f(y)
+  	    	}
   	    	else t(y)
   	    }
   	    
-  	    override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = {
+  	    override def dyadImpl[T1 <: JInt : Manifest, T2 <: JInt : Manifest](x: JArray[T1], y: JArray[T2]) = {
   	      if (tref(x,y) == JReal.Zero) f(x,y)
   	      else t(x,y)
   	    }

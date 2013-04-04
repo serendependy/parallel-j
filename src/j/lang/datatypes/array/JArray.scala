@@ -70,7 +70,7 @@ class JArray[+T <: JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
   lazy val rank = shape.length
   lazy val tally = shape(0)
   lazy val itemSize = shape.drop(1).foldLeft(1)(_ * _)
-  lazy val numItemz = if (shape isEmpty) 0 else shape(0)
+  lazy val numItemz = if (shape isEmpty) 1 else shape(0)//TODO double check this doesn't break anything
   
   lazy val rankSizes = shape.scanRight(1)(_ * _).reverse
   lazy val rankItems = shape.scanLeft(1)(_ * _).reverse
@@ -105,4 +105,9 @@ class JArray[+T <: JArrayType : Manifest](val flag: JArrayFlag, val jaType: JTyp
       ravel(i).toString + {if (endItem.length == 0) " " else "\n" * endItem.length}
     }).mkString.dropRight(shape.length - 1)
   }
+    
+    //cheating
+    def toJInt(implicit ev1: T <:< JFloat) = {
+      JArray(jaType, shape, ravel.map((f:T) => JInt(ev1(f).v.toInt)))
+    }
 }
