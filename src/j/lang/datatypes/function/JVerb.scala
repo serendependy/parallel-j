@@ -18,7 +18,7 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   override def monad[T <: JArray[M]](y: T) = { //some testing with types and shape
 	  val jaf = JArrayFrame(ranks.map(_ r1), y)
 
-	   val newCells = (0 until jaf.frameSize).par map { fr =>
+	   val newCells = (0 until jaf.frameSize) map { fr =>
 	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
 	  }
 
@@ -26,21 +26,6 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[MR]())(_ ++ _.ravel))
 	}
 	
-  def addRanks(r: JFuncRank) = {
-    val thisotherthing = this
-    new JVerb[M,D1,D2,MR,DR](
-        rep + "(\"" + r + ")",
-        ranks :+ r,
-        mdomain, d1domain, d2domain) {
-     
-      override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
-        thisotherthing(y)
-      }
-      override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = 
-        thisotherthing(x, y)
-    }
-  }
-  
 //TODO reflex
   
   	def apply[T1 <: JArray[D1], T2 <: JArray[D2]](x: T1, y: T2) = dyad(x,y)
@@ -70,6 +55,21 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	    }
 	  }
 	}
+  
+ def addRanks(r: JFuncRank) = {
+    val thisotherthing = this
+    new JVerb[M,D1,D2,MR,DR](
+        rep + "(\"" + r + ")",
+        ranks :+ r,
+        mdomain, d1domain, d2domain) {
+     
+      override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
+        thisotherthing(y)
+      }
+      override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = 
+        thisotherthing(x, y)
+    }
+  }
   	
   //TODO leverage (implicit ev1: D1 =:= D2, ev2: D2 =:= DR)
   def insert(implicit ev1: JArray[D1] =:= JArray[D2], ev2: JArray[DR] =:= JArray[D2], ev3: JArray[D2] =:= JArray[D1]) = {
@@ -82,7 +82,8 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         mdomain, d1domain,d2domain
     ){
 
-      protected override def monadImpl[T <: D1 : Manifest](y: JArray[T]) = y.numItemz match {
+      protected override def monadImpl[T <: D1 : Manifest](y: JArray[T]) = { 
+        y.numItemz match {
         case 0 => throw new Exception() //TODO should fetch identity element
         case 1 => y
         case n: Int => {
@@ -90,7 +91,7 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
         	  ev2(thisotherthing.dyad(ev3(y1), y2))
         	})
         }
-      }
+      }}
       
       protected override def dyadImpl[T1 <: D1 : Manifest, T2 <: D1 : Manifest](x: JArray[T1], y: JArray[T2]) = {
         throw new NotImplementedException()//TODO implement
@@ -104,7 +105,7 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   	  
   	  new JVerb[M, D1, D2, MR, DR](
   	      f.rep + " ` " + t.rep + "@. " + tref.rep,
-  	      List(JFuncRank(JReal.Zero)),
+  	      tref.ranks :+ JFuncRank(JInfinity),
   	      tref.mdomain, tref.d1domain, tref.d2domain){
   	    
   	    override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
@@ -118,7 +119,62 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   	    }
   	  }
   	}
+ 
+  	def power(times: JVerb[M, D1, D2, JInt, JInt])(
+  	    implicit ev1: JArray[MR] =:= JArray[M], 
+  	    ev2: JArray[M] =:= JArray[MR]): JVerb[M,D1,D2,MR,DR] = {
+  	  val tref = this
+  	  
+  	  new JVerb[M,D1,D2,MR,DR](
+  	      "(" + rep + "^:" + times.rep + ")",
+  	      tref.ranks,
+  	      tref.mdomain, tref.d1domain, tref.d2domain){
+  	    
+  	    override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
+  	      var ret: JArray[M] = y
+  	      
+  	      for (i <- 0 until times(y).ravel(0).v) {
+  	        val ret = ev1(tref(y))
+  	      }
+  	      
+  	      ret
+  	    }
+  	    
+  	    override def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]) = {
+  	      throw new NotImplementedException()
+  	    }
+  	  }
+  	}
+ 
+/*  	def force1[TA](implicit ev1: TA <:< M, ev2: TA <:< MR) = {
+  	  val tref = this
+  	  new JVerb[TA, TA, TA, TA, TA](
+  	      tref.rep,
+  	      tref.ranks, 
+  	      tref.mdomain, tref.d1domain, tref.d2domain
+  	  ){
+  	    override def monadImpl[T <: TA](y: JArray[TA]) = {
+  	      tref(ev1(y))
+  	    }
+  	  }
+  	}*/
   	
 	protected def monadImpl[T <: M : Manifest](y: JArray[T]): JArray[MR]
 	protected def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]): JArray[DR]
 }
+/*
+object JVerb {
+  def apply[M : Manifest,D1 : Manifest,D2 : Manifest,MR : Manifest,DR : Manifest](
+      u: JVerb[M,D1,D2,MR,DR]) = {
+    new JVerb[M,D1,D2,MR,DR](
+        u.rep,
+        u.ranks,
+        u.mdomain, u.d1domain, u.d2domain
+    ){
+      override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
+    	  
+      }
+    }
+  }
+  
+}*/

@@ -165,13 +165,13 @@ object JVerbs {
     }
   }
   
-  final object decrementLesserthanequal extends JVerb[JNumber, JReal, JReal, JNumber, JInt](
+  final object decrementLesserthanequal extends JVerb1Type[JInt](
       "<:",
       List(JFuncRank(0)),
-      jNUMERIC, jNUMERIC, jNUMERIC
+      jINT
   ){
-    protected override def monadImpl[T <: JNumber : Manifest](y: JArray[T]) = JArray(y.jaType, List(), Vector(y.ravel(0) - 1))
-    protected override def dyadImpl[T1 <: JReal : Manifest, T2 <: JReal : Manifest](x: JArray[T1], y: JArray[T2]) = {
+    protected override def monadImpl[T <: JInt : Manifest](y: JArray[T]) = JArray(y.jaType, List(), Vector(y.ravel(0) - 1))
+    protected override def dyadImpl[T1 <: JInt : Manifest, T2 <: JInt : Manifest](x: JArray[T1], y: JArray[T2]) = {
       JArray[JInt,Int](jINT, List(), Vector(if (x.ravel(0) <= y.ravel(0)) 1 else 0))
     }
 //    protected override def dyadImpl[T1 <: JReal : Manifest, T2 <: JReal : Manifest](x: JArray[T1], y: JArray[T2]):JArray[JInt] = {
@@ -246,10 +246,13 @@ object JVerbs {
       jANY, jINT, jANY
   ){
     protected override def monadImpl[T <: JArrayType : Manifest](y: JArray[T]) = {
-      JArray(y.jaType, y.shape,
+      JArray(y.jaType, y.shape, (0 until y.numItemz).reverse.map(i => {
+        y(i)
+      }).foldLeft(Vector[T]())(_ ++ _.ravel))
+/*      JArray(y.jaType, y.shape,
           (0 until y.numItemz).reverse.map(
               i => y.ravel.slice(i, i*y.itemSize)).foldLeft(
-                  Vector[JArrayType]())(_ ++ _))
+                  Vector[JArrayType]())(_ ++ _))*/
     }
     
     protected override def dyadImpl[T1 <: JInt : Manifest, T2 <: JArrayType : Manifest](x: JArray[T1], y: JArray[T2]) = {

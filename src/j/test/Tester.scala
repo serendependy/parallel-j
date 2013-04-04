@@ -28,6 +28,7 @@ object Tester {
       testRoll()
       testSquare()
       testRavelItems()
+      //TODO test reverse
       
       testPlus()
       testShift()
@@ -39,9 +40,11 @@ object Tester {
     {
     	import ExampleProblems._
     	import j.lang.datatypes.array.ArrayImplicits._
+    	import j.lang.datatypes.array.JArray
     	
     	testNumericalIntegration(10)
     	testGameOfLife(5,5,0.5, 10)
+    	testMergeSort(JArray.auto[JInt, Int](-100, 5, 100, 10, -3, 8, 9, 1))
     }
     
   }
@@ -56,6 +59,7 @@ object Tester {
     import j.lang.datatypes.JTypeMacros._
     
     import j.lang.datatypes.function.JVerb1Type
+    import j.lang.datatypes.function.JVerb
     import j.lang.datatypes.JFuncRank
     
     def testNumericalIntegration(numRiemann: JInt) {
@@ -138,7 +142,21 @@ object Tester {
       
       println("DONE")
     }
-
+    
+    
+    def testMergeSort(y: JArray[JInt]) {
+      
+      println("\n--Testing MergeSort")
+      val intReverse = reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]]
+      val sort2 = (decrementLesserthanequal insert) agenda(
+          reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]],
+          rightIdentity.asInstanceOf[JVerb1Type[JInt]])
+          
+       val test = JArray.auto[JInt, Int](-1, -2)
+       println(sort2(test))
+       
+       println("DONE")
+    }
   }
   
   object FunctionTester {
