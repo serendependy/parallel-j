@@ -243,6 +243,76 @@ merge sort will always the same number of sub-problems each with the same size,
 allowing for a data parallel approach.
 
 \subsection{Solutions}
+\subsubsection{C with OpenMP}
+A parallel merge sort in C with OpenMP is given below.
+The solution, as well as the description of its workings, 
+was taken from an article on parallelism in OpenMP and MPI\cite{mergeomp}.
+
+\begin{singlespacing}
+\begin{small}
+\verbatiminput{mergeSort-omp.c}
+\end{small}
+\end{singlespacing}
+
+The \ttfamily sections \normalfont compiler directive % TODO citeP{omp}
+specifies that the following blocks of code (each begin with a \ttfamily section \normalfont directive) 
+are to be executed independently of each other.
+
+Like with the previoius C examples, special care must be taken with the shared variable \ttfamily temp \normalfont 
+so that race conditions do not occur.
+However, in this situation a similiar serial program would also have to take the same precautions, 
+meaning this is more of a limitation of the C programming language itself, rather than a limitation of OpenMP.
 
 \subsubsection{J}
 \label{jmerge}
+In the following J code, the function \ttfamily merge \normalfont and its helper functions were ommited.
+The full solution can be found in Appendix \ref{jmfull}
+
+\begin{singlespacing}
+\begin{small}
+\verbatiminput{mergeSort.ijs}
+\end{small}
+\end{singlespacing}
+
+This solution takes advantage of the constraints on the length of the array (it must be an integral power of two), 
+expressing the regularity of the sizes of sub-problems through a regular array 
+whose rank grows as the number of sub-problems does.
+For example: 
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   ] vec8 =: (deal =: ?~) 8
+0 5 1 2 3 4 7 6
+   ] vec16 =: deal 16
+11 8 3 10 12 1 15 9 4 13 7 14 6 5 2 0
+   divide vec8
+0 5
+1 2
+
+3 4
+7 6
+   divide vec16
+11  8
+ 3 10
+
+12  1
+15  9
+
+
+ 4 13
+ 7 14
+
+ 6  5
+ 2  0
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+Unlike the high level description of the problem given at the begining of this section (but equivalently), 
+this solution first sorts each two item vectors, 
+expressing the recursive base-case of the merge sort algorithm as a data parallel operation.
+Then, vectors are repeatedly merged via an insert of the \ttfamily merge \normalfont function on the rank 2 items 
+(which always consist of two vector elements).
+Again, while repeated function application doesn't quite fall into the bounds of data parallelism, 
+each merge operation on the rank 2 items is itself data parallel.
