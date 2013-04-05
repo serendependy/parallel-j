@@ -172,33 +172,20 @@ object Tester {
       }
       
       val sortBase = (sort2 addRanks(JFuncRank(1)) )
+      val merger2 = (merge insert) addRanks(JFuncRank(2))
       
-      val repeatedMerge = (merge insert) addRanks(JFuncRank(2)) power( negateMinus(
-            dim(y),
-            JArray.scalar(JInt(1))).asInstanceOf[JArray[JInt]] )
+      val repeatedMerge = (y: JArray[JInt]) => {
+        merger2.power(decrementLesserthanequal(dim(y)
+            ).asInstanceOf[JArray[JInt]]).apply(y)
+      }
       
       def mergeSort = (y: JArray[JInt]) => {
         repeatedMerge(sortBase(divide(y)))
       }
-      
-       val test1 = JArray.auto[JInt, Int](-1, -2)
-       val test2 = rollDeal(j16, j16)
-       
-       println("test1: " + test1)
-       println("test2: " + test2)
-       
-       println("divide test1: " + divide(test1) + "\n--")
-       println("divide test2:\n" + divide(test2) + "\n----")
-       
-       println("sortBase divide test1: " + sortBase(divide(test1)))
-       println("sortBase divide test2:\n" + sortBase(divide(test2))+"\n--")
-       
-       println(sort2(test1) + "\n--")
-       println("<:/ test1: " + 
-       (decrementLesserthanequal insert).apply(test1))
-       
-       println(sortBase(test1) + "\n--")
 
+      println("sorting: " + y) 
+      println("sorted:  " + repeatedMerge(sortBase(divide(y))))
+       
        println("DONE")
     }
   }

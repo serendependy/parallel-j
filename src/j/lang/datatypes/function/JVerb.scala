@@ -111,13 +111,8 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   	      jINT){
   	    
   	    override def monadImpl[T <: JInt : Manifest](y: JArray[T]) = {
-  	      println("---in agenda, y is: " + y)
-  	      println("   predicate: " + tref.rep)
-  	      println("   false:     " + f.rep)
-  	      println("   true:      " + t.rep)
-  	      println("   p(y): " + tref(y))
+
   	    	if (tref(y).ravel(0) == JReal.Zero) {
-  	    	  println("   p(y) was false; f(y) is " + f(y))
   	    	  f(y)
   	    	}
   	    	else t(y)
@@ -136,15 +131,16 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   	  val tref = this
   	  
   	  new JVerb[M,D1,D2,MR,DR](
-  	      "(" + rep + "^:" + times + ")",
-  	      tref.ranks,
+  	      "(" + tref.rep + "^:" + times + ")",
+  	      tref.ranks :+ JFuncRank(JInfinity),
   	      tref.mdomain, tref.d1domain, tref.d2domain){
   	    
   	    override def monadImpl[T <: M : Manifest](y: JArray[T]) = {
   	      var ret: JArray[M] = y
   	      
   	      for (i <- 0 until times.ravel(0).v) {
-  	        val ret = ev1(tref(y))
+  	        //val ret = ev1(tref(y))
+  	        ret = ev1(tref(ret))
   	      }
   	      
   	      ret
