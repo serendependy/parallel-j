@@ -20,4 +20,5 @@ NB.      0 (cell dead)   1 (cell alive)
 rules =: (3 = ])       ` ([: +./ 2 3 = ])
 
 NB. Uses cell state to index into rule to apply
-nextState =: rules (appliedBy =: @.) (cellStatus =: [) (" 0) (p_rank 1)  listNeighbors
+NB. appliedBy =: @.
+nextState =: rules @. (cell =: [)("0)(p_rank 1) listNeighbors

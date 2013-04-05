@@ -10,7 +10,7 @@ and in an automatically data parallel fashion.
 To demonstrate this, the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
 \textit{Design Patterns} are general, reusable solutions to a common class of problems. % TODO cite? (from Wikipedia)
 Software design patterns were first made popular for object-oriented programming through the work of the "Gang of Four," % TODO cite
-and are now seeing interest for applications in parallel computing. % TODO cite Massingill, Berkely work 
+and are now seeing interest for applications in parallel computing. \cite{mass} 
 This research has chosen to focus on the pattern language developed by Mattson et. al. 
 presented in their book, "Patterns for Parallel Programming." % TODO justify?
 Using parallel design patterns to guide the choices and discussion of these problems 
@@ -36,7 +36,7 @@ where $x = \frac{i}{n}$
 
 \subsection{Relevant Design Pattern}
 This problem was chosen to represent the \textit{Task Parallelism} pattern, 
-in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' % TODO \cite{ppp}
+in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' \cite{mass}
 In this problem, the concurrent tasks are calculating $\frac{4}{1 + x^2}$ for the different values of $x$. 
 There is also a task dependency: the multiplication of $\frac{1}{n}$ and the sum of the values produced by each task 
 cannot occur until all tasks have finished. 
@@ -46,7 +46,7 @@ meaning no sophisticated scheduling is required in order to exploit concurrency 
 \subsection{Solutions}
 \subsubsection{C with OpenMP}
 A parallel solution to this problem using C with the OpenMP libraries is given below. 
-It is based off of the solution given in Appendix A of Mattson et. al. % TODO \cite{ppp}
+It is based off of the solution given in Appendix A of Mattson et. al. \cite{mass}
 
 \begin{singlespacing}
 \begin{small}
@@ -64,7 +64,7 @@ otherwise, there could very well be race conditions.
 \subsubsection{J}
 A sequential J solution to this problem is given below, 
 with some definitions to facilitate a discussion 
-of the behavior of a solution in the proposed Parallel-J. % TODO parallel insert
+of the behavior of a solution in the proposed Parallel-J. 
 The operators \ttfamily p\_rank \normalfont and \ttfamily p\_insert \normalfont 
 are defined as the normal rank and insert operators, respectively,  
 but are included to demonstrate where parallelism would be exploited in a parallel implementation of J.
@@ -124,7 +124,7 @@ Then, to calculate the number of alive neighbors for each give cell,
 one need only sum the values of all of the neighbors.
 
 \subsection{Relevant Design Patterns}
-This problem was chosen to represent the \textit{Geometric Decomposition} design pattern, % TODO cite
+This problem was chosen to represent the \textit{Geometric Decomposition} design pattern, \cite{mass}
 in which ``the algorithm [is] organized around a data structure that has been decomposed into concurrently updatable `chunks'.''
 For the bounded version of this problem, 
 the data structure is a regular rank 2 array with shape \textit{n, m}, 
@@ -178,7 +178,9 @@ E.g.,
 0 1 1
 0 1 0
 1 0 0
-   0 1 2 (from =: {) neighborArray board NB. The up-left, up, and up-right neighbors
+   NB. The up-left, up, and up-right neighbors
+
+   0 1 2 (from =: {) neighborArray board 
 0 0 0
 0 0 1
 0 0 1
@@ -213,3 +215,34 @@ what the direct index into the rank 2 array would be.
 A solution using the Parallel-J system which takes a similiar approach as the J program 
 (but includes a non-J for loop for the iteration)
 can be found in Section \ref{pjsGol}.
+
+\section{Merge Sort}
+\subsection{Description}
+Conceptually, sorting an array using merge sort is fairly easy to describe.
+
+\begin{itemize}
+	\item If the array as fewer than 2 elements, it's sorted
+	\item Otherwise, divide the array into two halves and sort each of these
+	\item Take the two sorted halves and merge them such that the resulting array remains sorted.
+\end{itemize}
+
+To simplify the discussion of the problem, 
+we will be concerned with sorting arrays 
+whose lengths are of the form $2^n$, where $n$ is a positive integer.
+This way the nature of the parallelism in the problem can be discussed 
+without going into the detail of handling special cases.
+
+\subsection{Relevant Design Patterns}
+This problem was chosen to represent the ``Divide and Conquer'' design pattern, \cite{mass}
+in which, like its sequential equivalent,
+``the problem is solved by splitting it into a number of smaller sub-problems, 
+solving them independently [concurrently], and merging the subsolutions.''
+Normally, problems that fit this design pattern are difficult to approach with data parallelism.
+Given the constraints mentioned above, however,
+merge sort will always the same number of sub-problems each with the same size, 
+allowing for a data parallel approach.
+
+\subsection{Solutions}
+
+\subsubsection{J}
+\label{jmerge}

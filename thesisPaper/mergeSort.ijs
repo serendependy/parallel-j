@@ -1,4 +1,4 @@
-mrg. NB. Taken from the J Phrase Book
+NB. Taken from the J Phrase Book
 mrg =: 1 : '/:@/:@(m " _) { ,'
 
 merge =: 4 : 0
