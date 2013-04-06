@@ -18,10 +18,15 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   override def monad[T <: JArray[M]](y: T) = { //some testing with types and shape
 	  val jaf = JArrayFrame(ranks.map(_ r1), y)
 
-	   val newCells = (0 until jaf.frameSize) map { fr =>
+	   val newCells = if (!JVerb.parallelFlag) {
+	    (0 until jaf.frameSize) map { fr =>
 	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
-	  }
-
+	  }}
+	   else {
+   	    (0 until jaf.frameSize).par map { fr =>
+	    monadImpl(JArray(jaf.jar.jaType, jaf.cellShape, jaf.jar.ravel.slice(fr*jaf.cellSize, (1+fr)*jaf.cellSize)))
+	   }}
+	  
 	  val newShape = jaf.frames.dropRight(ranks.length).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
 	  JArray(newCells(0).jaType, newShape, newCells.foldLeft(Vector[MR]())(_ ++ _.ravel))
 	}
@@ -46,9 +51,13 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
 	      val ycellSize  = ycellShape.foldLeft(1)(_ * _)
 	      val frameSize  = agree.init.foldLeft(1)(_ * _.foldLeft(1)(_ * _))
 	      
-	      val newCells = (0 until frameSize) map { fr =>
+	      val newCells = if (!JVerb.parallelFlag) { 
+	        (0 until frameSize) map { fr =>
 	        dyadImpl(JArray(jafx.jar.jaType, xcellShape, xreframed.ravel.slice(fr*xcellSize, (1+fr)*xcellSize)),
 	        		 JArray(jafy.jar.jaType, ycellShape, yreframed.ravel.slice(fr*ycellSize, (1+fr)*ycellSize)) )
+	      }}
+	      else {
+	        
 	      }
 
 	      val newShape = agree.dropRight(1).foldLeft(List[Int]())(_ ++ _) ++ newCells(0).shape
@@ -154,4 +163,8 @@ abstract class JVerb[M <: JArrayType : Manifest, D1 <: JArrayType : Manifest, D2
   	
 	protected def monadImpl[T <: M : Manifest](y: JArray[T]): JArray[MR]
 	protected def dyadImpl[T1 <: D1 : Manifest, T2 <: D2 : Manifest](x: JArray[T1], y: JArray[T2]): JArray[DR]
+}
+
+object JVerb {
+  var parallelFlag = false
 }
