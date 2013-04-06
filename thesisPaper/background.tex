@@ -60,8 +60,8 @@ and in this paper we will say when this happens that ``the shapes of $x$ and $y$
 We also say that this prefix is the \textit{frame} for the two collections,
 and the remaining suffixes the shape of $x$ and $y$ are their respective \textit{cells}.
 
-Going back to the above example: a scalar, a vector of 2 elements, and another 2 by 3 matrix will aggree with $mat2\_3$ under addition, since the shape of these prefixes the shape of $mat2\_3$; 
-any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also aggree with $mat2\_3$ under addition, since $mat2\_3$ would prefix it.
+Going back to the above example: a scalar, a vector of 2 elements, and another 2 by 3 matrix will agree with $mat2\_3$ under addition, since the shape of these prefixes the shape of $mat2\_3$; 
+any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also agree with $mat2\_3$ under addition, since $mat2\_3$ would prefix it.
 
 \begin{singlespacing}
 \begin{small}
@@ -115,7 +115,7 @@ adding a vector $vec3$ of 3 scalars to $mat2\_3$, since there is no prefix betwe
 \end{singlespacing}
 
 However, it should be possible to add $vec3$ to each of the vectors of $mat2\_3$, since each vector has the same length.
-In order to accomplish this and many similiar use cases where the desired extension of a function is not the default extension, 
+In order to accomplish this and many similar use cases where the desired extension of a function is not the default extension, 
 J also includes a \textit{rank operator} which is spelled \ttfamily"\normalfont.
 The rank operator is a higher order function which takes as its first argument a regular function 
 and as its second argument a vector of 1, 2, or 3 numeric values, 
@@ -139,7 +139,7 @@ the frames of the rank 1 items in $mat2\_3$ and $vec3$ are $2$ and an empty fram
 Because the frame at rank 1 of $vec3$ prefixes the same frame $mat2\_3$ (the empty frame prefixes every frame), 
 the shapes now agree, and there is an implicit map on the vector elements of $vec3$ expanding to a matrix of two vectors.
 
-\subsection{Inherrent Data Parallelism}
+\subsection{Inherent Data Parallelism}
 For any function $f$ with function rank $r$ and arguments $x$ and $y$, 
 the following steps give a high level description of how $f$ is applied to its arguments.\cite{rankanduni}
 \begin{enumerate}
@@ -147,7 +147,7 @@ the following steps give a high level description of how $f$ is applied to its a
 		by taking the $r$ smallest dimensions of the shape vector of each.
 		E.g., the cell shape of $mat2\_3$ at rank 1 is 3, since each vector contains 3 items.
 	\item Calculate the frame shape at rank $r$ of $x$ and $y$ 
-		by removing from the shape vector of each their repsective cell shapes.
+		by removing from the shape vector of each their respective cell shapes.
 		E.g, at rank 1, the frame shape of $mat2\_3$ is $2$,
 		the frame shape of $arr2\_3\_2$ is $2$ $3$, 
 		and the frame shape of $vec3$ is an empty frame.
@@ -170,7 +170,7 @@ since these cells can themselves be large regular collections.
 Finally, one consequence of having this common set of steps for applying all functions with function rank is
 that all such functions can be parallelized in the library code.
 This means that applications which uses a parallelized function rank library 
-can automatically exploit the inherrent concurrency of their problem, 
+can automatically exploit the inherent concurrency of their problem, 
 provided this problem can be expressed naturally in terms of function rank.
 
 \section{Other Solutions}
@@ -180,7 +180,7 @@ describing work they had done on a Haskell library, which they named \textit{Rep
 There is much to commend about their work, including ``that it (1) is purely
 functional, (2) supports reuse through shape polymorphism, (3)
 avoids unnecessary intermediate structures rather than relying on
-subsequent loop fusion, and (4) supports transparent parallelisation,''
+subsequent loop fusion, and (4) supports transparent parallelization,''
 and that it is a library for a functional language with relatively wide use.
 
 Most impressively, they were able to statically capture some of the effects functions have on the shapes of their arguments.
@@ -204,7 +204,7 @@ In contrast, in order to get the same behavior in J of Repa's \textit{sum} funct
 it is $+/ " 1$, which in English reads rather intuitively as ``apply sum to the vector elements of its argument.''
 
 Finally, although both J and Repa support function rank, 
-in the same way that the arabic numeral system is more convenient to work with than Church's numerals, % TODO cite?
+in the same way that the Arabic numeral system is more convenient to work with than Church's numerals, % TODO cite?
 we believe that it is conceptually easier to understand, for example, that $(" 3)$ means ``operate on the rank 3 items'', than it is to understand Repa's equivalent, $(sh.:Int.:Int.:Int)$.
 
 \subsection{SA-C, Boost MultiArray}
@@ -221,7 +221,7 @@ not an extension to an existing, general purpose programming with a broad user b
 with access to large and well developed libraries.
 
 In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language. \cite{boost}
-However, its ability to analyize and operate on the structure of regular collections is limited compared to SA-C or Repa.
+However, its ability to analyze and operate on the structure of regular collections is limited compared to SA-C or Repa.
 Furthermore, it does not benefit from a naturally parallel implementation, 
 its arrays are operated on in a conceptually lower (imperative) level, 
 and it also does not have an equivalent to the rank operator. 

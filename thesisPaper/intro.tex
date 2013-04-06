@@ -2,7 +2,7 @@
 
 \section{Motivation}
 Many scientific and business computing applications must work on large data sets naturally structured in regular, multidimensional collections.
-In order for these applications to achieve good performance, it is often the case that programers must exploit any and all concurrency in the application through different approaches to parallel programming.
+In order for these applications to achieve good performance, it is often the case that programmers must exploit any and all concurrency in the application through different approaches to parallel programming.
 One approach frequently used to exploit concurrency on large collections is \textit{data parallelism}, in which programs update elements or subsections of collections in parallel.
 Many tools have already been developed to help programmers exploit data parallelism easily and safely. %TODO citation
 However, we believe that many of these tool are not as helpful for exploiting data parallelism on regular collections as they could be, for two reasons.
@@ -18,7 +18,7 @@ For example, if a function requires that one or more of its arguments is a regul
 
 Alternatively, regular collections can be implemented as vectors which have an associated shape vector. 
 Making the structure of a regular collection a field which can be viewed and manipulated 
-allows the programer greater transparency and control when writing programs to operate on them.
+allows the programmer greater transparency and control when writing programs to operate on them.
 Unfortunately, most statically-typed languages do not have type systems advanced enough 
 to capture all of the structural information of regular collections statically, even though this is theoretically possible. % TODO cite dependent types (xi probably)
 However, some languages are able to capture some of this structure statically, \cite{boost} \cite{sac} \cite{dph}
@@ -38,15 +38,15 @@ needs to be extended to a collection of higher dimensions,
 or if the function only operates on scalar values but needs to be extended to some multidimensional collection, 
 the programmer usually must wrap the function in nested for loops.
 Without abstraction in the language or library to deal with the general cases of such extensions, 
-this activity is tedious in the trivial cases and prone to uneccesary error 
+this activity is tedious in the trivial cases and prone to unnecessary error 
 because programmers must instead write boilerplate code in order to accomplish it.
 Moreover, in some cases these extensions are data parallel, 
-and can be done automatically and automatically exploit inherrent concurrency.
-Using nested for loops obfuscates this inherrent concurrency and 
-requires the programer to make changes to existing code in order to exploit it
+and can be done automatically and automatically exploit inherent concurrency.
+Using nested for loops obfuscates this inherent concurrency and 
+requires the programmer to make changes to existing code in order to exploit it
 
 Functional programming languages, in contrast to imperative programming languages, allow programmers to view and write programs at a higher level of abstraction.
-When dealing with collections, this higer level of abstraction usually means that related types of operations can be expressed as \textit{higher-order} functions 
+When dealing with collections, this higher level of abstraction usually means that related types of operations can be expressed as \textit{higher-order} functions 
 like \textit{map} and \textit{reduce} that take functions as their arguments and return functions that operate on collections.
 These higher-order functions can allow programmers to more easily understand what operations are being done to multidimensional collections 
 than if the same operations were done imperatively using for loops 
@@ -67,7 +67,7 @@ makes it easier for a programmer to make them safely, quickly, and at a higher l
 In some cases, these extensions are so trivial that they can be done automatically,\cite{jvocab} \cite{rankanduni} 
 meaning the programmer need not modify the code at all. 
 Furthermore, since multiple applications of the rank operator 
-are equivalent to the cases where nested loops or nested higher-order function applications are inherrently parallel, 
+are equivalent to the cases where nested loops or nested higher-order function applications are inherently parallel, 
 it too is inherently data parallel.
 Consequently, languages with both formalized function rank and a rank-operator allow the programmer to 
 exploit the inherent data parallelism of extending existing operations to collections of higher dimension 
@@ -89,13 +89,13 @@ The rest of the paper is organized as follows:
 \begin{itemize} 
 	\item The remaining sections of this chapter give the design plan (\ref{desp}) and implementation (\ref{imp}) of our research. 
 	Unfortunately, the latter did not quite fulfill the expectations we had in the former, so we include both a description of what we wanted to accomplish and what we were actually able to accomplish given the time constraints. 
-	\item Chapter \ref{back} gives the neccessary background information for understanding this work, 
+	\item Chapter \ref{back} gives the necessary background information for understanding this work, 
 	including a brief description of function rank and how it is equivalent to nested loops or nested calls to \textit{map},
 	a discussion of relevant parallel design patterns for the example problem set, 
-	and a literature review of other attempts to solve the same or similiar problems
+	and a literature review of other attempts to solve the same or similar problems
 	\item Chapter \ref{paraop} proposes two new operators for future parallel implementations of the J programming language 
 		and illustrates how these operators might be used
-    \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a descritpion of how possibly to extend the problem to higher dimensions.
+    \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a description of how possibly to extend the problem to higher dimensions.
     \item Chapter \ref{res} compares example solutions to the problems listed in Chapter \ref{probs} in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses the relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work. 
 \end{itemize}
@@ -141,7 +141,7 @@ or to set thread scheduling schemes.
 Although not entirely related to function rank, such controls are to be expected from any serious parallel computing environment.
 
 To implement this parallel subset of J, we chose the Scala programming language.\cite{scala} 
-Scala has many features that make it desireable for this task, including: 
+Scala has many features that make it desirable for this task, including: 
 \begin{enumerate} 
 	\item support for multiple programming paradigms, such as
 	\begin{itemize}
@@ -154,21 +154,21 @@ Scala has many features that make it desireable for this task, including:
 	\begin{itemize}
 		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, \cite{scala28col}
 			common to many solutions to data parallel problems, and
-		\item a library for parallel collections that exploits the concurrency inherrently data parallel operations,\cite{pc}
-			which, being similiar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
+		\item a library for parallel collections that exploits the concurrency inherently data parallel operations,\cite{pc}
+			which, being similar to our own use cases, we anticipated would make parallelizing our implementation relatively easy.
 	\end{itemize}
 \end{enumerate}
 
 We would then compare solutions to a suite of data parallel problems written in C with OpenMP, Scala and Parallel-J,
-and discuss the relative level of abstraction, scalability to similiar problems of higher dimension, and performance of each. 
+and discuss the relative level of abstraction, scalability to similar problems of higher dimension, and performance of each. 
 It was not expected that Parallel-J would compare favorably to the raw performance of C or the current implementation of J; 
-the hoped for result was to show that the performance Paralle-J scales relative to the number of threads, 
+the hoped for result was to show that the performance Parallel-J scales relative to the number of threads, 
 showing that this implementation does effectively exploit potential concurrency.
 % TODO also parallelisation techniques.
 
 \section{Implementation}
 \label{imp}
-Unfortunately, during the the development of this research it became clear that the given time constraints would not allow for such an ambitious project.
+Unfortunately, during the development of this research it became clear that the given time constraints would not allow for such an ambitious project.
 This has lead to a change of focus in the research. 
 Rather than finishing a parallel subset of J, the J system libraries developed 
 are instead used as a prototype for a Scala regular collections library which supports function rank.
