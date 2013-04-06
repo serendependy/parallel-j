@@ -1,5 +1,4 @@
 NB. `mrg' Taken from the J Phrase Book
-NB. #mergesort #jprogramming
 mrg =: 1 : '/:@/:@(m" _) { ,'
  
 merge =: 4 : 0

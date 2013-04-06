@@ -102,6 +102,7 @@ A solution using the Parallel-J system which takes exactly the same approach as 
 can be found in Section \ref{pjsPi}.
 
 \subsection{Extensions}
+\label{piext}
 The problem of calculating $\pi$ by finding the area of the unit circle 
 generalizes to calculating any useful value by finding the value of an integral. 
 In general, the domain over which an integral takes place need not be 1-dimensional, 
@@ -110,10 +111,10 @@ Instead, the desired value may most naturally be expressed as a volume or hyper-
 Fourier transformations, for example, have many applications in physics and engineering, 
 and can be expressed over arbitrary dimension.
 
-To extend the calculation of $\pi$ to higher dimensions, 
+To extend the calculation of $\pi$ to the higher dimensions 3 or 4, 
 we calculate the volume or hyper-volume of the unit sphere or hyper-sphere, respectively.
 While it is possible to express (in both C and J) for arbitrary $n$ the $n$-dimensional measure $f_n$ of the unit $n$-ball, 
-it would be somewhat involved to explain its behavior, so it will be assumed that it already written.
+it would be somewhat involved to explain its behavior, so it will be assumed that it already available.
 Instead, we will focus on generalizing the generation of 
 the set of points in $n$-dimensional space for the right-handed Riemann sum.
 
@@ -156,7 +157,7 @@ The solution to this aspect of the problem along with some example uses is given
 \end{small}
 \end{singlespacing}
 
-The function \ttfamily xs\normalfont now takes a vector \ttfamily vn \normalfont of length $n$ 
+The function \ttfamily xs \normalfont now takes a vector \ttfamily vn \normalfont of length $n$ 
 specifying how to break up the interval $[0,1]^n$.
 To calculate the appropriate coordinates to do the Riemann sum, 
 the function first calculates the total number of points required (reducing \ttfamily vn \normalfont with multiplication). 
@@ -165,11 +166,11 @@ the array representation of $i$ in base \ttfamily v8 \normalfont.
 Finally, like the above example, it divides each of these values by the original input 
 so that the resulting points are in the appropriate bounds.
 
-Because of this, now matter the dimension on which the programmer desires to calculate their integral, 
+Because of this, no matter the dimension on which the programmer desires to calculate their integral, 
 the points for applying the desired function (in this case, the appropriate measure of the unit $n$-ball) 
 can always be represented by at most a rank 2 array with shape \ttfamily (* insert vn) , n \normalfont.
 To approximate the desired integral, apply the appropriate function (in an inherently parallel fashion) 
-to each of the vector elements, then divide their sum by the appropriate value (\ttfamily 1 div (* insert v8)\normalfont).
+to each of the vector elements, then multiply their sum by the appropriate value (\ttfamily 1 div (* insert v8)\normalfont).
 
 \section{Conway's ``Game of Life''}
 \subsection{Description}
@@ -214,7 +215,7 @@ A fragment of a parallel solution in C with OpenMP for the Game of Life is given
 The solution was work done by the author for an undergraduate course in parallel computing.
 The fragment contains the function which updates each cell, 
 which is where most of the computational concurrency for the game of life is found. 
-Notice the two arguments to the function, \ttfamily board\normalfont and \ttfamily new\_board\normalfont.
+Notice the two arguments to the function, \ttfamily board \normalfont and \ttfamily new\_board\normalfont.
 In the iteration loop (not shown), these parameters are swapped every iteration, 
 solving the potential race condition mentioned above.
 
@@ -290,6 +291,89 @@ A solution using the Parallel-J system which takes a similar approach as the J p
 (but includes a non-J for loop for the iteration)
 can be found in Section \ref{pjsGol}.
 
+\subsection{Extensions}
+Of the listed problems, the Game of Life perhaps best demonstrates the utility 
+of generalizing the application of functions to higher rank arrays using function rank.
+This is not only because with function rank 
+the problem can be expressed in a data parallel fashion by extending the rank 2 array to a rank 3 array;
+in general, simulations of cellular automata need not be restricted to two dimensions, 
+but can occur on arbitrary dimensions.
+This discussion of extending the Game of Life to higher dimensions 
+will focus on calculating the number of neighbors in any dimension.
+While it is possibly desirable that the rules governing the life of a cell 
+would also change depending on the dimension, 
+for simplicity it is assumed that the desired rules are already present.
+
+In the C solution with OpenMP, 
+the obvious extension of the problem to any specific rank 
+is to nest the existing for loops with additional for loops. 
+Since for loops are used for both examining each cell, 
+as well as examining each neighbor of the given cell, 
+this involves writing 2 for loops with 2 extra variables for every additional dimension desired. 
+Additionally, if the convenience of the C structure \ttfamily twoD\_array \normalfont is desired, 
+the structure must be rewritten for every rank desired. 
+Again, on the other hand, it is may not be easy for a programmer to see 
+how to begin an approach which handles the problem in the general case.
+
+The solution to the general approach in J is given below.
+
+\begin{singlespacing}
+\begin{small}
+\verbatiminput{gol_ext.ijs}
+\end{small}
+\end{singlespacing}
+
+The most significant change from the previous approach 
+is changing \ttfamily shiftBy \normalfont to a function 
+that calculates the appropriate values based on the dimension of the board, 
+rather than hard coding them like before.
+This is accomplished using much the same approach 
+as used with the previous problem in Section \ref{piext}, 
+so the details of its behavior will be glossed with a simple illustration:
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   ] board =: 3 3 $ 0 1 1  1 0 0  0 1 0
+0 1 1
+1 0 0
+0 1 0
+   ] board3D =: 2 2 2 $ 0 0  0 1  1 0  1 1
+0 0
+0 1
+
+1 0
+1 1
+   0 1 4 7 8 (from =: {) shiftBy board
+_1 _1
+_1  0
+ 0  0
+ 1  0
+ 1  1
+   0 1 2 13 23 24 25 from shiftBy board3D
+_1 _1 _1
+_1 _1  0
+_1 _1  1
+ 0  0  0
+ 1  0  1
+ 1  1 _1
+ 1  1  0
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+There is one additional change necessary:
+since the values to shift always include the ``no shift'' vector
+(a vector with only 0s as entries),
+without additional logic live cells will always be counted as 
+having one additional neighbor. 
+The listed code handles this by subtracting from 
+the sum of the values the value of the cell itself.
+
+No other changes to the code are necessary for this extension to work, 
+meaning the inherent parallelism of the solution for fixed rank 
+is preserved without additional logic.
+
 \section{Merge Sort}
 \subsection{Description}
 Conceptually, sorting an array using merge sort is fairly easy to describe.
@@ -305,6 +389,11 @@ we will be concerned with sorting arrays
 whose lengths are of the form $2^n$, where $n$ is a positive integer.
 This way the nature of the parallelism in the problem can be discussed 
 without going into the detail of handling special cases.
+
+Unfortunately, merge sort does not have a very intuitive extension into higher dimensions, 
+since comparing collections is not similar to comparing numbers.
+However, it will be shown that an advantage of function rank in approaching this problem
+will be easily extending a given vector to sort into an arbitrarily high dimension.
 
 \subsection{Relevant Design Patterns}
 This problem was chosen to represent the ``Divide and Conquer'' design pattern, \cite{mass}
