@@ -6,6 +6,13 @@ Each of the following problems was selected to illustrate
 both the advantages in approaching different forms of exploitable concurrency with the notion of function rank, 
 as well as to illustrate how extensions of these problems to higher dimensions can be done easily, safely, 
 and in an automatically data parallel fashion.
+For each of these problems, there is a trivial extension into a higher dimension: 
+gather several rank $n$ inputs to the problem into a rank $n+1$ collection 
+and use the parallel rank operator to evaluate each of these inputs concurrently.
+By specifying the original function operates on rank $n$ elements, 
+this extension can be done automatically.
+Additionally, for each problem there is a discussion 
+of how more complex parallel extensions to higher dimensions are aided through using function rank. 
 
 To demonstrate this, the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
 \textit{Design Patterns} are general, reusable solutions to a common class of problems. % TODO cite? (from Wikipedia)
@@ -69,7 +76,6 @@ The operators \ttfamily p\_rank \normalfont and \ttfamily p\_insert \normalfont
 are defined as the normal rank and insert operators, respectively,  
 but are included to demonstrate where parallelism would be exploited in a parallel implementation of J.
 
-
 \begin{singlespacing}
 \begin{small}
 \verbatiminput{num_int_pi.ijs}
@@ -95,7 +101,75 @@ it would be sequential with $/$.
 A solution using the Parallel-J system which takes exactly the same approach as the J program 
 can be found in Section \ref{pjsPi}.
 
-% TODO extension?
+\subsection{Extensions}
+The problem of calculating $\pi$ by finding the area of the unit circle 
+generalizes to calculating any useful value by finding the value of an integral. 
+In general, the domain over which an integral takes place need not be 1-dimensional, 
+as it was in this example (over the closed interval $[0,1]$).
+Instead, the desired value may most naturally be expressed as a volume or hyper-volume. 
+Fourier transformations, for example, have many applications in physics and engineering, 
+and can be expressed over arbitrary dimension.
+
+To extend the calculation of $\pi$ to higher dimensions, 
+we calculate the volume or hyper-volume of the unit sphere or hyper-sphere, respectively.
+While it is possible to express (in both C and J) for arbitrary $n$ the $n$-dimensional measure $f_n$ of the unit $n$-ball, 
+it would be somewhat involved to explain its behavior, so it will be assumed that it already written.
+Instead, we will focus on generalizing the generation of 
+the set of points in $n$-dimensional space for the right-handed Riemann sum.
+
+The most immediate extension of the C solution to any specific dimension $n$
+would be to wrap the program in the appropriate number of for loops 
+and to change the interior calculation to match the appropriate formula for the $n$-dimensional measure.
+While this only involves changing two parts of the code, it is tedious 
+and must be done for every such extension. 
+On the other hand, finding a general solution could be somewhat involved 
+as it is perhaps not clear at first sight how to begin such an approach.
+
+The solution to this aspect of the problem along with some example uses is given below in J:
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   xs =: (n (base=:#:) integers@:(* insert)) div("1) n
+
+   NB. Divide [0,1]x[0,1] into 4x4 grid
+   xs 4 4
+   0    0
+   0 0.25
+   0  0.5
+   0 0.75
+0.25    0
+0.25 0.25
+0.25  0.5
+0.25 0.75
+ 0.5    0
+ 0.5 0.25
+ 0.5  0.5
+ 0.5 0.75
+0.75    0
+0.75 0.25
+0.75  0.5
+0.75 0.75
+   xs 10
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+The function \ttfamily xs\normalfont now takes a vector \ttfamily vn \normalfont of length $n$ 
+specifying how to break up the interval $[0,1]^n$.
+To calculate the appropriate coordinates to do the Riemann sum, 
+the function first calculates the total number of points required (reducing \ttfamily vn \normalfont with multiplication). 
+Then it finds, for each of the integers $i$ between 0 and one less than this total, 
+the array representation of $i$ in base \ttfamily v8 \normalfont. 
+Finally, like the above example, it divides each of these values by the original input 
+so that the resulting points are in the appropriate bounds.
+
+Because of this, now matter the dimension on which the programmer desires to calculate their integral, 
+the points for applying the desired function (in this case, the appropriate measure of the unit $n$-ball) 
+can always be represented by at most a rank 2 array with shape \ttfamily (* insert vn) , n \normalfont.
+To approximate the desired integral, apply the appropriate function (in an inherently parallel fashion) 
+to each of the vector elements, then divide their sum by the appropriate value (\ttfamily 1 div (* insert v8)\normalfont).
 
 \section{Conway's ``Game of Life''}
 \subsection{Description}
