@@ -1,10 +1,43 @@
-%
-% FIX THIS -- remove/change, just some examples of things
-%
 \chapter{Conclusion}
 \label{conc}
 
 \section{Future Research}
-\subsection{Parallel Implementation of J in C with OpenMP}
+
+\subsection{Parallel Implementation of J}
+This research could be useful for future work which provides 
+a parallel alternative of J.
+No matter the implementing language chosen, 
+the considerations in Section \ref{desp} 
+over which language features to include in a prototype, 
+and the discussion in Section \ref{fridp} of the behavior and inherent data parallelism of the rank operator, 
+would likely be useful to those not intimately familiar with the current J implementation.
+
+Also to be taken into consideration should be 
+the forces which lead to the choice of Scala as the language 
+for this research, also listed in Section \ref{desp}. 
+If future work is done in this area in Scala 
+or another language with suitable programming paradigms and libraries 
+for developing a parallel implementation of J, 
+then this research should be used as a prototype 
+to help guide development.
+
+Alternatively, a future parallel implementation of J
+could be done in the C programming language. 
+In order to begin this approach, 
+it is strongly recommended that researchers first 
+familiarize themselves with the working of the current implementation of J\cite{ioj}, 
+the source code and documentation of which 
+is available freely under open source licenses.
+In addition, it seems that there are at least two viable options in such an approach 
+which are possibly not mutually exclusive.
+Future researchers may use shared memory parallel environments
+such as the OpenMP library 
+to parallelize operations within a single instance of a parallel J.
+Also, the current implementation of J already includes 
+functionality to allow for multiple instances of J to be running in the same process 
+without race conditions.
+Therefore, it may be possible to approach future work using 
+a distributed memory parallel environment, such as MPI. % TODO cite!
+
 
 \subsection{Sequential and Parallel Scala Library for Regular Arrays using Function Rank}
