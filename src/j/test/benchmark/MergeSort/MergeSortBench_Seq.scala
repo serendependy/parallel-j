@@ -53,6 +53,7 @@ object MergeSortBench_Seq extends Benchmark {
       def mergeSort = (y: JArray[JInt]) => {
         repeatedMerge(sortBase(divide(y)))
       }
- 
+
+	  mergeSort(y)
   }
 }

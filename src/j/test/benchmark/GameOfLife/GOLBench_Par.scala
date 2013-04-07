@@ -24,7 +24,7 @@ object GOLBench_Par extends Benchmark {
   import j.test.benchmark.GameOfLife.GOLParams._
   
   def run() {
-    JVerb.parallelFlag = false
+    JVerb.parallelFlag = true
     
       val numCells = (signumMultiply insert).monad(boardShape).asInstanceOf[JArray[JInt]]
       val lifeThreshold = signumMultiply(JArray.scalar(ratioAliveDead),
