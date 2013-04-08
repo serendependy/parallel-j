@@ -60,11 +60,12 @@ abstract class MergeSortBench extends Benchmark {
         repeatedMerge(sortBase(divide(y)))
       }
 
-	  mergeSort(y)	  
+	  res = mergeSort(y)	  
 	}
 	
 	override def tearDown() {
-	  
+	  println("Array is sorted: " + 
+	      (decrementLesserthanequal insert).apply(res) )
 	  super.tearDown()
 	}
 }
