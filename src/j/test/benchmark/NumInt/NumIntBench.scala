@@ -33,5 +33,7 @@ abstract class NumIntBench extends Benchmark {
 	
 	override def tearDown() {
 	  println("Pi is " + pi)
+	  
+	  super.tearDown()
 	}
 }
