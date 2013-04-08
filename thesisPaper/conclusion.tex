@@ -1,8 +1,26 @@
 \chapter{Conclusion}
 \label{conc}
 
-\section{Future Research}
+\section{Discussion of Results}
+There are several potential reasons for the underwhelming results for the Parallel-J solutions given in Section \ref{res}. 
+Probably the most significant of these is the creation of both temporary 
+and potentially permanent objects in every thread. 
+This means there are multiple requests for memory allocation, a likely bottleneck for performance.
+For example, since this work was originally intended to be a parallel implementation of J, 
+several wrapper classes were created to hold the same kind of information the current version of J \cite{ioj} 
+maintains about arrays and its primitive values, such as reference counts and bit flags for type information. 
 
+Additionally, in many instances new collections were created and values copied 
+were they could instead have been represented as index permutations. % TODO cite
+Using index permutations to represent, for example, vectors containing multiple copies of a single scalar, 
+could reduce the number of requests for the creation of new objects.
+
+Finally, this research did not make use of the macros introduced by Scala 2.10. %TODO cite scala 2.10
+These macros have the potential to improve performance 
+by replacing at compile time source code expressions that appear to be acting on objects 
+with lower-level expressions acting on primitives.
+
+\section{Future Research}
 \subsection{Parallel Implementation of J}
 This research could be useful for future work which provides 
 a parallel alternative of J.
@@ -56,10 +74,10 @@ the author was not aware of current work being done in
 generic and polytipic programming in Scala by Miles Sabin. 
 In particular this work, which is collectively called ``Shapeless''%TODO \cite{shapeless}
 , supports collections whose sizes are known statically. 
-This functionality would be useful for developing 
+This functionality would be useful for future work in developing 
 a library of collections whose dimensions are known statically, 
 possibly granting some or all of the advantages give when discussing 
 the Haskell library Repa \cite{dph} in Section \ref{repa}.
-
-
-
+Combining these advantages with functions supporting function rank into a single Scala library
+would lead to significant expressiveness and reduced boiler-plate code, 
+and could lend itself to a future parallel implementation for good performance, as well.

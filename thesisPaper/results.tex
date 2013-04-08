@@ -1,5 +1,82 @@
-%
-% FIX THIS -- remove/change, just some examples of things
-%
 \chapter{Results}
 \label{res}
+
+\section{Methodology}
+To determine the performance of the Parallel-J solutions to the problems listed in Chapter \ref{probs}, 
+we developed for each problem both a sequential and parallel solution. 
+The differences between these two solutions consists of nothing more than a boolean flag 
+to turn parallelism on or off. 
+Additionally, the results of solutions in C with OpenMP for the same problems 
+are given for comparison.
+
+All solutions were compiled and run on the Dione00 work station. %TODO get machine specs!
+Before the performance of the Parallel-J solutions were recorded, 
+these programs were run 5 times in order for the Java Just-In-Time compiler %TODO cite?
+to make additional optimizations.
+All solutions were then run 5 times then averaged, with performance measured in milliseconds.
+The software used to measure the performance of the Parallel-J solutions was the Scala API Benchmark object, % TODO cite
+which forces garbage collection between every program run.
+Performance measurement code was written for each of the C solutions.
+
+Finally, each of the Parallel-J solutions are listed in Appendix \ref{apsol}. % TODO list benchmark, refactor
+
+\section{Calculating Pi using Numerical Integration}
+The number of operations performed in this problem scales 
+as the number of divisions $n$ between the interval $[0,1]$ grows.
+For our tests, we chose $n=20000$.
+
+Table \ref{tnip} below gives the outcomes.
+
+\begin{center}
+\begin{tabular}{|r|l|l|l|l|l||l|}
+\label{tnip}
+	           & Trial 1 & Trial 2 & Trial 3 & Trial 4 & Trial 5 & Average \\ 
+	\hline
+	Sequential & 21995   & 19815   & 19908   & 19713   & 19717   & 20229.6 \\ 
+	\hline
+	Parallel   & 23557   & 24568   & 24497   & 24256   & 24145   & 24204.6 \\ 
+	\hline
+\end{tabular}
+\end{center}
+
+\section{Game of Life}
+For the two-dimensional version of this problem, 
+the number of operations performed in this problem scales 
+as the dimensions $x$ and $y$ grow larger, 
+and also as the number of desired iterations $i$ grows. 
+The latter, however, is fundamentally sequential, 
+so $i$ was fixed to be relatively small with value 10, 
+whereas $x$ and $y$ were both set to 100, 
+meaning each iteration consists of updating 10,000 cells.
+
+Table \ref{tgol} below gives the outcomes.
+
+\begin{center}
+\begin{tabular}{|r|l|l|l|l|l||l|}
+\label{tgol}
+	           & Trial 1 & Trial 2 & Trial 3 & Trial 4 & Trial 5 & Average \\ \hline
+	Sequential & 72512   & 68714   & 68679   & 68604   & 68611   & 69424   \\ \hline
+	Parallel   & 70105   & 68092   & 67755   & 67743   & 67541   & 68247.2 \\ \hline
+\end{tabular}
+\end{center}
+
+\section{Merge Sort}
+The number of operations required for this problem 
+grows as the number $n$ of values to sort increases. 
+Because of the problem constraint listed in Section \ref{mgdes}, 
+we chose $n=16384$, which is $2^14$.
+These are all 32-bit integers; 
+in the Parallel-J example, they are also unique values 
+in the range of $[0,16384)$. 
+It is not believed that this has a significant impact on performance.
+
+Table \ref{tmrg} below gives the outcomes.
+
+\begin{center}
+\begin{tabular}{|r|l|l|l|l|l||l|}
+\label{tmrg}
+			   & Trial 1 & Trial 2 & Trial 3 & Trial 4 & Trial 5 & Average \\ \hline
+	Sequential & 6128    & 2998    & 2969    & 2849    & 2826    & 3554    \\ \hline
+	Parallel   & 4158    & 2560    & 2588    & 2540    & 2550    & 2879.2  \\ \hline
+\end{tabular}
+\end{center}

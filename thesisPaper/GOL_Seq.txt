@@ -1,0 +1,1 @@
+j.test.benchmark.GameOfLife.GOLBench_Seq$	72512	68714	68679	68604	68611

@@ -17,7 +17,7 @@ import j.lang.primitives.JVerbs._
 import j.lang.primitives.cheating.JCheating._
 
 object MergeSortBench_Seq extends Benchmark {
-  import j.test.benchmark.GameOfLife.GOLParams._
+  import j.test.benchmark.MergeSort.MergeSortParams._
   def run() {
     JVerb.parallelFlag = false
       val jtwo = JArray.scalar(JInt(2))

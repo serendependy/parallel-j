@@ -18,8 +18,8 @@ Additionally, we propose a new system library
 which would allow the programmer to give annotations or force changes in the underlying parallel environment,
 described in section \ref{pfor}
 
-The spellings $``::$ and $/::$ for the two parallel operators were chosen for mnemonic and compliance reasons.
-Mnemonically, each uses the same base character as their sequential analogs, ($``$ and $/$), 
+The spellings \ttfamily ":: \normalfont and \ttfamily /:: \normalfont for the two parallel operators were chosen for mnemonic and compliance reasons.
+Mnemonically, each uses the same base character as their sequential analogs, (\ttfamily " \normalfont and \ttfamily / \normalfont), 
 as well as two ``parallel'' colons, making it easier to remember their functions.
 They also require no changes be made to the existing J lexer\cite{ioj}, 
 as demonstrated below:
@@ -52,7 +52,7 @@ The proposed parallel rank operator is a conjunction
 whose first argument is a function 
 and whose second argument is the ranks to both apply the function and to parallelize it. 
 It would be functionally equivalent to the rank operator, i.e. 
-\[f\;\;(``::r)\;y\;\;\Leftrightarrow\;\;f\;(``r)\;y\] and \[x\;\;f(``::r)\;y\;\;\Leftrightarrow\;\;x\;f(``r)\;y\] for all $f, r, x,$ and $y$.
+\[f\;\;(``::r)\;y\;\;\Leftrightarrow\;\;f\;(``r)\;y\] and \[x\;\;f(``::r)\;y\;\;\Leftrightarrow\;\;x\;f(``r)\;y\] for all $f, r, x,$ and $y$. % TODO fix ``
 
 Its purpose would be to override other parallel system defaults 
 to guarantee that the resulting function would parallelize operations on sub-arrays of the given rank 
@@ -81,7 +81,7 @@ To illustrate, consider the following examples:
 Incrementing numeric values always applies to scalars, so it always gives the same result, 
 regardless of which rank it is applied. 
 Using the parallel rank operate, this behavior would still remain; 
-however, each of the cases of $increment(``::0)$, $increment(``::1)$ and $increment(``::2)$ 
+however, each of the cases of \texttt{increment("::0)}, \texttt{increment("::1)}, and \texttt{increment("::2)}
 would result in the environment attempting to parallelize for the scalar, row, and whole matrix, respectively.
 E.g., if no limit is set on the number of threads available, 
 then the system might use 6 threads for parallelizing the scalars, 
@@ -139,14 +139,14 @@ as well as repeated applications of the rank operator.
 
 
 Using the parallel rank operator, 
-$mat2\_3\;+(``::2)\;arr2\_2\_3$ would parallelize addition on each of the two matrices, whereas
-$mat2\_3\;+(``::1)(``2)\;arr2\_2\_3$ would parallelize addition on each of the vector elements.
+\texttt{mat2\_3 +("::2) arr2\_2\_3} would parallelize addition on each of the two matrices, whereas
+\texttt{mat2\_3 +("::1)("2) arr2\_2\_3} would parallelize addition on each of the vector elements.
 
 Some open questions remain, most notably 
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
 This is left as a question for future research to investigate.
 
-\section{Parallel Insert Operator: \ttfamily /:: \normalfont}
+\section{Parallel Insert Operator: \texttt{/::}}
 \label{pins}
 \subsection{Rationale}
 Frequently, programmers need to perform some sort of reduction operation on an entire collection, 
@@ -161,7 +161,8 @@ As a unary, higher ordered function (\textit{adverb}),
 the parallel insert operator would be equivalent to its sequential equivalent 
 for all associative operations. 
 Thus, the following J session would be the same, 
-regardless of whether \ttfamily insert\normalfont was assigned to be $/::$ or $/$ .
+regardless of whether \texttt{insert}
+was assigned to be \texttt{/::} or \texttt{/}
 
 \begin{singlespacing}
 \begin{small}
