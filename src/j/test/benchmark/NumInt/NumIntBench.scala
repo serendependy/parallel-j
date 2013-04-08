@@ -21,14 +21,15 @@ abstract class NumIntBench extends Benchmark {
       val xvals =  signumMultiply(integersIndex(JArray.scalar(numSquares)),
     		  					  recip)
       val yvals = recipricalDivide(
-          conjugatePlus(JArray.scalar(JReal.One)), 
-    		  squareNotand(xvals))
+          conjugatePlus(JArray.scalar(JReal.One), 
+    		  squareNotand(xvals)))
 
-      pi = signumMultiply(
+      pi = (conjugatePlus insert).apply(signumMultiply(
+          yvals, 
           signumMultiply(
-              (conjugatePlus insert).apply(yvals),
-              JArray.scalar[JInt,Int](4)),
-          recip)
+              JArray.scalar[JInt,Int](4),
+              recip)
+          ))
 	}
 	
 	override def tearDown() {
