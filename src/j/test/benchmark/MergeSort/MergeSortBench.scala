@@ -17,7 +17,7 @@ import j.lang.primitives.cheating.JCheating._
 abstract class MergeSortBench extends Benchmark {
 
 	val y = {
-		val numToDeal = JArray.scalar[JInt,Int](16384)
+		val numToDeal = JArray.scalar[JInt,Int](1048576)
 		rollDeal(numToDeal, numToDeal)
 	}
 	

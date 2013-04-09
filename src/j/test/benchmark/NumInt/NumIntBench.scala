@@ -11,7 +11,7 @@ import j.lang.primitives.cheating.JCheating._
 
 abstract class NumIntBench extends Benchmark {
   
-  	val numSquares = JInt(20000)
+  	val numSquares = JInt(1000000)
 	private var pi: JArray[JNumber] = null
   
 	override def setUp()
