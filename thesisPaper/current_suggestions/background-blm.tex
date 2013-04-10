@@ -1,0 +1,226 @@
+% (BLM) I'm vaguely unhappy with a lot of the subsection names here but don't have better ideas to suggest for most of them.  Maybe tomorrow ....
+
+\chapter{Background}
+\label{back}
+
+This chapter gives the background information necessary to understand what advantages function rank has in exploiting data parallelism over other approaches.
+
+\section{Function Rank}
+\subsection{History and Definition}
+\textit{Function rank} was first developed and described by K. Iverson in a series of research reports written at IBM. % TODO cite
+In one such report, Iverson described it as 
+``the most important notion needed to provide a simple and systematic basis for the uniform treatment of all `mixed' or non-scalar functions.''\cite{rapl} % TODO footnote of next comment
+Since that time, the idea of function rank has matured and found its way into many dialects of APL, including J.
+
+J's model of function rank is slightly different from what was first presented by Iverson. \cite{rankanduni} \cite{jvocab}
+The rank of a function $f$ in J is a vector $v$ of three values representing the data rank of $f$'s expected arguments.
+Since in J functions take either one or two arguments, the first value of $v$ represents the expected data rank of $f$'s one-argument case (in J referred to as the \textit{monadic} case);
+the second and third values in $v$ represent the expected data rank of $f$'s two-argument (\textit{dyadic}) case.
+If $f$ has no restrictions on some or all of its arguments, this is represented in $v$ with the value for infinity, spelled \ttfamily \_ \normalfont ;
+if $f$ operates on scalar values, this is represented as an entry in $v$ of 0 (in J, scalars are collections of rank 0 and an empty extent). % TODO make footnote
+
+So, for example, most arithmetic functions, such as addition, fundamentally operate on scalar values and must be extended to operate on collections of rank $n \ge 1$.
+On the other hand, most collective operations, such as indexing, operate on whole collections at once.
+% (BLM)  could you give an example of each of these with its function rank?  also it's not clear to me whether "must be extended" means "by the programmer" (no, right?) or what.  Examples in the next section clarify but it might be as well to mention that here.
+
+\subsection{Shape Agreement}
+In the trivial cases, where a function $f$ is given arguments with ranks matching $f$'s function rank, 
+J behaves much like any programming language without function rank. % TODO make single spaces
+% (BLM) maybe the "singlespace" environment does what you want?  as follows?
+\begin{singlespace}
+\begin{verbatim}
+   1 + 1
+2
+   ] mat2_3 =: (integers =: i.) 2 3
+0 1 2
+3 4 5
+   1 (from =: {) mat2_3
+3 4 5
+\end{verbatim}
+\end{singlespace}
+% (BLM) It would help here if you could say what some of the symbols mean -- some are pretty obvious, but others, not so much (']', maybe 'i.', '{').  You could just put "NB." comments in the J code -- that might be easiest for you right now.
+
+In some cases, when the arguments to $f$  do not match its function rank, $f$  is automatically extended to the appropriate dimensions.
+For example, if $x$ is a scalar, addition can always be extended so that $x$ is added to every element of a collection $c$ 
+no matter $c$'s rank or extent. 
+\begin{verbatim}
+   1 + mat2_3
+1 2 3
+4 5 6
+\end{verbatim}
+
+In general, addition (and all other scalar functions) can be extended over two regular collections $x$ and $y$ 
+if the shape of one collection \textit{prefixes} the other.
+This is called \textit{prefix shape agreement}, or just \textit{shape agreement},\cite{rankanduni} 
+and in this paper we will say when this happens that ``the shapes of $x$ and $y$ agree under addition.''
+We also say that this prefix is the \textit{frame} for the two collections,
+and the remaining suffixes the shape of $x$ and $y$ are their respective \textit{cells}.
+% (BLM) the preceding sentence seems to me to be missing some words after "suffixes", or -- something.  ?
+
+Going back to the above example: a scalar, a vector of 2 elements, and another 2 by 3 matrix will aggree with $mat2\_3$ under addition, since the shape of these prefixes the shape of $mat2\_3$; 
+any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also aggree with $mat2\_3$ under addition, since $mat2\_3$ would prefix it.
+
+\begin{verbatim}
+   3.141 2.718 + mat2_3
+3.141 4.141 5.141
+5.718 6.718 7.718
+   mat2_3 + mat2_3
+0 2  4
+6 8 10
+   ] arr2_3_2 =: integers 2 3 2
+ 0  1
+ 2  3
+ 4  5
+
+ 6  7
+ 8  9
+10 11
+   arr2_3_2 + mat2_3
+ 0  1
+ 3  4
+ 6  7
+
+ 9 10
+12 13
+15 16
+\end{verbatim}
+% (BLM) using PI and E here may be more interesting than integers, but I'm inclined to think that integers would be easier to understand -- possibly a larger order of magnitude so the distinction between the two operands is easy to notice.
+
+In this last example, every scalar of $mat2\_3$ was added to both scalars of each vector in $arr2\_3\_2$. 
+Another way to conceptualize this is that J made an implicit \textit{map} on the scalar elements of $mat2\_3$, 
+expanding each into a vector of 2 scalars.
+J knew to do this because with a \textit{frame} of $2$ $3$, $mat2\_3$'s \textit{cells} were scalars and 
+$arr2\_3\_2$'s \textit{cells} were vectors of two scalars.
+% (BLM) Very helpful sentence!
+% (BLM) formatting nitpick -- I like to write variable names using the same font as for verbatim.  Just a thought!  Could be a "TODO" for later if time permits. 
+
+\subsection{Rank Operator}
+With what we have developed so far, we are still unable to perform the operation of 
+adding a vector $vec3$ of 3 scalars to $mat2\_3$, since there is no prefix between shapes $3$ and $2$ $3$.
+% (BLM) "prefix between"?  shapes 3 and 2 3 have no common prefix?
+
+\begin{verbatim}
+   ] vec3=: i. 3
+0 1 2
+  vec3 + mat2_3
+|length error
+|   vec3    +mat2_3
+\end{verbatim}
+
+However, it should be possible to add $vec3$ to each of the vectors of $mat2\_3$, since each vector has the same length.
+In order to accomplish this and many similiar use cases where the desired extension of a function is not the default extension, 
+J also includes a \textit{rank operator} which is spelled \ttfamily"\normalfont.
+The rank operator is a higher order function which takes as its first argument a regular function 
+and as its second argument a vector of 1, 2, or 3 numeric values, 
+and returns a function which performs the same operation as the argument function but on the specified data rank.\cite{rankanduni}
+% (BLM) "regular" function here means "as opposed to higher-order"?  may be clear from context.
+
+Therefore, the following command, 
+
+\begin{verbatim}
+   vec3 +"1 mat2_3
+0 2 4
+3 5 7
+\end{verbatim}
+
+is read ``add the rank 1 items of $vec3$ to the rank 1 items of $mat2\_3$.''
+In terms of \textit{frames}, \textit{cells}, and implicit \textit{maps}, we say that
+the frames of the rank 1 items in $mat2\_3$ and $vec3$ are $2$ and an empty frame, respectively, and they share a common cell size of $3$.
+Because the frame at rank 1 of $vec3$ prefixes the same frame $mat2\_3$ (the empty frame prefixes every frame), 
+the shapes now agree, and there is an implicit map on the vector elements of $vec3$ expanding to a matrix of two vectors.
+
+\subsection{Inherrent Data Parallelism}
+% (BLM) I say rename/split this subsection -- first part is "how functions are applied" and second part is about data parallelism
+For any function $f$ with function rank $r$ and arguments $x$ and $y$, 
+the following steps give a high level description of how $f$ is applied to its arguments.\cite{rankanduni}
+\begin{enumerate}
+	\item Calculate the cell shape at rank $r$ of $x$ and $y$ 
+		by taking the $r$ smallest dimensions of the shape vector of each.
+		E.g., the cell shape of $mat2\_3$ at rank 1 is 3, since each vector contains 3 items.
+	\item Calculate the frame shape at rank $r$ of $x$ and $y$ 
+		by removing from the shape vector of each their repsective cell shapes.
+		E.g, at rank 1, the frame shape of $mat2\_3$ is $2$,
+		the frame shape of $arr2\_3\_2$ is $2$ $3$, 
+		and the frame shape of $vec3$ is an empty frame.
+	\item If the frame shape of $x$ and $y$ do not agree, then return with an error.
+		Otherwise, extend the argument with the smaller frame shape via an implicit map on its cells at rank $r$.
+		If the frame shape of $x$ and $y$ are the same, do nothing.
+	\item \label{dataparstep}Apply $f$ to every cell at rank $r$ of $x$ and $y$.
+		If $f$ is a user defined function $u$ with function rank $r_1$ given with the rank operator,
+		(i.e., $f =: u"r_1$)
+		repeat this process with each of the cells of $x$ and $y$, $u$, and $r_1$
+	\item Reassemble the result cells of the previous step using the agreed frame shape.
+\end{enumerate}
+
+% (BLM) start "data parallelism" subsection here
+While quite a few of these steps have some exploitable concurrency, 
+step \ref{dataparstep} has the most potential for performance increases through parallelism.
+It is inherently data parallel because each of the cells of $x$ and $y$ are operated on completely independently of each other.
+For large computations, it is also the most computationally complex 
+because not only is this step itself recursive, but
+since these cells can themselves be large regular collections.
+% (BLM) something missing from the previous sentence?
+Finally, one consequence of having this common set of steps for applying all functions with function rank is
+that all such functions can be parallelized in the library code.
+This means that applications which uses a parallelized function rank library can automatically exploit the inherrent concurrency of their problem, 
+provided this problem can be expressed naturally in terms of function rank.
+% (BLM) computationally complex or computationally intensive?  I say the latter if the point is that it's a lot of computation -- but that may not be your meaning.
+
+\section{Other Solutions}
+% (BLM) "Other Approaches"?
+\subsection{Regular Parallel Arrays in Haskel}
+In 2010, Keller et. al. published a paper\cite{dph} 
+describing work they had done on a Haskell library, which they named \textit{Repa}, that implements and parallelizes regular arrays.
+There is much to commend about their work, including ``that it (1) is purely
+functional, (2) supports reuse through shape polymorphism, (3)
+avoids unnecessary intermediate structures rather than relying on
+subsequent loop fusion, and (4) supports transparent parallelisation,''
+and that it is a library for a functional language with relatively wide use.
+
+Most impressively, they were able to statically capture some of the effects functions have on the shapes of their arguments.
+For example, the type signature of \textit{sum} shows that, given a numeric array of rank $n$, 
+it returns an array of rank $n-1$ which has the same shape as the argument array except for the rightmost axis.
+% (BLM) "axis"?  not sure I know what that means in context.
+Consequently, passing \textit{sum} a rank 0 array is a compile-time error.
+In general, this library ``enables [the user] to track the rank of each array in its type,
+guaranteeing the absence of rank-related runtime errors.''
+
+Repa's static capturing of the rank of a function's arguments is equivalent to J's notion of function rank, 
+in the same way that Church's numerals are equivalent to the arabic numerals. % TODO this only gets justification later
+% (BLM) "Church's numerals"?  I'm sure I should know what those are but -- I don't.  If it should be common knowledge for educated computer scientists, okay, otherwise a reference?
+It is implemented as a list of types and uses Haskell's pattern-matching capabilities and some language extensions 
+to analyze the structure of this list.
+However, unlike J, Repa appears to lack a rank operator, at least as of our understanding of the research.
+Instead, functions must be extended manually in order to operate of arrays of higher rank.
+
+For example, while in J the idiom for \textit{sum} (spelled $+/$) automatically operates on the rank $n-1$ items of a rank $n$ array, 
+in Repa, \textit{sum} by default operates only on scalar values in each vector of a collection.
+In order to scale the existing \textit{sum} function in Repa to any array of rank $n > 2$, 
+a new function must be written for each dimension which manually extends \textit{sum}.
+In contrast, in order to get the same behavior in J of Repa's \textit{sum} function, no manual extension is required; 
+it is $+/ " 1$, which in English reads rather intuitively as ``apply sum to the vector elements of its argument.''
+
+Finally, although both J and Repa support function rank, 
+in the same way that the arabic numeral system is more convenient to work with than Church's numerals, 
+we believe that it is conceptually easier to understand, for example, that $(" 3)$ means ``operate on the rank 3 items'', than it is to understand Repa's equivalent, $(sh.:Int.:Int.:Int)$.
+% (BLM) I don't understand what (" 3) means in context.
+
+\subsection{SA-C, Boost MultiArray}
+% (BLM) maybe make this two subsections?
+While we believe that Repa is the best of the solutions we have found so far, 
+it is necessary to mention other influential work in the subject of data parallelism on regular collections.
+Our analysis is mostly in agreement with the developers of Repa.\cite{dph}
+
+Single-Assignment C (\textit{SA-C}) is a functional, C-like language 
+that has many of the same advantages as Repa.\cite{dph}, \cite{sac}
+Unfortunately, this also means that it has the same limitations, most notably the lack of a rank operator.
+Additionally, unlike Repa and our own research (but like J), 
+it is a special purpose array programming language and 
+not an extension to an existing, general purpose programming with a broad user base and 
+with access to large and well developed libraries.
+
+In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language. \cite{boost}
+However, its ability to analyize and operate on the structure of regular collections is limited compared to SA-C or Repa.
+Furthermore, it does not benefit from a naturally parallel implementation, 
+its arrays are operated on in a conceptually lower (imperative) level, 
+and it also does not have an equivalent to the rank operator. 
