@@ -15,7 +15,7 @@ and thus make it more difficult for programs to achieve good performance, for tw
 
 First, many programming languages implement regular collections as nested collections;
 e.g. a 2-dimensional, 2 by 3 array (or rank 2 array with shape 2 3) of integers would be implemented as 
-an array of 2 arrays, with each of these containing 3 integers. % TODO mention alternative of shape vector associated
+an array of 2 arrays, with each of these containing 3 integers. 
 However, in such languages irregular collections are also usually implemented as nested collections, 
 with each of the sub-collections possibly containing a different number of elements from each other.
 Since both regular and irregular collections are implemented the same way,
@@ -33,7 +33,7 @@ greater transparency and control when writing programs to operate on them.
 Unfortunately, most statically-typed languages do not have type systems advanced enough 
 to capture all of the structural information of shape-associated collections statically, 
 even though this is theoretically possible. % TODO cite dependent types (xi probably)
-However, some languages are able to capture some of this structure statically, \cite{boost} \cite{sac} \cite{dph}
+However, some languages are able to capture some of this structure statically\cite{boost} \cite{sac} \cite{dph}, 
 enabling programmers to reduce or eliminate the need for manual verification, 
 such as the fact that the arguments to a function are in fact regular collections or lower bounds to the ranks of a function's argument.
 Even when these properties of regular collections cannot be captured statically, 
@@ -61,7 +61,8 @@ It seems clear that it would be better for programmers to express the potential 
 rather than expressing it as sequential for loop and either hoping a compiler can reverse this transformation 
 or write additional code to exploit the concurrency.
 
-Functional programming languages, in contrast to imperative programming languages, allow programmers to view and write programs at a higher level of abstraction.
+Functional programming languages, in contrast to imperative programming languages, 
+allow programmers to view and write programs at a higher level of abstraction.
 When dealing with collections, 
 this higher level of abstraction usually means that related types of operations can be expressed as \textit{higher-order} functions 
 like \textit{map} and \textit{reduce} that take functions as their arguments and return functions that operate on collections.
@@ -84,7 +85,7 @@ can be expressed as the application of a higher-ordered function,
 called in J and in this paper the \textit{rank operator}\cite{jvocab}. 
 Expressing these extensions as a higher-order function 
 makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
-In some cases, these extensions are so trivial that they can be done automatically,\cite{jvocab} \cite{rankanduni} 
+In some cases, these extensions are so trivial that they can be done automatically\cite{jvocab} \cite{rankanduni}, 
 meaning the programmer need not modify the code at all. 
 Furthermore, since multiple applications of the rank operator 
 are equivalent to the cases where nested loops or nested higher-order function applications are inherently parallel, 
@@ -99,7 +100,7 @@ are not in common use. % TODO cite lack of parallelism
 One often-cited reason for this is that these languages are difficult to read, % TODO cite
 because, in order to use them effectively, a programmer must memorize 
 dozens of 1 or 2 character functions each with different, sometimes unrelated use cases 
-depending on whether the function takes one or two arguments.\cite{jvocab} %TODO cite APL cheat sheet
+depending on whether the function takes one or two arguments\cite{jvocab}. %TODO cite APL cheat sheet
 These language design choices, however, 
 are not required in order for a language to support function rank.
 It seems that a proof-of-concept may be needed 
@@ -128,7 +129,7 @@ The rest of the paper is organized as follows:
 \label{desp}
 The goal of this research was
 to implement a parallel subset of the programming language J, called \textit{Parallel-J}.
-This language subset would require:\cite{ioj} 
+Based on the documentation of J's current implementation\cite{ioj}, it was determined that this language subset would require:
 \begin{itemize}
 	\item a J language lexer and parser
 	\item limited memory management
@@ -177,9 +178,9 @@ Scala has many features that make it desirable for this task, including:
 	\end{itemize}
 	\item a feature-rich library for collections, including 
 	\begin{itemize}
-		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, \cite{scala28col}
+		\item support for many higher-order operations such as \textit{map} and \textit{reduce}\cite{scala28col}, 
 			common to many solutions to data parallel problems, and
-		\item a library for parallel collections that exploits the concurrency inherently data parallel operations,\cite{pc}
+		\item a library for parallel collections that exploits the concurrency inherently data parallel operations\cite{pc},
 			which, being similar to the use-cases in this research, were anticipated to make parallelizing the implementation relatively easy.
 	\end{itemize}
 \end{enumerate}
