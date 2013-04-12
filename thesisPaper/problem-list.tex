@@ -16,10 +16,10 @@ of how more complex parallel extensions to higher dimensions are aided through u
 
 To demonstrate this, the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
 \textit{Design Patterns} are general, reusable solutions to a common class of problems. % TODO cite? (from Wikipedia)
-Software design patterns were first made popular for object-oriented programming through the work of the "Gang of Four," % TODO cite
+Software design patterns were first made popular for object-oriented programming through the work of the "Gang of Four,"\cite{designp} 
 and are now seeing interest for applications in parallel computing. \cite{mass} 
 This research has chosen to focus on the pattern language developed by Mattson et. al. \cite{mass}
-presented in their book, "Patterns for Parallel Programming." % TODO justify?
+presented in their book, \textit{Patterns for Parallel Programming}. % TODO justify?
 Using parallel design patterns to guide the choices and discussion of these problems 
 should allow this limited selection of problems to better represent families of parallel problems.
 
@@ -35,7 +35,11 @@ This is done with the following equation:
 
 \[\pi = \int_0^1 \frac{4}{1 + x^2} \; dx\]
 
-One way to approximate this formula is to use a left-handed Riemann sum:
+One way to approximate this formula is to use a left-handed Riemann sum. 
+This method works by dividing the desired interval into $n$ sub intervals, 
+evaluating the function of concern at the left hand side of the interval, called $x_i$ (where $0 \le i < n$), 
+and approximates the are underneath the curve by finding the area of a rectangle 
+whose width is the width of the interval and height the value of the function at $x_i$.
 
 \[\frac{1}{n} \cdot \sum_{i=0}^n \frac{4}{1 + x^2} \]
 
@@ -47,7 +51,9 @@ in which ``the problem is decomposed into a collection of tasks that can execute
 In this problem, the concurrent tasks are calculating $\frac{4}{1 + x^2}$ for the different values of $x$. 
 There is also a task dependency: the multiplication of $\frac{1}{n}$ and the sum of the values produced by each task 
 cannot occur until all tasks have finished. 
-Each individual task takes roughly the same amount of time, as well, 
+This task, which is a reduction on addition, can also be executed in parallel, 
+with sub-tasks summing the resulting areas concurrently.
+Each individual task of calculating the area of a rectangle takes roughly the same amount of time, as well, 
 meaning no sophisticated scheduling is required in order to exploit concurrency effectively for large $n$.
 
 \subsection{Solutions}
@@ -61,7 +67,8 @@ It is based off of the solution given in Appendix A of Mattson et. al. \cite{mas
 \end{small}
 \end{singlespacing}
 
-This solution parallelizes each of the iterations of the for loop 
+This solution parallelizes the for loop; 
+i.e., it distributes iterations of the loop among threads to execute concurrently.
 and specifies both that $x$ is a temporary work variable and so should not be shared among threads, 
 and that there is to be a reduction on the variable $sum$ with addition. 
 Since the entire body of the for loop is parallelized, including the update of $sum$, 
@@ -89,7 +96,7 @@ are instead expressed as operations on the whole array.
 Because J is functional, and 
 because it allows the programmer to express collective rather than item-by-item operations, 
 the need for the temporary work variable $x$ used in the previous solution, 
-a potential source of error, is eliminated. 
+a potential source of race conditions and thus error, is eliminated. 
 
 Similarly, whereas the C solution required 
 protecting against race conditions when reducing on the $sum$ variable
@@ -112,11 +119,13 @@ Fourier transformations, for example, have many applications in physics and engi
 and can be expressed over arbitrary dimension.
 
 To extend the calculation of $\pi$ to the higher dimensions 3 or 4, 
-we calculate the volume or hyper-volume of the unit sphere or hyper-sphere, respectively.
-While it is possible to express (in both C and J) for arbitrary $n$ the $n$-dimensional measure $f_n$ of the unit $n$-ball, 
-it would be somewhat involved to explain its behavior, so it will be assumed that it already available.
+we calculate the volume or hyper-volume of the unit sphere or hyper-sphere, respectively. 
+While it is possible to generalize calculating the area of the unit circle, 
+the volume of the unit sphere, and the hyper-volume of the unit hyper-shpere, 
+it would be somewhat involved to explain how to accomplish this, 
+so it will be assumed that these functions are already available.
 Instead, we will focus on generalizing the generation of 
-the set of points in $n$-dimensional space for the right-handed Riemann sum.
+the set of points in $n$-dimensional space for the left-handed Riemann sum.
 
 The most immediate extension of the C solution to any specific dimension $n$
 would be to wrap the program in the appropriate number of for loops 
@@ -157,20 +166,23 @@ The solution to this aspect of the problem along with some example uses is given
 \end{small}
 \end{singlespacing}
 
-The function \ttfamily xs \normalfont now takes a vector \ttfamily vn \normalfont of length $n$ 
+The function \texttt{xs} now takes a vector \texttt{vn} of length $n$ 
 specifying how to break up the interval $[0,1]^n$.
 To calculate the appropriate coordinates to do the Riemann sum, 
-the function first calculates the total number of points required (reducing \ttfamily vn \normalfont with multiplication). 
+the function first calculates the total number of points required (reducing \texttt{vn} with multiplication). 
 Then it finds, for each of the integers $i$ between 0 and one less than this total, 
-the array representation of $i$ in base \ttfamily v8 \normalfont. 
+the array representation of $i$ in base \texttt{vn}. 
 Finally, like the above example, it divides each of these values by the original input 
 so that the resulting points are in the appropriate bounds.
+(For more on the behavior of the function \texttt{base}, see Appendix \ref{base}). % TODO footnote
 
 Because of this, no matter the dimension on which the programmer desires to calculate their integral, 
-the points for applying the desired function (in this case, the appropriate measure of the unit $n$-ball) 
-can always be represented by at most a rank 2 array with shape \ttfamily (* insert vn) , n \normalfont.
+the points for applying the desired function.
+In this case, the appropriate points to begin approximating the area of the unit circle, sphere, hyper-sphere, etc.,
+can always be represented by at most a rank 2 array with shape \texttt{(* insert vn), n}
 To approximate the desired integral, apply the appropriate function (in an inherently parallel fashion) 
-to each of the vector elements, then multiply their sum by the appropriate value (\ttfamily 1 div (* insert v8)\normalfont).
+to each of the vector elements (which represent the coordinates to calculate the Riemann sum), 
+then multiply the sum of the results by the appropriate value (\texttt{1 div (* insert vn)}).
 
 \section{Conway's ``Game of Life''}
 \subsection{Description}
@@ -215,9 +227,9 @@ A fragment of a parallel solution in C with OpenMP for the Game of Life is given
 The solution was work done by the author for an undergraduate course in parallel computing.
 The fragment contains the function which updates each cell, 
 which is where most of the computational concurrency for the game of life is found. 
-Notice the two arguments to the function, \ttfamily board \normalfont and \ttfamily new\_board\normalfont.
-In the iteration loop (not shown), these parameters are swapped every iteration, 
-solving the potential race condition mentioned above.
+Notice the two arguments to the function, \texttt{board} and \texttt{new\_board}.
+In the main program loop (not shown), these parameters are swapped every iteration, 
+avoiding the potential race condition mentioned above.
 
 \begin{singlespacing}
 \begin{small}
@@ -240,21 +252,24 @@ Like above, the J code below includes only the fragment responsible for updating
 \end{small}
 \end{singlespacing}
 
-One important difference between this solution and the previous is 
+One important difference between this solution and the OpenMP version is 
 the approach to calculating the number of neighbor cells which are alive.
 Instead of using array indexing at an item by item level, 
-the neighbors are represented as a rank 3 array of shifted versions of the original board.
+the neighbors are represented as a rank 3 array of shifted versions of the original board. 
+In order to represent that cells near the edges do not have neighbors, 
+0s are shifted in the appropriate places.
 E.g.,
 
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
-   ] board =: 3 3 (reshape =: $) 0 1 1  0 1 0  1 0 0
+   NB. Reshape: binds a shape vector to a rank 1 array
+   show board =: 3 3 (reshape =: $) 0 1 1  0 1 0  1 0 0
 0 1 1
 0 1 0
 1 0 0
    NB. The up-left, up, and up-right neighbors
-
+   NB. from: index into an array
    0 1 2 (from =: {) neighborArray board 
 0 0 0
 0 0 1
@@ -276,14 +291,14 @@ in that it now acts on sub-collections of the rank 3 array independently.
 This approach is a safer alternative to requiring 
 that the location of the cell is known to evaluate its neighbors, 
 which potentially causes race conditions on thread-local variables.
-Similarly, instead of specifying a reduction on a work variable \ttfamily sum\normalfont,
+Similarly, instead of specifying a reduction on a work variable \texttt{sum},
 the parallel insert operator parallelize the operation in an automatically safe fashion.
 
 One objection to this approach would be the potentially dramatic increase 
 of memory use in the J approach compared to C with OMP. 
-This can be avoided by using index permutations, % TODO cite?
-in which only one copy of the original rank 2 array is kept.
-Instead of direct indexing into the rank 3 array, 
+This can be avoided by using an approach called an \texttt{index permutation}. % TODO cite?
+With an index permutation, only one copy of the original rank 2 would be kept, 
+and instead of direct indexing into a rank 3 array, 
 an index function is used to determine 
 what the direct index into the rank 2 array would be.
 
@@ -334,17 +349,17 @@ so the details of its behavior will be glossed with a simple illustration:
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
-   ] board =: 3 3 $ 0 1 1  1 0 0  0 1 0
+   show board =: 3 3 reshape 0 1 1  1 0 0  0 1 0
 0 1 1
 1 0 0
 0 1 0
-   ] board3D =: 2 2 2 $ 0 0  0 1  1 0  1 1
+   show board3D =: 2 2 2 reshape 0 0  0 1  1 0  1 1
 0 0
 0 1
 
 1 0
 1 1
-   0 1 4 7 8 (from =: {) shiftBy board
+   0 1 4 7 8 from shiftBy board
 _1 _1
 _1  0
  0  0
@@ -380,7 +395,7 @@ is preserved without additional logic.
 Conceptually, sorting an array using merge sort is fairly easy to describe.
 
 \begin{itemize}
-	\item If the array as fewer than 2 elements, it's sorted
+	\item If the array has fewer than 2 elements, it's sorted
 	\item Otherwise, divide the array into two halves and sort each of these
 	\item Take the two sorted halves and merge them such that the resulting array remains sorted.
 \end{itemize}
@@ -418,18 +433,20 @@ was taken from an article on parallelism in OpenMP and MPI\cite{mergeomp}.
 \end{small}
 \end{singlespacing}
 
-The \ttfamily sections \normalfont compiler directive % TODO citeP{omp}
-specifies that the following blocks of code (each begin with a \ttfamily section \normalfont directive) 
+The \texttt{sections} compiler directive\cite{openmp}
+specifies that the following blocks of code (each begin with a \texttt{section} directive) 
 are to be executed independently of each other.
 
-Like with the previous C examples, special care must be taken with the shared variable \ttfamily temp \normalfont 
-so that race conditions do not occur.
+Similarly to the Game of Life example in C, 
+in order to avoid race conditions on the array a temporay array (\texttt{temp}) must be introduced
+so that intermediate mutations do not affect the original array.
 However, in this situation a similar serial program would also have to take the same precautions, 
-meaning this is more of a limitation of the C programming language itself, rather than a limitation of OpenMP.
+meaning this is more of a limitation of the C programming language itself, 
+and other imperative languages like it, rather than a limitation of OpenMP.
 
 \subsubsection{J}
 \label{jmerge}
-In the following J code, the function \ttfamily merge \normalfont and its helper functions were omitted.
+In the following J code, the function \texttt{merge} and its helper functions were omitted.
 The full solution can be found in Appendix \ref{jmfull}
 
 \begin{singlespacing}
@@ -446,9 +463,11 @@ For example:
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
-   ] vec8 =: (deal =: ?~) 8
+   NB. Deal: Create a list of integers
+   NB. from the argument, and shuffle them
+   show vec8 =: (deal =: ?~) 8
 0 5 1 2 3 4 7 6
-   ] vec16 =: deal 16
+   show vec16 =: deal 16
 11 8 3 10 12 1 15 9 4 13 7 14 6 5 2 0
    divide vec8
 0 5
@@ -476,7 +495,7 @@ For example:
 Unlike the high level description of the problem given at the beginning of this section (but equivalently), 
 this solution first sorts each two item vectors, 
 expressing the recursive base-case of the merge sort algorithm as a data parallel operation.
-Then, vectors are repeatedly merged via an insert of the \ttfamily merge \normalfont function on the rank 2 items 
+Then, vectors are repeatedly merged via an insert of the \texttt{merge} function on the rank 2 items 
 (which always consist of two vector elements).
 Again, while repeated function application doesn't quite fall into the bounds of data parallelism, 
 each merge operation on the rank 2 items is itself data parallel.

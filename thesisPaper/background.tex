@@ -1,11 +1,12 @@
 \chapter{Background}
 \label{back}
 
-This chapter gives the background information necessary to understand what advantages function rank has in exploiting data parallelism over other approaches.
-
 \section{Function Rank}
+This section gives the background information necessary to understand 
+the advantages function rank has in exploiting data parallelism over other approaches.
+
 \subsection{History and Definition}
-\textit{Function rank} was first developed and described by K. Iverson in a series of research reports written at IBM. % TODO cite
+\textit{Function rank} was first developed and described by K. Iverson in a series of research reports written at IBM\cite{rapl}\cite{opandfunc}. 
 In one such report, Iverson described it as 
 ``the most important notion needed to provide a simple and systematic basis for the uniform treatment of all `mixed' or non-scalar functions.''\cite{rapl} % TODO footnote of next comment
 Since that time, the idea of function rank has matured and found its way into many dialects of APL, including J.
@@ -18,7 +19,7 @@ the second and third values in \texttt{v} represent the expected data rank of \t
 If \texttt{f} has no restrictions on some or all of its arguments, 
 this is represented in \texttt{v} with the value for infinity, spelled \texttt{\_} ;
 if \texttt{f} operates on scalar values, this is represented as an entry in \texttt{v} of 0 
-(in J, scalars are collections of rank 0 and an empty extent). % TODO make footnote
+(in J, scalars are collections of rank 0 and an empty shape vector). % TODO make footnote
 
 So, for example, most arithmetic functions, such as addition, 
 fundamentally operate on scalar values, and thus usually have the function rank \texttt{0 0 0}.
@@ -31,7 +32,7 @@ In the above example, function ranks with only 2 elements represent the J primit
 similarly for the function ranks with only 1 element and J's monads. % TODO footnote?
 
 \subsection{Shape Agreement}
-In the trivial cases, where a function $f$ is given arguments with ranks matching $f$'s function rank, 
+In the trivial cases, where a function \texttt{f} is given arguments with ranks matching \texttt{f}'s function rank, 
 J behaves much like any programming language without function rank. 
 
 \begin{singlespacing}
@@ -70,14 +71,14 @@ no matter \texttt{c}'s rank or shape.
 
 In general, addition (and all other scalar functions) can be extended over two regular collections \texttt{x} and \texttt{y}  
 if the shape of one collection \textit{prefixes} the other.
-This is called \textit{prefix shape agreement}, or just \textit{shape agreement},\cite{rankanduni} 
+This is called \textit{prefix shape agreement}, or just \textit{shape agreement}\cite{rankanduni}, 
 and in this paper we will say when this happens that ``the shapes of \texttt{x} and \texttt{y} agree under addition.''
 We also say that this prefix is the \textit{frame} for the two collections,
 and what remains of the shape vectors of \texttt{x} and \texttt{y} after dropping the prefix are their respective \textit{cells}.
 
 Going back to the above example: 
 a scalar, a vector of 2 elements, and another 2 by 3 matrix will agree with \texttt{mat2\_3} under addition, 
-since the shape of these prefixes the shape of \texttt{mat2\_3}; 
+since the shapes of the scalar (empty shape), the vector, and the other matrix would prefix the shape of \texttt{mat2\_3}; 
 any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also agree with 
 \texttt{mat2\_3} under addition, since the shape of \texttt{mat2\_3} would prefix its shape.
 
@@ -87,9 +88,59 @@ any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also agree
    100 200 + mat2_3
 100 101 102
 203 204 205
+
+   NB. agreement: visualizes
+   NB. how the cells of each 
+   NB. collection are paired with each other
+   NB. before performing the desired operation
+   agreement =: ; "
+
+   NB. Show agreement of two collections above
+   NB. under adition
+   NB. The shape 2 is the frame;
+   NB. the scalars are expanded to
+   NB. vectors of 3 to match 
+   NB. the shape of mat2_3
+   100 200 (+ agreement) mat2_3
++---+-+
+|100|0|
++---+-+
+|100|1|
++---+-+
+|100|2|
++---+-+
+
++---+-+
+|200|3|
++---+-+
+|200|4|
++---+-+
+|200|5|
++---+-+
+
    mat2_3 + mat2_3
 0 2  4
 6 8 10
+   NB. The frame is 2 3;
+   NB. the scalar cells of both collections
+   NB. are paired with each other
+   mat2_3 (+ agreement) mat2_3
++-+-+
+|0|0|
++-+-+
+|1|1|
++-+-+
+|2|2|
++-+-+
+
++-+-+
+|3|3|
++-+-+
+|4|4|
++-+-+
+|5|5|
++-+-+
+
    show arr2_3_2 =: integers 2 3 2
  0  1
  2  3
@@ -106,6 +157,48 @@ any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also agree
  9 10
 12 13
 15 16
+   NB. The frame is 2 3;
+   NB. The scalar cells of mat2_3
+   NB. are expanded to vectors of 2
+   NB. to match the shape of
+   NB. arr2_3_2
+   arr2_3_2 + agreement mat2_3
++--+-+
+|0 |0|
++--+-+
+|1 |0|
++--+-+
+
++--+-+
+|2 |1|
++--+-+
+|3 |1|
++--+-+
+
++--+-+
+|4 |2|
++--+-+
+|5 |2|
++--+-+
+
+
++--+-+
+|6 |3|
++--+-+
+|7 |3|
++--+-+
+
++--+-+
+|8 |4|
++--+-+
+|9 |4|
++--+-+
+
++--+-+
+|10|5|
++--+-+
+|11|5|
++--+-+
 \end{verbatim}
 \end{small}
 \end{singlespacing}
@@ -239,7 +332,7 @@ that \texttt{f (" 3)} means ``apply f on the rank 3 items'', than it is to under
 
 \subsection{SA-C, Boost MultiArray}
 While we believe that Repa is the best of the solutions we have found so far, 
-it is necessary to mention other influential work in the subject of data parallelism on regular collections.
+it is appropriate to mention other influential work in the subject of data parallelism on regular collections.
 Our analysis is mostly in agreement with the developers of Repa.\cite{dph}
 
 Single-Assignment C (\textit{SA-C}) is a functional, C-like language 
