@@ -1,0 +1,3 @@
+parallel program results with 4 threads:
+pi = 3.14159  (3.141592653589853)
+time to compute = 0.014461 seconds

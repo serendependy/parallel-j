@@ -1,0 +1,108 @@
+\chapter{J \texttt{\#:} (Base) Primitive}
+\label{base}
+The J primitive \texttt{\#:} is a function that allows 
+programmers to easily convert numeric values into different number bases. 
+For its one argument (\textit{monadic}) usage, 
+the primitive defaults to converting values into base 2. 
+The result of applying this function as a monad 
+is a vector of 0s and 1s, with the indicies giving the appropriate place value.
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   base =: #:
+   base 2
+1 0
+   base 3
+1 1
+   base 65
+1 0 0 0 0 0 1
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+For its two argument (\textit{dyadic}) use case, \texttt{\#:} takes as its left argument 
+a vector representing the place values of the desired base, shown below. 
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   2 2 base 3
+1 1
+   2 2 2 2 2 2 2 base 65
+1 0 0 0 0 0 1
+   10 10 base 65
+6 5
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+One advantage of taking a vector for a numeric base representation, instead of a more traditional scalar (base 2, 8, 10, 16, etc.), 
+is that that \texttt{\#:} can also represent numbers in irregular numeric bases.
+The example below shows how \texttt{\#:} can be used to represent 100,000,000 milliseconds in 
+the most familiar of the irregular numeric bases, time as measured in days, hours, seconds, and milliseconds.
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   365 24 60 60 1000 base 100000000
+1 3 46 40 0\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+In the discussion of extending the Game of Life to higher dimensions in Section \ref{piext}, 
+the dyadic case of \texttt{\#:} is used in the function \texttt{xs}, 
+which takes a vector \texttt{vn} of length \texttt{n} specifying how to divide the interval $[0,1]^n$. 
+\texttt{\#:}'s purpose in \texttt{xs} is to convert scalar values to 
+a vector \texttt{vcn} representing coordinate values, where each scalar \texttt{c} at index \texttt{i} in 
+\texttt{vcn} lies in the interval $[0, \texttt{i from vn}]$.
+Finally, each vector element in \texttt{vcn} is divided by \texttt{vn} so that the resulting coordinate values 
+all lie in the interval $[0,1]^n$.
+This process is illustrated step by step in the following example.
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   intergers =: i.
+   insert =: /
+   (* insert) 4 4
+16
+   integers (* insert) 4 4
+0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+   4 4 base integers (* insert) 4 4
+0 0
+0 1
+0 2
+0 3
+1 0
+1 1
+1 2
+1 3
+2 0
+2 1
+2 2
+2 3
+3 0
+3 1
+3 2
+3 3
+   (4 4 base integers (* insert) 4 4) %(" 1) 4 4
+   0    0
+   0 0.25
+   0  0.5
+   0 0.75
+0.25    0
+0.25 0.25
+0.25  0.5
+0.25 0.75
+ 0.5    0
+ 0.5 0.25
+ 0.5  0.5
+ 0.5 0.75
+0.75    0
+0.75 0.25
+0.75  0.5
+0.75 0.75
+\end{verbatim}
+\end{small}
+\end{singlespacing}
