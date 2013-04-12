@@ -1,14 +1,15 @@
 \chapter{Introduction}
 
 \section{Motivation}
-Many scientific and business computing applications must work on large data sets naturally structured in regular, multidimensional collections.
+Many scientific and business computing applications must work on large data sets 
+naturally structured in regular, multidimensional collections.
 In order for these applications to achieve good performance, 
 it is often the case that programmers must exploit any and all potential concurrency in the application 
 through different approaches to parallel programming.
 One form of potential concurrency frequently encountered when programs operate on large collections of data 
 is \textit{data parallelism}, which is when programs update elements or subsections of collections in parallel.
-Many tools have already been developed to help programmers exploit data parallelism % TODO cite OpenMP, dph
-easily and safely (i.e., with reduced risk of race conditions or program crashes). %TODO citation
+Many tools have already been developed to help programmers exploit data parallelism\cite{dph}\cite{openmp}
+easily and safely (i.e., with reduced risk of race conditions or program crashes). 
 However, many of these tools may not be as helpful 
 for exploiting data parallelism on regular collections as they could be, 
 and thus make it more difficult for programs to achieve good performance, for two reasons.
@@ -33,7 +34,7 @@ greater transparency and control when writing programs to operate on them.
 Unfortunately, most statically-typed languages do not have type systems advanced enough 
 to capture all of the structural information of shape-associated collections statically, 
 even though this is theoretically possible. % TODO cite dependent types (xi probably)
-However, some languages are able to capture some of this structure statically\cite{boost} \cite{sac} \cite{dph}, 
+However, some languages are able to capture some of this structure statically\cite{boost}\cite{sac}\cite{dph}, 
 enabling programmers to reduce or eliminate the need for manual verification, 
 such as the fact that the arguments to a function are in fact regular collections,
 or that some collection satisfies a function's lower and/or upper bounds for rank.
@@ -101,7 +102,7 @@ are not in common use. % TODO cite lack of parallelism
 One often-cited reason for this is that these languages are difficult to read, % TODO cite
 because, in order to use them effectively, a programmer must memorize 
 dozens of 1 or 2 character functions each with different, sometimes unrelated use cases 
-depending on whether the function takes one or two arguments\cite{jvocab}. %TODO cite APL cheat sheet
+depending on whether the function takes one or two arguments\cite{jvocab}\cite{dapl}. 
 These language design choices, however, 
 are not required in order for a language to support function rank.
 It seems that a proof-of-concept may be needed 
@@ -122,7 +123,9 @@ The rest of the paper is organized as follows:
 	\item Chapter \ref{paraop} proposes two new operators for future parallel implementations of the J programming language 
 		and illustrates how these operators might be used
     \item Chapter \ref{probs} gives the listing of our selection of example problems, giving briefly for each a description, a discussion of the relevant parallel design patterns for exploiting concurrency, and a description of how possibly to extend the problem to higher dimensions.
-    \item Chapter \ref{res} compares example solutions to the problems listed in Chapter \ref{probs} in Scala, J, Parallel-J and in some cases C with OpenMP, and discusses the relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
+    \item Chapter \ref{res} compares example solutions to the problems listed in Chapter \ref{probs} 
+		in J, Scala with Parallel-J, and C with OpenMP, 
+		and discusses the relative level of abstraction, scalability and performance of each solution. %(CJ) TODO remove falsehoods - probably won't compare with all
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work. 
 \end{itemize}
 
@@ -160,12 +163,13 @@ This would allow us to directly address the involved computations,
 as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
 without getting distracted with a discussion of J's more advanced or nuanced language features.
 
-Also to be included was a proposal and implementation of a new \textit{foreign} operator, 
-called the \textit{parallel operator} and spelled\ttfamily (111 !:)\normalfont , % TODO change this 
-that would allow the programmer to set environmental parameters for parallelizing code.
-For example, this operator could be used to specify the number of threads to use in executing a piece of code, 
-or to set thread scheduling schemes.
-Although not entirely related to function rank, such controls are to be expected from any serious parallel computing environment.
+Also to be included was a proposal and implementation of two new operators (parallel rank and parallel insert), 
+and an extension to the existing \textit{foreign} operator to allow for changing the parallel environment. 
+The former would allow for the equivalent of parallel map and reduce operations at the specified rank(s). 
+The latter would allow the programmer to set environmental parameters for parallelizing code, 
+for example specifying the number of threads to use in executing a piece of code, or setting thread scheduling schemes.
+Although not entirely related to function rank, such environmental controls as would be included in the parallel environment 
+are to be expected from any serious parallel computing language or library.
 
 The Scala programming language\cite{scala} 
 was chosen to implement this parallel subset of J.
@@ -194,7 +198,6 @@ a discussion of the relative level of abstraction, scalability to similar proble
 It was not expected that Parallel-J would compare favorably to the raw performance of C or the current implementation of J; 
 the hoped for result was to show that the performance Parallel-J scales relative to the number of threads, 
 showing that this implementation does effectively exploit potential concurrency.
-% TODO also parallelisation techniques.
 
 \section{Implementation}
 \label{imp}
@@ -212,5 +215,6 @@ along with a discussion of the relative level of abstraction, scalability, and p
 
 The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented in the time available.
 
-Finally, some work completed with the idea of implementing a subset of J did not contribute to developing a regular collections library in Scala that supports function rank.
+Finally, some work completed with the idea of implementing a subset of J 
+did not contribute to developing a regular collections library in Scala that supports function rank.
 Most of this work consisted of implementing a lexer for the J programming language, which is listed in Appendix \ref{jlex}
