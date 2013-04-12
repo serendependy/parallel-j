@@ -1,0 +1,23 @@
+\chapter{J \texttt{\#:} (Base) Primitive}
+\label{base}
+
+The J primitive \texttt{\#:} is a function that allows 
+programmers to easily convert numeric values into different number bases. 
+For its one argument (\textit{monadic}) usage, 
+the primitive defaults to converting values into base 2. 
+The result of applying this function as a monad 
+is a vector of 0s and 1s, with the indicies giving the appropriate place value
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   base =: #:
+   base 2
+1 0
+   base 3
+1 1
+   base 65
+1 0 0 0 0 0 1
+\end{verbatim}
+\end{small}
+\end{singlespacing}
