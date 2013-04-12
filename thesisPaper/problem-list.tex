@@ -165,6 +165,7 @@ Then it finds, for each of the integers $i$ between 0 and one less than this tot
 the array representation of $i$ in base \ttfamily v8 \normalfont. 
 Finally, like the above example, it divides each of these values by the original input 
 so that the resulting points are in the appropriate bounds.
+For more information on how the function base works, see Appendix \ref{base}. %TODO footnote
 
 Because of this, no matter the dimension on which the programmer desires to calculate their integral, 
 the points for applying the desired function (in this case, the appropriate measure of the unit $n$-ball) 
@@ -479,4 +480,37 @@ expressing the recursive base-case of the merge sort algorithm as a data paralle
 Then, vectors are repeatedly merged via an insert of the \ttfamily merge \normalfont function on the rank 2 items 
 (which always consist of two vector elements).
 Again, while repeated function application doesn't quite fall into the bounds of data parallelism, 
-each merge operation on the rank 2 items is itself data parallel.
+each merge operation on the rank 2 items is itself data parallel. 
+The following example illustrates this possibly unintuitive result of data parallelism 
+in a traditionally divide and conquer problem.
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   'merging' link ("2) sort2 ("1) divide vec16
++-------+----+
+|merging|8 11|
+|       |3 10|
++-------+----+
+|merging|1 12|
+|       |9 15|
++-------+----+
+
++-------+----+
+|merging|4 13|
+|       |7 14|
++-------+----+
+|merging|5 6 |
+|       |0 2 |
++-------+----+
+   'merging' link ("2) (merge insert)(p_rank 2) sort2 ("1) divide vec16 
++-------+---------+
+|merging|3 8 10 11|
+|       |1 9 12 15|
++-------+---------+
+|merging|4 7 13 14|
+|       |0 2  5  6|
++-------+---------+
+\end{verbatim}
+\end{small}
+\end{singlespacing}
