@@ -8,7 +8,8 @@ package j.test
       val jtwo = JArray.scalar(JInt(2))
       val j16  = JArray.scalar(JInt(16))
       
-      val intReverse = reverseShift.asInstanceOf[JVerb[JInt, JInt, JInt, JInt, JInt]]
+      val intReverse = reverseShift.asInstanceOf[
+	  	JVerb[JInt, JInt, JInt, JInt, JInt]]
       val sort2 = (decrementLesserthanequal insert) agenda(
           reverse,
           rightIdentity.asInstanceOf[JVerb1Type[JInt]])
@@ -18,7 +19,8 @@ package j.test
         	tallyCopies(
         		naturalLog(
         			jtwo,
-        			tallyCopies(y)).asInstanceOf[JArray[JFloat]].toJInt,
+        			tallyCopies(y)).asInstanceOf[
+						JArray[JFloat]].toJInt,
         		jtwo).asInstanceOf[JArray[JInt]],
         	y).asInstanceOf[JArray[JInt]]
       }
