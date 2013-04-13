@@ -39,8 +39,14 @@ as demonstrated below:
 \end{small}
 \end{singlespacing}
 
+For the purposes of this discussion, the important result the above example demonstrates 
+is that the string of characters \texttt{"::} is read as a whole lexeme, and is placed entirely in a box, 
+rather than being interpreted as several lexemes, 
+which would result in the characters being split into several boxes.
+For more detail on the behavior of the J language, consult Appendix \ref{jlex}. % TODO footnote!
+
 For the parallel environment library, 
-it seemed best to augment the existing ``foreign'' operator (spelled \texttt{!::}).
+it seemed best to augment the existing ``foreign'' operator (spelled \texttt{!:}).
 This is because the foreign operator was designed to 
 allow the programmer to change environmental parameters 
 such as print precision, file I/O, etc\cite{jvocab}. 
@@ -55,8 +61,8 @@ The proposed parallel rank operator is a conjunction
 whose first argument is a function 
 and whose second argument is the ranks to both apply the function and to parallelize it. 
 It would be functionally equivalent to the rank operator, i.e. 
-\texttt{f(":: r) y} $\Leftrightarrow$ \texttt{f("r) y} and
-\texttt{x f(":: r) y} $\Leftrightarrow$ \texttt{x f("r) y}
+\texttt{f (":: r) y} $\Leftrightarrow$ \texttt{f (" r) y} and
+\texttt{x f (":: r) y} $\Leftrightarrow$ \texttt{x f (" r) y}
 for all $f, r, s$, and $y$
 
 Its purpose would be to override other parallel system defaults for automatic parallelization
@@ -68,7 +74,7 @@ To illustrate, consider the following examples:
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
-   (increment =: >:) mat2_3
+   increment mat2_3
 1 2 3
 4 5 6
    increment"0 mat2_3
@@ -81,6 +87,9 @@ To illustrate, consider the following examples:
 |4 5 6|4 5 6|4 5 6|
 +-----+-----+-----+
    NB. Box places its argument in a box
+   NB. This example visualizes how threads
+   NB. could be distributed subcollections
+   NB. of mat2_3, discussed below
    box =: <
    (box"0 link box"1 link box"2) increment mat2_3
 +-------+-------------+-----+
@@ -90,14 +99,13 @@ To illustrate, consider the following examples:
 ||4|5|6||             |     |
 |+-+-+-+|             |     |
 +-------+-------------+-----+
-
 \end{verbatim}
 \end{small}
 \end{singlespacing}
 
-Incrementing numeric values always applies to scalars, so it always gives the same result, 
-regardless of which rank it is applied. 
-Using the parallel rank operate, this behavior would still remain; 
+Incrementing numeric values always applies to scalars, so the function \texttt{increment} always gives the same result, 
+regardless of the rank of the subcollections to which it is applied. 
+Using the parallel rank operator, the behavior of always having the same result would remain; 
 however, as the last example visually illustrates, 
 each of the cases of \texttt{increment("::0)}, \texttt{increment("::1)}, and \texttt{increment("::2)}
 would result in the environment attempting to parallelize for the scalar, row, and whole matrix, respectively.
@@ -169,18 +177,20 @@ This is left as a question for future research to investigate.
 \subsection{Rationale}
 Frequently, programmers need to perform some sort of reduction operation on an entire collection, 
 for example finding the sum, product, maximum, minimum, etc. of a collection of numbers.
-It's well known that when the reducing operation $f$ is associative, i.e. when $f(x,y) = f(y,x)$ for all $f, x, y$, 
+It's well known that when the reducing operation $f$ is associative, 
+i.e. when $f(x,y) = f(y,x)$ for all $f, x, y$ (and for a sufficiently tolerant comparison, when dealing with floating point values),
 then the reduction can be carried out in a parallel fashion with little effort on the programmer's part.
 It is expedient, therefore, that future parallel implementations of J allow the programmer 
-to explicitly state that a specific associative function should be used to reduce an array in parallel.
+to explicitly state that a specific associative function should be used to reduce an array in parallel, 
+since in the general case the default insert operator does not assume its argument function is associative, 
+nor is it immediately obvious how to determine if a user-defined function is associative.
 
 \subsection{Usage}
 As a unary, higher ordered function (\textit{adverb}), 
-the parallel insert operator would be equivalent to its sequential equivalent 
+the parallel insert operator would be equivalent to the sequential insert operator 
 for all associative operations. 
-Thus, the following J session would be the same, 
-regardless of whether \texttt{insert}
-was assigned to be \texttt{/::} or \texttt{/}
+Thus, the following J session would have the same results for every line of code executed, 
+regardless of whether \texttt{insert} was assigned to be \texttt{/::} or \texttt{/}
 
 \begin{singlespacing}
 \begin{small}
@@ -214,9 +224,16 @@ It remains an open question how the parallel insert operator should behave on no
 One possibility is to define its domain to be only the associative primitives. 
 This would prevent logical errors such as radically different results for the same calculations on the same data, 
 depending on the thread scheduling scheme. 
-However, this approach would exclude the possibility of 
-user-defined functions which are associative benefiting from parallelization.
-Alternatively, the programmer may choose to toggle this restriction using the parallel environment library, 
+However, this approach would likely require adding an additional table of information 
+that would store whether or not the given primitive was associative.
+This approach would also exclude the possibility of 
+user-defined functions that are associative from benefiting from parallelization. 
+
+Another possibility would be ignore the question of whether or not a function \texttt{f} is associative, 
+and try to parallelize \texttt{f} as if it were associative.
+Using this approach could lead to errors that might be difficult for a novice parallel programmer to debug and may even go unnoticed, 
+since those errors would be at the logic-level and not during run-time.
+Finally, a middle solution could be taken in which the programmer chooses to switch between these approaches using the parallel environment library, 
 discussed below.
 
 \section{Parallel Environment Library: \texttt{111 !:}} 
@@ -274,6 +291,6 @@ but an example of how one would use this proposed library.
 \end{small}
 \end{singlespacing}
 
-The above example would parallelize addition on the row elements of $mat2\_3$ and $arr2\_2\_3$,
+The above example would parallelize addition on the row elements of \texttt{mat2\_3} and \texttt{arr2\_2\_3},
 then parallelize the sum operation on each of the vectors of the resulting array, 
 using 4 threads with a round-robin scheduling scheme.
