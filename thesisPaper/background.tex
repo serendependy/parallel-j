@@ -228,9 +228,9 @@ adding a vector \texttt{vec3} of 3 scalars to \texttt{mat2\_3}, since shapes $3$
 However, it should be possible to add \texttt{vec3} to each of the vectors of \texttt{mat2\_3}, since each vector has the same length.
 In order to accomplish this and many similar use cases where the desired extension of a function is not the default extension, 
 J also includes a \textit{rank operator} which is spelled \texttt{"}.
-The rank operator is a higher order function which takes as its first argument a function (not higher-ordered) % TODO footnote?
+The rank operator is a higher order function which takes as its first argument a function (not higher-ordered) % TODO footnote for taking function?
 and as its second argument a vector of 1, 2, or 3 numeric values, 
-and returns a function which performs the same operation as the argument function but on the specified data rank.\cite{rankanduni}
+and returns a function which performs the same operation as the argument function but on the specified data rank\cite{rankanduni}.
 
 Therefore, the following command, 
 
@@ -253,7 +253,7 @@ the shapes now agree, and there is an implicit map on the single vector element 
 \subsection{The Application of a Function with Rank on its Arguments}
 \label{fridp}
 For any function \texttt{f} with function rank \texttt{r} and arguments \texttt{x} and \texttt{y}, 
-the following steps give a high level description of how \texttt{f} is applied to its arguments.\cite{rankanduni}
+the following steps give a high level description of how \texttt{f} is applied to its arguments\cite{rankanduni}.
 \begin{enumerate}
 	\item Calculate the cell shape at rank \texttt{r} of \texttt{x} and \texttt{y} 
 		by taking the \texttt{r} smallest dimensions of the shape vector of each.
@@ -323,11 +323,10 @@ a new function must be written for each dimension which manually extends \textit
 In contrast, in order to get the same behavior in J of Repa's \textit{sum} function, no manual extension is required; 
 it is \texttt{+/ " 1}, which in English reads rather intuitively as ``apply sum to the vector elements of its argument.''
 
-Finally, although both J and Repa support function rank, 
-in the same way that the Arabic numeral system is more convenient to work with than Church's numerals, % TODO cite?
+Finally, although both J and Repa support some notion of function rank, 
 it seems conceptually easier to understand, for example, 
 that \texttt{f (" 3)} means ``apply f on the rank 3 items'', than it is to understand Repa's equivalent, 
-\texttt{(sh.:Int.:Int.:Int)} as it would appear in the function declaration for \texttt{f}, 
+\texttt{(sh.:Int.:Int.:Int)} as it would appear in the function declaration  
 \texttt{f :: (Shape sh, Elt e) => Array (sh :. Int :. Int :. Int) e -> Array sh e} .
 
 \subsection{SA-C, Boost MultiArray}
@@ -336,14 +335,14 @@ it is appropriate to mention other influential work in the subject of data paral
 Our analysis is mostly in agreement with the developers of Repa.\cite{dph}
 
 Single-Assignment C (\textit{SA-C}) is a functional, C-like language 
-that has many of the same advantages as Repa.\cite{dph}, \cite{sac}
+that has many of the same advantages as Repa\cite{dph}\cite{sac}.
 Unfortunately, this also means that it has the same limitations, most notably the lack of a rank operator.
 Additionally, unlike Repa and our own research (but like J), 
 it is a special purpose array programming language and 
 not an extension to an existing, general purpose programming with a broad user base and 
 with access to large and well developed libraries.
 
-In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language. \cite{boost}
+In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language\cite{boost}.
 However, its ability to analyze and operate on the structure of regular collections is limited compared to SA-C or Repa.
 Furthermore, it does not benefit from a naturally parallel implementation, 
 its arrays are operated on in a conceptually lower (imperative) level, 

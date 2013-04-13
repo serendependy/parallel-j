@@ -3,58 +3,84 @@
 
 \section{Methodology}
 To determine the performance of the Parallel-J solutions to the problems listed in Chapter \ref{probs}, 
-we developed for each problem both a sequential and parallel solution. 
-The differences between these two solutions consists of nothing more than a boolean flag 
-to turn parallelism on or off. 
-Additionally, the results of solutions in C with OpenMP for the same problems 
-are given for comparison.
+each solution was run on varying problem sizes using 1, 2, and 4 threads. 
+For comparison, the performance of the solutions in 
+C with OpenMP for the same problems are also listed. 
+These C solutions were run on larger problem sizes 
+in order to demonstrate their scaling more effectively 
+(see Section \ref{discres} for more details).
+The Scala API Benchmark object was used to measure the performance of the Parallel-J solutions, 
+which allowed for ease of use from the command line, automatic timing, 
+and forcing the Java garbage collector to run between program runs. 
+For the C programs, timing had to be done manually for each program. 
+For all program results, the run time is given in seconds.
 
-All solutions were compiled and run on the Dione00 work station. %TODO get machine specs!
-Before the performance of the Parallel-J solutions were recorded, 
-these programs were run 5 times in order for the Java Just-In-Time compiler %TODO cite?
-to make additional optimizations.
-All solutions were then run 5 times then averaged, with performance measured in milliseconds.
-The software used to measure the performance of the Parallel-J solutions was the Scala API Benchmark object, % TODO cite
-which forces garbage collection between every program run.
-Performance measurement code was written for each of the C solutions.
-
-Finally, each of the Parallel-J solutions are listed in Appendix \ref{apsol}. % TODO list benchmark, refactor
+All solutions were run (and in the case of the C solutions, compiled) on the Dione00 work station. %TODO get machine specs! 
+For the Parallel-J solutions (all of which can be found in Appendix \ref{apsol}), % TODO list benchmark, refactor
+a single trial consisted of running each program 
+on a specific problem size with a specific number of threads 
+a total of 6 times and measuring their execution time. 
+the results of the latter 5 program runs were averaged. 
+The first program run was omitted in order to account for 
+the Java Just-In-Time (JIT) compiler making optimizations on the running Parallel-J code.
+For the solutions in C with OpenMP,
+a single trial consisted of running each program with a specific number of threads a total of 5 times. 
+The performance for all the program runs for the C trials were averaged.
 
 \section{Calculating Pi using Numerical Integration}
 The number of operations performed in this problem scales 
-as the number of divisions $n$ between the interval $[0,1]$ grows.
-For our tests, we chose $n=20000$.
-
+as the number of divisions $n$ between the interval $[0,1]$ grows. 
+For our tests, we measured performance for $n=10,000$, $n=20,000$, ..., $n=100,000$.
 Table \ref{tnip} below gives the outcomes.
 
 \begin{table}[htbp]
-\begin{center}
-\begin{tabular}{|r|l|l|l|l|l||l|}
+\begin{tabular}{|r||c|c|c||c|c|c||c|c|c||c|c|c||}
 	\hline
-	           & Trial 1 & Trial 2 & Trial 3 & Trial 4 & Trial 5 & Average \\ 
+		& \multicolumn{3}{|c|}{$n=10,000$} & \multicolumn{3}{|c|}{$n=20,000$} & \multicolumn{3}{|c|}{$n=30,000$} & \multicolumn{3}{|c|}{$n=40,000$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
 	\hline
 	\hline
-	Sequential & 21995   & 19815   & 19908   & 19713   & 19717   & 20229.6 \\ 
-	\hline
-	Parallel   & 23557   & 24568   & 24497   & 24256   & 24145   & 24204.6 \\ 
+		Parallel-J & 10.1 & 10.1 & 10.2 & 31.5 & 38.4 & 38.5 & 70.6 & 90.8 & 91.0 & 126.2 & 152.5& 152.8 \\
 	\hline
 \end{tabular}
-\end{center}
-\caption{A nice caption goes here.}
+
+\begin{tabular}{|r|c|c|c||c|c|c||c|c|c||}
+	\hline
+		& \multicolumn{3}{|c||}{$n=50,000$} & \multicolumn{3}{|c|}{$n=60,000$} & \multicolumn{3}{|c|}{$n=70,000$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & 173.7 & 236.0 & 235.6 & 251.0 & 361.0 & 361.0 & 342.2 & 490.2 & 491.3 \\
+	\hline
+\end{tabular}
+
+\begin{tabular}{|r|c|c|c||c|c|c||c|c|c||}
+	\hline
+		 & \multicolumn{3}{|c|}{$n=80,000$} & \multicolumn{3}{|c|}{$n=90,000$} & \multicolumn{3}{|c|}{$n=100,000$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & 651.6 & 653.7 & 653.3 & 826.1 & 769.3 & 814.5 & 1017.5 & 1020.0 & 1021.5 \\
+	\hline
+\end{tabular}
+\caption{Performance results for calculating $\pi$}
 \label{tnip}
 \end{table}
 
 \section{Game of Life}
-For the two-dimensional version of this problem, 
+For the two-dimensional version of the ``Game of Life'', 
 the number of operations performed in this problem scales 
 as the dimensions $x$ and $y$ grow larger, 
 and also as the number of desired iterations $i$ grows. 
 The latter, however, is fundamentally sequential, 
-so $i$ was fixed to be relatively small with value 10, 
-whereas $x$ and $y$ were both set to 100, 
-meaning each iteration consists of updating 10,000 cells.
-
-Table \ref{tgol} below gives the outcomes.
+so $i$ was fixed to be relatively small with value 10.
+In order to simplify the benchmarking process, 
+trials were only run on square boards ($x=y$). 
+Table \ref{tgol} below gives the outcomes for $x$ and $y$ 
+ranging from 100 to 300 by increments of 25.
 
 \begin{center}
 \begin{tabular}{|r|l|l|l|l|l||l|}
@@ -70,14 +96,24 @@ The number of operations required for this problem
 grows as the number $n$ of values to sort increases. 
 Because of the problem constraint listed in Section \ref{mgdes}, 
 problem sizes of the form $2^n$ were chosen, 
-where $14 \le n \le 16$
+where $14 \le n \le 16$. 
+The reader should note that due to time constraints, 
+the Parallel-J version of this solution uses a \texttt{merge} function 
+implemented imperatively in Scala, rather than 
+implementing it in an equivalent way to the J idiom given in Appendix \ref{jmfull}.
 Table \ref{tmrg} below gives the outcomes.
 
-\begin{center}
-\begin{tabular}{|r|l|l|l|l|l||l|}
-\label{tmrg}
-			   & Trial 1 & Trial 2 & Trial 3 & Trial 4 & Trial 5 & Average \\ \hline
-	Sequential & 6128    & 2998    & 2969    & 2849    & 2826    & 3554    \\ \hline
-	Parallel   & 4158    & 2560    & 2588    & 2540    & 2550    & 2879.2  \\ \hline
+\begin{table}[htbp]
+\begin{tabular}{|r||c|c|c||c|c|c||c|c|c||}
+	\hline
+		& \multicolumn{3}{|c|}{$n=2^{14}$} & \multicolumn{3}{|c|}{$n=2^{15}$}& \multicolumn{3}{|c|}{$n=2^{16}$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & 2.9 & 2.5 & 2.5 & 10.6 & 9.2 & 9.2 & 41.1 & 35.5 & 35.7 \\
+	\hline
 \end{tabular}
-\end{center}
+\caption{Performance results for merge sort}
+\label{tmrg}
+\end{table}
