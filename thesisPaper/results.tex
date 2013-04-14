@@ -82,14 +82,40 @@ trials were only run on square boards ($x=y$).
 Table \ref{tgol} below gives the outcomes for $x$ and $y$ 
 ranging from 100 to 300 by increments of 25.
 
-\begin{center}
-\begin{tabular}{|r|l|l|l|l|l||l|}
-\label{tgol}
-	           & Trial 1 & Trial 2 & Trial 3 & Trial 4 & Trial 5 & Average \\ \hline
-	Sequential & 72512   & 68714   & 68679   & 68604   & 68611   & 69424   \\ \hline
-	Parallel   & 70105   & 68092   & 67755   & 67743   & 67541   & 68247.2 \\ \hline
+\begin{table}[htbp]
+\begin{tabular}{|r||c|c|c||c|c|c||c|c|c||}
+	\hline
+		& \multicolumn{3}{||c||}{$x=100$} & \multicolumn{3}{||c||}{$x=125$} & \multicolumn{3}{||c||}{$x=150$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & 66.4 & 66.5 & 66.4 & 159.8 & 159.6 & 326.8 & 335.5 & 348.1 & \\
+	\hline
 \end{tabular}
-\end{center}
+\begin{tabular}{|r||c|c|c||c|c|c||c|c|c||}
+	\hline
+		& \multicolumn{3}{||c||}{$x=175$} & \multicolumn{3}{||c||}{$x=200$} & \multicolumn{3}{||c||}{$x=225$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & & & & & & & & & \\
+	\hline
+\end{tabular}
+\begin{tabular}{|r||c|c|c||c|c|c||c|c|c||}
+	\hline
+		& \multicolumn{3}{||c||}{$x=250$} & \multicolumn{3}{||c||}{$x=275$} & \multicolumn{3}{||c||}{$x=300$} \\
+	\hline
+		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & & & & & & & & & \\
+	\hline
+\end{tabular}
+\caption{Performance results for the Game of Life}
+\label{tgol}
+\end{table}
 
 \section{Merge Sort}
 The number of operations required for this problem 
