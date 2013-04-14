@@ -311,7 +311,9 @@ For example, using a C-style notation, transposition might be represented as
 \texttt{transpose2D(matrix)[i][j] $\Leftrightarrow$ matrix[j][i]}, for all integers $i,j$. 
 \textit{Index functions} allow index transformations to be implemented purely as 
 a change to how a given collection is indexed, 
-rather than by allocating new memory for the transposed collection and copying every element.
+rather than by allocating new memory for the transposed collection and copying every element. 
+Parallel-J currently lacks this feature, 
+but a future Scala regular collections library could easily support index functions.
 
 Impressively, \textit{Repa} also statically captures some of the effects functions have on the shapes of their arguments.
 For example, the type signature of \textit{sum} shows that, given a numeric array of rank $n$, 
