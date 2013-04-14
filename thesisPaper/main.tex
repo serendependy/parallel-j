@@ -22,6 +22,7 @@
 \usepackage{graphicx}
 \usepackage{moreverb}
 \usepackage{url}
+\usepackage[toc]{glossaries}
 
 % double spacing
 \usepackage{setspace}
@@ -58,13 +59,8 @@
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 
-% author, title, and date
-% FIX THIS
 \newcommand{\theAuthor}{Christopher Jenkins}
-% FIX THIS -- but be sure to leave in \par if title might exceed
-%   one line -- otherwise space between lines will be wrong
 \newcommand{\theTitle}{Toward a Parallel Implementation of J: Data Parallelism in Functional, Array-Oriented Languages with Function Rank\par}
-% FIX THIS
 \newcommand{\theDate}{April 19, 2013}
 
 \newlength{\WidthOfX}
@@ -80,6 +76,9 @@
 {\end{list}}
 
 % FIX THIS -- can put additional macro definitions here
+\makeglossaries
+
+\input{glossary}
 
 %----------------------------------------------------------------------
 
@@ -130,5 +129,7 @@
 \input{appendix-mergeSort}
 
 \input{appendix-base}
+
+\input{appendix-glossary}
 
 \end{document}
