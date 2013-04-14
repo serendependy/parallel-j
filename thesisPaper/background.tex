@@ -216,7 +216,7 @@ adding a vector \texttt{vec3} of 3 scalars to \texttt{mat2\_3}, since shapes $3$
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
-   ] vec3=: i. 3
+   show vec3=: i. 3
 0 1 2
   vec3 + mat2_3
 |length error
@@ -290,15 +290,30 @@ provided this problem can be expressed naturally in terms of function rank.
 \section{Other Approaches}
 \subsection{Regular Parallel Arrays in Haskel}
 \label{repa}
-In 2010, Keller et. al. published a paper\cite{dph} 
+In 2010, Keller et al. published a paper\cite{dph} 
 describing work they had done creating a Haskell library, which they named \textit{Repa}, that implements and parallelizes regular arrays.
 There is much to commend about their work, including ``that it (1) is purely
 functional, (2) supports reuse through shape polymorphism, (3)
 avoids unnecessary intermediate structures rather than relying on
 subsequent loop fusion, and (4) supports transparent parallelization,''
-and that it is a library for a functional language with relatively wide use.
+and that it is a library for a functional language with relatively wide use. 
+There are two features of \textit{Repa} specifically 
+that influenced work on Parallel-J; 
+these are \textit{index functions} and static capture of a collection's shape information.
 
-Impressively, they were able to statically capture some of the effects functions have on the shapes of their arguments.
+In order to achieve good performance on functions 
+that fall into the family of operations known as \textit{index transformations}, 
+such as transposing or shifting a rank 2 array, 
+\textit{Repa} formalizes the notion of an \textit{index function}. 
+An \textit{index transformation} is an operation on a regular collection that 
+conceptually changes how the collection is indexed. 
+For example, using a C-style notation, transposition might be represented as 
+\texttt{transpose2D(matrix)[i][j] $\Leftrightarrow$ matrix[j][i]}, for all integers $i,j$. 
+\textit{Index functions} allow index transformations to be implemented purely as 
+a change to how a given collection is indexed, 
+rather than by allocating new memory for the transposed collection and copying every element.
+
+Impressively, \textit{Repa} also statically captures some of the effects functions have on the shapes of their arguments.
 For example, the type signature of \textit{sum} shows that, given a numeric array of rank $n$, 
 it returns an array of rank $n-1$ which has the same shape as the argument array 
 except for the rightmost (smallest) dimension.

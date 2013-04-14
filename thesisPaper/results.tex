@@ -28,6 +28,7 @@ a single trial consisted of running each program with a specific number of threa
 The performance for all the program runs for the C trials were averaged.
 
 \section{Calculating Pi using Numerical Integration}
+\label{respi}
 The number of operations performed in this problem scales 
 as the number of divisions $n$ between the interval $[0,1]$ grows. 
 For our tests, we measured performance for $n=10,000$, $n=20,000$, ..., $n=100,000$.
@@ -100,7 +101,7 @@ ranging from 100 to 300 by increments of 25.
 		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
 	\hline
 	\hline
-		Parallel-J & 725.8 & & & & & & & & \\
+		Parallel-J & 725.8 & 728.3 & & & & & & & \\
 	\hline
 \end{tabular}
 \begin{tabular}{|r||c|c|c||c|c|c||c|c|c||}

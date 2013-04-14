@@ -300,8 +300,8 @@ the parallel insert operator parallelize the operation in an automatically safe 
 
 One objection to this approach would be the potentially dramatic increase 
 of memory use in the J approach compared to C with OMP. 
-This can be avoided by using an approach called an \texttt{index permutation}. % TODO cite?
-With an index permutation, only one copy of the original rank 2 would be kept, 
+This can be avoided by using an approach called an \textit{index function}, described in Section \ref{repa}.
+With an index transformation, only one copy of the original rank 2 would be kept, 
 and instead of direct indexing into a rank 3 array, 
 an index function is used to determine 
 what the direct index into the rank 2 array would be.

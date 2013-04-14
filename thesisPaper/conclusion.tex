@@ -4,22 +4,32 @@
 \section{Discussion of Results}
 \label{discres}
 There are several potential reasons for the underwhelming results for the Parallel-J solutions given in Section \ref{res}. 
-Probably the most significant of these is the creation of both temporary 
-and potentially permanent objects in every thread. 
-This means there are multiple requests for memory allocation, a likely bottleneck for performance.
+Probably the most significant of these is that the body of code being parallelized (see Appendix \ref{apjverb}) 
+potentially creates a large number of permanent and temporary objects, 
+meaning that there are multiple requests for memory from the Java run-time heap. 
 For example, since this work was originally intended to be a parallel implementation of J, 
-several wrapper classes were created to hold the same kind of information the current version of J \cite{ioj} 
-maintains about arrays and its primitive values, such as reference counts and bit flags for type information. 
+several wrapper classes for were created to hold the same kind kind of information the current version of J\cite{ioj} 
+maintains about arrays and the primitive values, like reference counts and bit flags for type information. 
+The constant creation of new objects for every single integer was likely a bottleneck for performance.
+Also, operations that took existing collections and turned them into collections of higher rank 
+were implemented by copying whole collections, operating on them, 
+then concatenating each sub-result to return the final result. 
+This constant copying of sub-arrays could have been avoided through the use of \textit{index transformation} 
+which have been described in Section \ref{repa}.
+ 
+Additionally, the large number of wrapper classes for primitive values 
+caused the size of the program to cause cache faults to slow down performance significantly. 
+This was first discovered when analyzing the performance results in Section \ref{respi}, 
+in which increasing the problem size by a factor of 10, from $10,000$ to $100,000$, 
+caused the program's run time to increase by a factor of 100. 
+The solutions in C with OpenMP, in contrast, did not display this behavior, 
+and instead only began showing significant improvements from parallelism in the same problem 
+at a problem sizes of $1,000,000$.
 
-Additionally, in many instances new collections were created and values copied 
-were they could instead have been represented as index permutations. % TODO cite
-Using index permutations to represent, for example, vectors containing multiple copies of a single scalar, 
-could reduce the number of requests for the creation of new objects.
-
-Finally, this research did not make use of the macros introduced by Scala 2.10. %TODO cite scala 2.10
+Finally, this research did not make use of the macros introduced by Scala 2.10\cite{scala210}.
 These macros have the potential to improve performance 
 by replacing at compile time source code expressions that appear to be acting on objects 
-with lower-level expressions acting on primitives.
+with lower-level expressions acting on primitives, thus avoiding new object creation.
 
 \section{Future Research}
 \subsection{Parallel Implementation of J}
