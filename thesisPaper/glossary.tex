@@ -1,5 +1,64 @@
 \newglossaryentry{show}{
 	name={show},
-	description={ Identity function for the right (as opposed to left) argument. 
-		Used to display the a value that has been assigned a name, which by default would not display}
+	description={Identity function for the right (as opposed to left) argument. Used to display the a value that has been assigned a name, which by default would not display}
+}
+
+\newglossaryentry{integers}{
+	name={integers},
+	description={Function that creates an array of integers with the shape of the argument array. Populated by incrementing values, starting at 0}
+}
+
+\newglossaryentry{NB.}{
+	name={NB.},
+	description={Nota bene. Begins a comment spanning a line}
+}
+
+\newglossaryentry{from}{
+	name={from},
+	description={Function that takes from the right argument the items specified by the right argument}
+}
+
+\newglossaryentry{agreement}{
+	name={agreement},
+	description={Higher order function that takes a function and returns a function that visualizes the shape agreement of its arguments under the argument function}
+}
+
+\newglossaryentry{increment}{
+	name={increment},
+	description={Function that takes an array of numbers and increments them (adds 1 to each number)}
+}
+
+\newglossaryentry{link}{
+	name={link},
+	description={Function that places both its arguments in a box (unless the right argument is already boxed) then appends them together}
+}
+
+\newglossaryentry{box}{
+	name={box},
+	description={Function that places its arguments in a box}
+}
+
+\newglossaryentry{insert}{
+	name={insert},
+	description={Higher order function that takes a function and inserts it between the items of an array, starting from the right. Equivalent to reduceRight or foldRight in Scala}
+}
+
+\newglossaryentry{foreign}{
+	name={foreign},
+	description={Higher order function taking two arguments that index, from left to right, a library and a function.}
+}
+
+\newglossaryentry{deal}{
+	name={deal},
+	description={Creates a list of numbers like when ``integers'' is given a scalar argument, only randomly shuffled}
+}
+
+\newglossaryentry{base}{
+	name={base},
+	description={When given one argument, converts a number into binary, with output an array of bits. When given two arguments, left argument is a vector used as the base (radix) for representing the right argument; output is again an array}
+}
+
+\newglossaryentry{reshape}{
+	name={reshape},
+	description={Function that creates an array by associating the left argument as the shape of the right argument}
 }

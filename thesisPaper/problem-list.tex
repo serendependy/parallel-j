@@ -140,7 +140,7 @@ and must be done for every such extension.
 On the other hand, finding a general solution could be somewhat involved 
 as it is perhaps not clear at first sight how to begin such an approach.
 The solution to this aspect of the problem along with some example uses is given below in J:
-
+\glsadd{base}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -263,18 +263,18 @@ the neighbors are represented as a rank 3 array of shifted versions of the origi
 In order to represent that cells near the edges do not have neighbors, 
 0s are shifted in the appropriate places.
 E.g.,
-
+\glsadd{reshape}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
    NB. Reshape: binds a shape vector to a rank 1 array
-   show board =: 3 3 (reshape =: $) 0 1 1  0 1 0  1 0 0
+   reshape =: $
+   show board =: 3 3 reshape 0 1 1  0 1 0  1 0 0
 0 1 1
 0 1 0
 1 0 0
    NB. The up-left, up, and up-right neighbors
-   NB. from: index into an array
-   0 1 2 (from =: {) neighborArray board 
+   0 1 2 from neighborArray board 
 0 0 0
 0 0 1
 0 0 1
@@ -461,13 +461,14 @@ This solution takes advantage of the constraints on the length of the array (it 
 expressing the regularity of the sizes of sub-problems through a regular array 
 whose rank grows as the number of sub-problems does.
 For example: 
-
+\glsadd{deal}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
    NB. Deal: Create a list of integers
    NB. from the argument, and shuffle them
-   show vec8 =: (deal =: ?~) 8
+   deal =: ?~
+   show vec8 =: deal 8
 0 5 1 2 3 4 7 6
    show vec16 =: deal 16
 11 8 3 10 12 1 15 9 4 13 7 14 6 5 2 0

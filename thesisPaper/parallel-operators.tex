@@ -15,7 +15,7 @@ would allow the programmer to specify the ranks on which to parallelize code.
 The \textit{parallel insert operator}, described in Section \ref{pins}, 
 would allow the programmer to parallelize reduction operations with associative functions.
 Additionally, we propose a new system library
-which would allow the programmer to give annotations or force changes in the underlying parallel environment,
+that would allow the programmer to give annotations or force changes in the underlying parallel environment,
 described in section \ref{pfor}
 
 The spellings \texttt{"::}  and \texttt{/::} for the two parallel operators were chosen for mnemonic and compliance reasons.
@@ -46,7 +46,7 @@ which would result in the characters being split into several boxes.
 For more detail on the behavior of the J language, consult Appendix \ref{jlex}. % TODO footnote!
 
 For the parallel environment library, 
-it seemed best to augment the existing ``foreign'' operator (spelled \texttt{!:}).
+it seemed best to augment the existing ``\gls{foreign}'' operator (spelled \texttt{!:}).
 This is because the foreign operator was designed to 
 allow the programmer to change environmental parameters 
 such as print precision, file I/O, etc\cite{jvocab}. 
@@ -68,12 +68,15 @@ for all $f, r, s$, and $y$
 Its purpose would be to override other parallel system defaults for automatic parallelization
 to guarantee that the resulting function would parallelize operations on sub-arrays of the given rank 
 using the available threads.
-
 To illustrate, consider the following examples:
-
+\glsadd{increment}
+\glsadd{link}
+\glsadd{box}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
+   NB. increment: increments the values of a numeric array
+   increment =: >:
    increment mat2_3
 1 2 3
 4 5 6
@@ -191,7 +194,7 @@ the parallel insert operator would be equivalent to the sequential insert operat
 for all associative operations. 
 Thus, the following J session would have the same results for every line of code executed, 
 regardless of whether \texttt{insert} was assigned to be \texttt{/::} or \texttt{/}
-
+\glsadd{insert}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
