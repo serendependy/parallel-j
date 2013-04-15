@@ -1,18 +1,38 @@
-/*Imports here*/
+package j.test.benchmark.NumInt
 
-// TODO this is the wrong method!
+/*Imports*/
 
-def testNumericalIntegration(numRiemann: JArray[JInt]) {
-   val recip =  reciprocalDivide(numRiemann)
-   val xvals =  signumMultiply(integersIndex(numRiemann),
-                               recip)
-   val yvals = squarerootRoot(negateMinus(JArray.scalar(JReal.One),
-                              squareNotand(xvals)))
-   val pi = signumMultiply(
-      signumMultiply(
-	     (conjugatePlus insert).apply(yvals),
-	      JArray.scalar[JInt,Int](4)),
-      recip)
+abstract class NumIntBench extends Benchmark {
+  
+    var numSquares: JInt = null
+    private var pi: JArray[JNumber] = null
+  
+    override def setUp()
+    
+    //modified from scala.testing.Benchmark
+    override def main(args: Array[String]) {
+        //command line argument parsing, setting value for numSquares
+    }
+    
+    def run() {
+      val recip = JArray.scalar(numSquares.recip)
+      val xvals =  signumMultiply(integersIndex(JArray.scalar(numSquares)),
+                                  recip)
+      val yvals = recipricalDivide(
+          conjugatePlus(JArray.scalar(JReal.One), 
+              squareNotand(xvals)))
 
-   println("PI is: " + pi)
+      pi = (conjugatePlus insert).apply(signumMultiply(
+          yvals, 
+          signumMultiply(
+              JArray.scalar[JInt,Int](4),
+              recip)
+          ))
+    }
+    
+    override def tearDown() {
+      println("Pi is " + pi)
+      
+      super.tearDown()
+    }
 }
