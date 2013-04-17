@@ -1,0 +1,256 @@
+\chapter{Tests}
+
+\section{Code set with verbatim}
+Below is an indented inline code example.
+
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   1 + 1
+2
+   show =: ] NB. Identity, used to display results
+   integers =: i. NB. creates array with shape of argument
+   NB.                populated with an incrementing value
+   NB.                starting at 0
+   show mat2_3 =: integers 2 3
+0 1 2
+3 4 5
+   from =: { NB. Indexing into an array
+   NB.           expressed as a function
+   1 from mat2_3
+3 4 5
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+\end{quote}
+
+\noindent
+In some cases, when the arguments to \texttt{f} do not match its function rank, \texttt{f} is automatically extended to the appropriate dimensions.
+For example, if \texttt{x} is a scalar, addition can always be extended so that \texttt{x} is added to every element of a collection \texttt{c} 
+no matter \texttt{c}'s rank or shape. 
+
+Now an unindented code example.
+
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   1 + mat2_3
+1 2 3
+4 5 6
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+
+\noindent
+Code in Figures~\ref{fig:code1} through \ref{fig:code4}
+illustrates something.
+% 
+% commented-out whitespace -- don't want to start a new paragraph
+% but might want whitespace in LaTeX source
+%
+% usually want \begin{figure}[htbp] but this example is long so put
+% each piece on a page by itself
+\begin{figure}[p]
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   100 200 + mat2_3
+100 101 102
+203 204 205
+
+   NB. agreement: visualizes
+   NB. how the cells of each 
+   NB. collection are paired with each other
+   NB. before performing the desired operation
+   agreement =: ; "
+
+   NB. Show agreement of two collections above
+   NB. under adition
+   NB. The shape 2 is the frame;
+   NB. the scalars are expanded to
+   NB. vectors of 3 to match 
+   NB. the shape of mat2_3
+   100 200 (+ agreement) mat2_3
++---+-+
+|100|0|
++---+-+
+|100|1|
++---+-+
+|100|2|
++---+-+
+
++---+-+
+|200|3|
++---+-+
+|200|4|
++---+-+
+|200|5|
++---+-+
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{A nice caption here.  
+Example continues in Figure~\ref{fig:code2}.}
+\label{fig:code1}
+\end{figure}
+%
+\begin{figure}[p]
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   mat2_3 + mat2_3
+0 2  4
+6 8 10
+   NB. The frame is 2 3;
+   NB. the scalar cells of both collections
+   NB. are paired with each other
+   mat2_3 (+ agreement) mat2_3
++-+-+
+|0|0|
++-+-+
+|1|1|
++-+-+
+|2|2|
++-+-+
+
++-+-+
+|3|3|
++-+-+
+|4|4|
++-+-+
+|5|5|
++-+-+
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{A nice caption here.  
+Example continued from Figure~\ref{fig:code1},
+continuing in Figure~\ref{fig:code3}.}
+\label{fig:code2}
+\end{figure}
+%
+\begin{figure}[p]
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+show arr2_3_2 =: integers 2 3 2
+ 0  1
+ 2  3
+ 4  5
+
+ 6  7
+ 8  9
+10 11
+   arr2_3_2 + mat2_3
+ 0  1
+ 3  4
+ 6  7
+
+ 9 10
+12 13
+15 16
+   NB. The frame is 2 3;
+   NB. The scalar cells of mat2_3
+   NB. are expanded to vectors of 2
+   NB. to match the shape of
+   NB. arr2_3_2
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{A nice caption here.  
+Example continued from Figure~\ref{fig:code2},
+continuing in Figure~\ref{fig:code4}.}
+\label{fig:code3}
+\end{figure}
+%
+\begin{figure}[p]
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\begin{verbatim}
+   arr2_3_2 + agreement mat2_3
++--+-+
+|0 |0|
++--+-+
+|1 |0|
++--+-+
+
++--+-+
+|2 |1|
++--+-+
+|3 |1|
++--+-+
+
++--+-+
+|4 |2|
++--+-+
+|5 |2|
++--+-+
+
+
++--+-+
+|6 |3|
++--+-+
+|7 |3|
++--+-+
+
++--+-+
+|8 |4|
++--+-+
+|9 |4|
++--+-+
+
++--+-+
+|10|5|
++--+-+
+|11|5|
++--+-+
+\end{verbatim}
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{A nice caption here.  
+Example continued from Figure~\ref{fig:code3}.}
+\label{fig:code4}
+\end{figure}
+%
+More text after the figures.  (Not a new paragraph.)
+
+\section{Math and code set as math}
+
+Equation~\ref{eqn:famous} is well-known.
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+%
+\begin{equation}
+E = mc^2 \label{eqn:famous}
+\end{equation}
+%
+Here are examples of code set as unnumbered equations.
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+%
+\[ \texttt{(sh.:Int.:Int.:Int)} \]
+%
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+%
+\[ \texttt{f :: (Shape sh, Elt e) => Array (sh :. Int :. Int :. Int) e -> Array sh e} \]
+%
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
+words words words words words words words words 
