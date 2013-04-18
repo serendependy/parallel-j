@@ -2,10 +2,10 @@
 \label{paraop}
 
 \section{Rationale}
-Ideally, it would be the case that a program would automatically perform better using a parallel library 
+Ideally, a program would automatically reduce runtime by using a parallel library, 
 without requiring the programmer to write a single line of parallelizing code. 
 However, this is often not the case. 
-Frequently, programmers must use domain knowledge of the problem or platform to achieve good results. 
+Frequently, programmers must use domain knowledge of the problem or platform to achieve good run-time results. 
 
 In order to grant this flexibility in future parallel implementations of J, 
 we propose introducing two new operators, called the \textit{parallel rank operator} 
@@ -16,7 +16,7 @@ The \textit{parallel insert operator}, described in Section \ref{pins},
 would allow the programmer to parallelize reduction operations with associative functions.
 Additionally, we propose a new system library
 that would allow the programmer to give annotations or force changes in the underlying parallel environment,
-described in section \ref{pfor}
+described in Section \ref{pfor}
 
 The spellings \texttt{"::}  and \texttt{/::} for the two parallel operators were chosen for mnemonic and compliance reasons.
 Mnemonically, each uses the same base character as their sequential analogs, (\texttt{"} and \texttt{/}), 
@@ -46,11 +46,12 @@ which would result in the characters being split into several boxes.
 For more detail on the behavior of the J language, consult Appendix \ref{jlex}. % TODO footnote!
 
 For the parallel environment library, 
-it seemed best to augment the existing ``\gls{foreign}'' operator (spelled \texttt{!:}).
-This is because the foreign operator was designed to 
+it seemed best to augment the existing ``\gls{foreign}'' operator (spelled \texttt{!:}).  
+The foreign operator was designed to 
 allow the programmer to change environmental parameters 
-such as print precision, file I/O, etc\cite{jvocab}. 
-We chose $111$ as the numeric encoding for the parallel environment library, again for mnemonic reasons; 
+such as print precision, file I/O, etc\cite{jvocab}, 
+and so fits conceptually with the idea of changing the state of a parallel environment. 
+We chose $111$ as the numeric encoding for the parallel environment library, again for mnemonic reasons: 
 $111$ looks like three parallel lines ($11$ was already taken).
 
 \section{Parallel Rank Operator: \texttt{"::}}
@@ -61,17 +62,21 @@ The proposed parallel rank operator is a conjunction
 whose first argument is a function 
 and whose second argument is the ranks to both apply the function and to parallelize it. 
 It would be functionally equivalent to the rank operator, i.e. 
-\texttt{f (":: r) y} $\Leftrightarrow$ \texttt{f (" r) y} and
-\texttt{x f (":: r) y} $\Leftrightarrow$ \texttt{x f (" r) y}
+\[\texttt{f (":: r) y} \Leftrightarrow \texttt{f (" r) y}\] and
+\[\texttt{x f (":: r) y} \Leftrightarrow \texttt{x f (" r) y}\]
+
 for all $f, r, s$, and $y$
 
 Its purpose would be to override other parallel system defaults for automatic parallelization
-to guarantee that the resulting function would parallelize operations on sub-arrays of the given rank 
-using the available threads.
+to guarantee that the resulting function would create parallelizable tasks from 
+the operations on sub-arrays of the given rank that would then be distributed to the available threads.
 To illustrate, consider the following examples:
+
 \glsadd{increment}
 \glsadd{link}
-\glsadd{box}
+\glsadd{showTasks}
+\begin{figure}[h]
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -80,47 +85,45 @@ To illustrate, consider the following examples:
    increment mat2_3
 1 2 3
 4 5 6
-   increment"0 mat2_3
-1 2 3
-4 5 6
    NB. Link places both its arguments in `boxes'
+   NB. This demonstrates that incrementing a collection
+   NB. is the same regardless of the rank applied
    (increment"0 link increment"1 (link =: ;) increment"2) mat2_3
 +-----+-----+-----+
 |1 2 3|1 2 3|1 2 3|
 |4 5 6|4 5 6|4 5 6|
 +-----+-----+-----+
-   NB. Box places its argument in a box
-   NB. This example visualizes how threads
-   NB. could be distributed subcollections
-   NB. of mat2_3, discussed below
-   box =: <
-   (box"0 link box"1 link box"2) increment mat2_3
-+-------+-------------+-----+
-|+-+-+-+|+-----+-----+|1 2 3|
-||1|2|3|||1 2 3|4 5 6||4 5 6|
-|+-+-+-+|+-----+-----+|     |
-||4|5|6||             |     |
-|+-+-+-+|             |     |
-+-------+-------------+-----+
+   NB. showTasks visualizes how the subcollections of mat2_3
+   NB. would be broken up into tasks that would then be 
+   NB. concurrently operated on ny threads
+   showTasks =: agreement (< @)
+      (increment (" 1) showTasks) mat2_3
++-----+-----+
+|0 1 2|3 4 5|
++-----+-----+
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\caption{Visualizing tasks created by the parallel rank operator}
+\label{fig::pr_tasks}
+\end{figure}
 
-Incrementing numeric values always applies to scalars, so the function \texttt{increment} always gives the same result, 
-regardless of the rank of the subcollections to which it is applied. 
-Using the parallel rank operator, the behavior of always having the same result would remain; 
+\noindent Incrementing numeric values always applies to scalars, so the function \texttt{increment} always gives the same result, 
+regardless of the rank of the sub-collections to which it is applied. 
+Using the parallel rank operator, the behavior increment of 
+always having the same result regardless of the rank applied would remain; 
 however, as the last example visually illustrates, 
-each of the cases of \texttt{increment("::0)}, \texttt{increment("::1)}, and \texttt{increment("::2)}
-would result in the environment attempting to parallelize for the scalar, row, and whole matrix, respectively.
-E.g., if no limit is set on the number of threads available, 
-then the system might use 6 threads for parallelizing the operation on scalars, 
-2 threads for parallelizing operation on vectors, 
-and only 1 thread for operating on the entire matrix 
-(which, since the example computation is so trivial, would probably lead to the best performance).
+specifying \texttt{increment (":: 1)} would result in the environment parallelizing 
+the operation of incrementing each of the vector elements of \texttt{mat2\_3}.
+In this example, a programmer could create parallelizable tasks from incrementing 
+the six scalars, the two vectors, and the one matrix.
 
-Here's a more complex example involving functions of two arguments 
-as well as repeated applications of the rank operator.
+A more complex example involving functions of two arguments, 
+as well as repeated applications of the rank operator, is given below.
 
+\begin{figure}[p]
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -142,30 +145,29 @@ as well as repeated applications of the rank operator.
 
  6  8 10
 12 14 16
-   mat2_3 link"2 arr2_2_3
-+-----+-------+
-|0 1 2|0 1 2  |
-|3 4 5|3 4 5  |
-+-----+-------+
-|0 1 2|6  7  8|
-|3 4 5|9 10 11|
-+-----+-------+
-   mat2_3 link("1)("2) arr2_2_3
-+-----+-------+
-|0 1 2|0 1 2  |
-+-----+-------+
-|3 4 5|3 4 5  |
-+-----+-------+
-
-+-----+-------+
-|0 1 2|6 7 8  |
-+-----+-------+
-|3 4 5|9 10 11|
-+-----+-------+
+   mat2_3 (+("2) showTasks) arr2_2_3
++-------------+---------------+
+|+-----+-----+|+-----+-------+|
+||0 1 2|0 1 2|||0 1 2|6  7  8||
+||3 4 5|3 4 5|||3 4 5|9 10 11||
+|+-----+-----+|+-----+-------+|
++-------------+---------------+
+   mat2_3 (+("1) showTasks) arr2_2_3
++-------------+---------------+
+|+-----+-----+|+-----+-----+  |
+||0 1 2|0 1 2|||3 4 5|3 4 5|  |
+|+-----+-----+|+-----+-----+  |
++-------------+---------------+
+|+-----+-----+|+-----+-------+|
+||0 1 2|6 7 8|||3 4 5|9 10 11||
+|+-----+-----+|+-----+-------+|
++-------------+---------------+
 \end{verbatim}
 \end{small}
 \end{singlespacing}
-
+\end{quote}
+\caption{}
+\end{figure}
 
 Using the parallel rank operator, 
 \texttt{mat2\_3 +("::2) arr2\_2\_3} would parallelize addition on each of the two matrices, whereas
