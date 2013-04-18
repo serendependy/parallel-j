@@ -25,24 +25,26 @@ data conceptually contained in regular, multidimensional collections.
 Frequently, operations on these collections are inherently data parallel.
 However, most languages and parallel environments 
 provide tools for exploiting data parallelism only for collections of one dimension.
-Programmrs who wish to use such tools to use existing programs to operate on regular, multidimensional collections
+Programmers who wish to use such tools on existing programs to operate on regular, multidimensional collections
 often must write non-generalized code that can be difficult to maintain and 
 that cannot automatically scale to collections of higher dimensions.
 
 Function rank, first developed by K. Iverson and implemented in the programming language J, 
-formalizes the dimension (rank) of the arguments to a function in such a way 
-that functions can be easily extended to collections of higher dimensions using a higher-order function (rank operator).
+formalizes the dimension (\textit{rank}) of the arguments to a function in such a way 
+that functions can be easily extended to collections of higher dimensions using 
+a higher-order function (the \textit{rank operator}).
 This extension is relatively simple, inherently parallel, and provably safe 
 from certain kinds of indexing errors which stem from not knowing the dimension, shape, or possible irregularity of the collection.
-However, this last property can be difficult to capture atc compile-time.
+However, this last property can be difficult to capture at compile-time.
 
-Presented a prototype for a parallel regular collections library that supports function rank 
+Presented is a prototype for a parallel regular collections library that supports function rank 
 to demonstrate that function rank allows a programmer to easily exploit potential concurrency 
 in problems involving inherently data parallel operations on regular collections.
 The programming language Scala was selected to implement this library because it is modern, multi-paradigm, 
 and in particular it provides a parallel collections framework that 
 allows programmers to easily write data parallel programs for 1 dimensional collectons.
-Also presented are three proposals for possible future parallel implementations of the J programming language:
+Also presented are three proposals that could be included in 
+possible future parallel implementations of the J programming language:
 two new operators, parallel rank and parallel insert;
 and an extension to the J environment library to include functions which affect a parallel environment.
 Each proposal includes a sketch of its use.
