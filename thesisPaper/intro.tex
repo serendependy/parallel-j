@@ -8,11 +8,12 @@ it is often the case that programmers must exploit any and all potential concurr
 through different approaches to parallel programming.
 One form of potential concurrency frequently encountered when programs operate on large collections of data 
 is \textit{data parallelism}, which is when programs update elements or subsections of collections in parallel.
-Many tools have already been developed to help programmers exploit data parallelism\cite{dph}\cite{openmp}
-easily and safely (i.e., with reduced risk of race conditions or program crashes). 
+Many tools have already been developed to help programmers exploit data parallelism 
+easily and safely (i.e., with reduced risk of race conditions or program crashes)\cite{dph}\cite{openmp}. 
 However, many of these tools may not be as helpful 
 for exploiting data parallelism on regular collections as they could be, 
-and thus make it more difficult for programs to achieve good performance, for two reasons.
+and thus make it more difficult for programs 
+to achieve good performance (that is, fast execution time), for two reasons.
 
 First, many programming languages implement regular collections as nested collections;
 e.g. a 2-dimensional, 2 by 3 array (or rank 2 array with shape 2 3) of integers would be implemented as 
@@ -27,20 +28,21 @@ programmers must either write code to ensure this requirement is met,
 increasing the difficulty of writing what could be an already complex program, 
 or risk run-time indexing errors and program crashes.
 
-Alternatively, regular collections can be implemented as vectors which have an associated shape vector. 
+Alternatively, regular collections can be implemented as vectors that have an associated shape vector. 
 These shape-associated collections make the structure of a regular collection 
-a field which can be viewed and manipulated and allow the programmer to have 
+a field that can be viewed and manipulated and allow the programmer to have 
 greater transparency and control when writing programs to operate on them.
 Unfortunately, most statically-typed languages do not have type systems advanced enough 
 to capture all of the structural information of shape-associated collections statically, 
 even though this is theoretically possible. % TODO cite dependent types (xi probably)
-However, some languages are able to capture some of this structure statically\cite{boost}\cite{sac}\cite{dph}, 
+However, some languages are able to capture some of this structure statically, 
 enabling programmers to reduce or eliminate the need for manual verification, 
 such as the fact that the arguments to a function are in fact regular collections,
-or that some collection satisfies a function's lower and/or upper bounds for rank.
+or that some collection satisfies a function's lower and/or upper bounds for rank\cite{boost}\cite{sac}\cite{dph}.
 Even when these properties of regular collections cannot be captured statically, 
 making this information more transparent at run time 
-should allow programmers to more easily verify that the required properties hold.
+should allow programmers to more easily verify that the required properties hold, 
+reducing programmer effort and increasing program safety.
 
 Second, in most imperative languages with regular collections, 
 applying functions to elements or sub-collections of a collection means 
@@ -58,8 +60,9 @@ and prone to error because programmers must instead write boilerplate code in or
 Moreover, in some cases these extensions are data parallel, 
 and can be done automatically and automatically exploit potential concurrency.
 However, using nested for loops obfuscates,
-and requires the programer make changes to existing code in order to exploit, this inherent concurrency. 
-It seems clear that it would be better for programmers to express the potential concurrency directly, 
+and requires the programmer make changes to existing code in order to exploit, this inherent concurrency. 
+Clearly it would be better for programmers to express the potential concurrency directly, 
+and thus hopefully exploit potential concurrency directly, 
 rather than expressing it as sequential for loop and either hoping a compiler can reverse this transformation 
 or writing additional code to exploit the concurrency.
 
@@ -76,19 +79,19 @@ to see more easily where there is inherent data parallelism in the algorithm,
 such as all calls to \textit{map}, or calls to \textit{reduce} with associative operations, on large collections.
 However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, 
 they too must be nested in order to extend existing functions to collections of higher rank, 
-with the same, though usually reduced, problem of tediousness and boilerplate code mentioned above.
+with the same, though usually reduced, problem of unnecessary overhead and boilerplate code mentioned above.
 
 \textit{Function rank}, first introduced by K. Iverson in 1978\cite{opandfunc} 
 and implemented in the programming language J, 
 is a functional abstraction that extends the notion of data rank to functions. 
-In functional languages where the idea of function rank is formalized, 
-extending existing functions to regular collections of higher dimension 
-can be expressed as the application of a higher-ordered function, 
-called in J and in this paper the \textit{rank operator}\cite{jvocab}. 
+Like other functional language abstractions, 
+function rank can allow the programmer to directly express 
+the application and extension of functions on specific ranks of regular collections 
+through a higher-ordered function, called in J and in this paper the \textit{rank operator}\cite{jvocab}.
 Expressing these extensions as a higher-order function 
 makes it easier for a programmer to make them safely, quickly, and at a higher level of abstraction.
-In some cases, these extensions are so trivial that they can be done automatically\cite{jvocab} \cite{rankanduni}, 
-meaning the programmer need not modify the code at all. 
+In some cases, these extensions are so trivial that they can be done automatically, 
+meaning the programmer need not modify the code at all\cite{jvocab} \cite{rankanduni}. 
 Furthermore, since multiple applications of the rank operator 
 are equivalent to the cases where nested loops or nested higher-order function applications are inherently data parallel, 
 it too is inherently data parallel.
@@ -99,13 +102,13 @@ safely, quickly, and in some cases automatically.
 However, currently the languages that meet these criteria, 
 such as J, Sharp APL, and some others from the APL language family, 
 are not in common use. 
-One often-cited reason for this is that these languages are difficult to read, % TODO cite
+One often-cited reason for this lack of use is that these languages are difficult to read, % TODO cite
 because, in order to use them effectively, a programmer must memorize 
 dozens of 1 or 2 character functions each with different, sometimes unrelated use cases 
 depending on whether the function takes one or two arguments\cite{jvocab}\cite{dapl}. 
 These language design choices, however, 
 are not required in order for a language to support function rank.
-It seems that a proof-of-concept may be needed 
+A proof-of-concept may be needed 
 to demonstrate that both the notions of function rank
 and associating collections with their shape
 are still very helpful for exploiting data parallelism on regular collections 
