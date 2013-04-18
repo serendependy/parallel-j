@@ -131,12 +131,15 @@ The rest of the paper is organized as follows:
 		and discusses the relative level of abstraction, scalability and performance of each solution. 
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work. 
 \end{itemize}
+\noindent
+In addition, appendecies and a glossary of J functions used throughout the remaining chapters 
+are given at the end of this paper, as aides to the reader.
 
 \section{Design Plan}
 \label{desp}
-The goal of this research was
+The goal of this research was going to be
 to implement a parallel subset of the programming language J, called \textit{Parallel-J}.
-Based on the documentation of J's current implementation\cite{ioj}, it was determined that this language subset would require:
+Based on the documentation of J's current implementation\cite{ioj}, this language subset would require:
 \begin{itemize}
 	\item a J language lexer and parser
 	\item limited memory management
@@ -152,43 +155,39 @@ Based on the documentation of J's current implementation\cite{ioj}, it was deter
 		\item the rank operator and function rank
 	\end{itemize}
 \end{itemize}
-
-Excluded from the design of the parallel language subset the following language features: 
+\noindent
+The following language features would be excluded:
 \begin{itemize}
 	\item namespaces (\textit{locales}) and local variable assignment
-	\item all existing environment-altering functions (the \textit{foreign} operator, spelled \ttfamily!:\normalfont)
+	\item all existing environment-altering functions (the \textit{foreign} operator, spelled \texttt{!:})
 	\item explicit scripts with imperative-style execution and control structure, and
 	\item the J primitives which calculate complex algorithms (prime factorization, derivatives of polynomial equations, etc.)
 \end{itemize}
 
-These choices were motivated by the desire to present solutions to our sample problems in as simple and ``idiomatic'' J as possible.
-This would allow us to directly address the involved computations, 
-as well as the advantages to exploiting data parallelism when approaching these problems with function rank, 
-without getting distracted with a discussion of J's more advanced or nuanced language features.
-
-Also to be included was a proposal and implementation of two new operators (parallel rank and parallel insert), 
+These choices would allow solutions to the sample problems written in as simple and ``idiomatic'' J as possible, 
+thus clearly showing the advantages to exploiting data parallelism when approaching these problems with function rank, 
+without getting distracted with a discussion of J's more advanced or nuanced language features. 
+Also to be included was both a proposal and an implementation of two new operators (parallel rank and parallel insert), 
 and an extension to the existing \textit{foreign} operator to allow for changing the parallel environment. 
-The former would allow for the equivalent of parallel map and reduce operations at the specified rank(s). 
-The latter would allow the programmer to set environmental parameters for parallelizing code, 
+The former would allow for the equivalent of parallel map and reduce operations at the specified rank(s); 
+the latter would allow the programmer to set environmental parameters for parallelizing code, 
 for example specifying the number of threads to use in executing a piece of code, or setting thread scheduling schemes.
 Although not entirely related to function rank, such environmental controls as would be included in the parallel environment 
 are to be expected from any serious parallel computing language or library.
 
-The Scala programming language\cite{scala} 
-was chosen to implement this parallel subset of J.
-Scala has many features that make it desirable for this task, including: 
+The Scala programming language was chosen to implement this parallel subset of J for the following reasons\cite{scala}:
 \begin{enumerate} 
-	\item support for multiple programming paradigms, such as
+	\item Scala supports multiple programming paradigms, such as
 	\begin{itemize}
 		\item imperative, for the tasks of memory management and object creation,
 		\item object oriented, for more structured encapsulation of the rank associated with each function 
 			and data associated with arrays, and
 		\item functional, to more easily capture J's functional paradigm in the implementation and thus facilitate development
 	\end{itemize}
-	\item a feature-rich library for collections, including 
+	\item Scala has a feature-rich library for collections, including 
 	\begin{itemize}
-		\item support for many higher-order operations such as \textit{map} and \textit{reduce}\cite{scala28col}, 
-			common to many solutions to data parallel problems, and
+		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, 
+			common to many solutions to data parallel problems\cite{scala28col}, and
 		\item a library for parallel collections that exploits the concurrency inherently data parallel operations\cite{pc},
 			which, being similar to the use-cases in this research, were anticipated to make parallelizing the implementation relatively easy.
 	\end{itemize}
@@ -204,11 +203,10 @@ showing that this implementation does effectively exploit potential concurrency.
 
 \section{Implementation}
 \label{imp}
-Unfortunately, during the development of this research it became clear 
-that the given time constraints would not allow for such an ambitious project.
-This has lead to a change of focus in the research. 
+Unfortunately, the given time constraints did not allow for such an ambitious project, 
+leading to a change of focus.
 Rather than finishing a parallel subset of J, the J system libraries developed 
-are instead used as a prototype for a Scala regular collections library which supports function rank.
+are instead used as a prototype for a Scala regular collections library that supports function rank.
 Taking the same set of parallel problems, 
 this research shows both how this library allows for uniformly extending these problems into higher dimensions and 
 how with future work it would be able to achieve good performance 
@@ -216,8 +214,9 @@ by automatically parallelizing solutions to problems in the given and in higher 
 Results are also compared with solutions written in C with OpenMP, 
 along with a discussion of the relative level of abstraction, scalability, and performance of each.
 
-The proposal for the \textit{parallel operator} is still given but it unfortunately could not be implemented in the time available.
-
-Finally, some work completed with the idea of implementing a subset of J 
-did not contribute to developing a regular collections library in Scala that supports function rank.
-Most of this work consisted of implementing a lexer for the J programming language, which is listed in Appendix \ref{jlex}
+Not all of the work done towards producing a parallel implementation of J 
+applies to producing a Scala library with function rank. 
+The majority of this work consists of the proposals 
+for the \textit{parallel rank} and \textit{parallel insert} operators and the parallel environment library, 
+given in Chapter \ref{paraop}, 
+as well as a partial lexer for the J programming language, listed in Appendix \ref{jlex}. 
