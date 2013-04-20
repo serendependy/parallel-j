@@ -70,10 +70,20 @@ for all $f, r, s$, and $y$
 Its purpose would be to override other parallel system defaults for automatic parallelization
 to guarantee that the resulting function would create parallelizable tasks from 
 the operations on sub-arrays of the given rank that would then be distributed to the available threads.
-To illustrate, consider the following examples:
+To illustrate, consider the examples in Fig~\ref{fig::pr_tasks}.
+Incrementing numeric values always applies to scalars, so the function \texttt{increment} always gives the same result, 
+regardless of the rank of the sub-collections to which it is applied. 
+Using the parallel rank operator, the behavior increment of 
+always having the same result regardless of the rank applied would remain; 
+however, as the last example visually illustrates, 
+specifying \texttt{increment (":: 1)} would result in the environment parallelizing 
+the operation of incrementing each of the vector elements of \texttt{mat2\_3}.
+In this example, a programmer could create parallelizable tasks from incrementing 
+the six scalars, the two vectors, and the one matrix.
+
+\pagebreak
 
 \glsadd{increment}
-\glsadd{link}
 \glsadd{showTasks}
 \begin{figure}[h]
 \begin{quote}
@@ -109,18 +119,11 @@ To illustrate, consider the following examples:
 \label{fig::pr_tasks}
 \end{figure}
 
-\noindent Incrementing numeric values always applies to scalars, so the function \texttt{increment} always gives the same result, 
-regardless of the rank of the sub-collections to which it is applied. 
-Using the parallel rank operator, the behavior increment of 
-always having the same result regardless of the rank applied would remain; 
-however, as the last example visually illustrates, 
-specifying \texttt{increment (":: 1)} would result in the environment parallelizing 
-the operation of incrementing each of the vector elements of \texttt{mat2\_3}.
-In this example, a programmer could create parallelizable tasks from incrementing 
-the six scalars, the two vectors, and the one matrix.
-
 A more complex example involving functions of two arguments, 
-as well as repeated applications of the rank operator, is given below.
+as well as repeated applications of the rank operator, is given in Fig~\ref{fig::pr_tasks2}.
+Using the parallel rank operator, the line of code
+\texttt{mat2\_3 +("::2) arr2\_2\_3} would create parallelizable tasks for adding the elements of each of the two matrices, whereas 
+\texttt{mat2\_3 +("::1)("2) arr2\_2\_3} would create parallelizable tasks for adding the elements of each of the four vectors.
 
 \begin{figure}[p]
 \begin{quote}
@@ -166,16 +169,19 @@ as well as repeated applications of the rank operator, is given below.
 \end{small}
 \end{singlespacing}
 \end{quote}
-\caption{}
+\label{fig::pr_tasks2}
+\caption{Visualizing tasks created by the parallel rank operator for two collections}
 \end{figure}
-
-Using the parallel rank operator, 
-\texttt{mat2\_3 +("::2) arr2\_2\_3} would parallelize addition on each of the two matrices, whereas
-\texttt{mat2\_3 +("::1)("2) arr2\_2\_3} would parallelize addition on each of the vector elements.
 
 Some open questions remain, most notably 
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
-This is left as a question for future research to investigate.
+For example, should multiple applications of the parallel rank operator result in multiple levels of parallelizable task creation, 
+leading to increased overhead from thread creation and scheduling, 
+or should the outermost application determine the only level at which parallizable tasks are created, 
+leading to unparallelizing previously parallelized programs when they are used in larger functions? 
+Either possibility having significant impact on program run time.
+One solution may be to allow the programmer to chose which behavior best suites their needs 
+using the parallel environment libary, described in Section \ref{pfor}.
 
 \section{Parallel Insert Operator: \texttt{/::}}
 \label{pins}
@@ -185,7 +191,7 @@ for example finding the sum, product, maximum, minimum, etc. of a collection of 
 It's well known that when the reducing operation $f$ is associative, 
 i.e. when $f(x,y) = f(y,x)$ for all $f, x, y$ (and for a sufficiently tolerant comparison, when dealing with floating point values),
 then the reduction can be carried out in a parallel fashion with little effort on the programmer's part.
-It is expedient, therefore, that future parallel implementations of J allow the programmer 
+Therefor, a future parallel implementations of J should allow the programmer 
 to explicitly state that a specific associative function should be used to reduce an array in parallel, 
 since in the general case the default insert operator does not assume its argument function is associative, 
 nor is it immediately obvious how to determine if a user-defined function is associative.
@@ -194,9 +200,12 @@ nor is it immediately obvious how to determine if a user-defined function is ass
 As a unary, higher ordered function (\textit{adverb}), 
 the parallel insert operator would be equivalent to the sequential insert operator 
 for all associative operations. 
-Thus, the following J session would have the same results for every line of code executed, 
+Thus, the J session depicted in Fig~\ref{fig::pinsert} would have the same results for every line of code executed, 
 regardless of whether \texttt{insert} was assigned to be \texttt{/::} or \texttt{/}
+
 \glsadd{insert}
+\begin{figure}[h]
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -224,9 +233,15 @@ regardless of whether \texttt{insert} was assigned to be \texttt{/::} or \texttt
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\label{fig::pinsert}
+\caption{Using the parallel insert operator}
+\end{figure}
 
-It remains an open question how the parallel insert operator should behave on non-associative functions.
-One possibility is to define its domain to be only the associative primitives. 
+An open question remains about how the parallel insert operator should behave on non-associative functions. 
+Without associativity, the results of reducing an array with a function depend on the order by which the function is applied, 
+destroying the possibility of concurrent operations.
+One possibility way to deal with non-associativity is to define domain of parallel insert to be only the associative primitives. 
 This would prevent logical errors such as radically different results for the same calculations on the same data, 
 depending on the thread scheduling scheme. 
 However, this approach would likely require adding an additional table of information 
@@ -252,11 +267,12 @@ The left argument indexes the desired library.
 E.g., $2$ indexes the library for functions which affect the host machine, 
 $9$ indexes the library for viewing and setting global J parameters (such as print precision), and etc.
 The second argument indexes a specific function.
-E.g., \texttt{9!:6}  is the function which displays the print characters for J's box type.
+For example, \texttt{9!:6}  is the function which displays the print characters for J's box type.
 
 \subsection{Usage}
-This section requires more research before a full suite of library functions is proposed.
-This would likely be done by reviewing the functionality of other shared-memory parallel libraries, such as OpenMP\cite{openmp}. 
+There are many options to consider for implementing a full suite of functions for a parallel environment library.
+A more full review of the functionality of other shared-memory parallel libraries, such as OpenMP\cite{openmp}, 
+to make sure such a library provides all the functionality parallel programmers expect.
 However, two types of functionality would almost certainly be required.
 They are:
 
@@ -267,13 +283,12 @@ They are:
         These would be encoded as numeric values, in keeping with the conventions of the foreign libraries.
 \end{enumerate}
 
-Additionally, as discussed above, it may be desirable to change 
-the default behavior of the parallel insert operator, 
+\noindent Additionally, as discussed in Sections \ref{pfor} and \ref{pins}, it may be desirable to change 
+the default behavior of the parallel rank operator and/or parallel insert operator, 
 in order to parallelize on user-defined associative operators.
 
-The following is not an actual session with any existing J REPL, 
-but an example of how one would use this proposed library.
-
+\begin{figure}
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -285,9 +300,13 @@ but an example of how one would use this proposed library.
 0
    (111 !: 3) 1 NB. Set thread scheduling to, for example, round robin.
 
-   (111 !: 4) '' NB. Get parallel insert restriction flag
+   (111 !: 4) '' NB. Get parallel rank nested thread creation flag
 0
-   (111 !: 5) 1 NB. Enable restrictions on insert
+   (111 !: 5) 1 NB. Enable nested thread creation
+
+   (111 !: 6) '' NB. Get parallel insert restriction flag
+0
+   (111 !: 7) 1 NB. Enable restrictions on insert
 
    +/::("1) mat2_3 +("::1)("2) arr2_2_3
  6 24
@@ -295,7 +314,13 @@ but an example of how one would use this proposed library.
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\label{fig::pfor}
+\caption{A hypothetical J session using the parallel environment library}
+\end{figure}
 
-The above example would parallelize addition on the row elements of \texttt{mat2\_3} and \texttt{arr2\_2\_3},
+The example given in Fig~\ref{fig::pfor} is not based on any existing J REPL, 
+but an illustration of how programmers might use this proposed library.
+The last line would parallelize addition on the row elements of \texttt{mat2\_3} and \texttt{arr2\_2\_3},
 then parallelize the sum operation on each of the vectors of the resulting array, 
 using 4 threads with a round-robin scheduling scheme.

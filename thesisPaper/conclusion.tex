@@ -4,18 +4,22 @@
 \section{Discussion of Results}
 \label{discres}
 There are several potential reasons for the underwhelming results for the Parallel-J solutions given in Section \ref{res}. 
-Probably the most significant of these is that the body of code being parallelized (see Appendix \ref{apjverb}) 
+Probably the most significant reason for these results is that the body of code being parallelized (see Appendix \ref{apjverb}) 
 potentially creates a large number of permanent and temporary objects, 
 meaning that there are multiple requests for memory from the Java run-time heap. 
 For example, since this work was originally intended to be a parallel implementation of J, 
 several wrapper classes for were created to hold the same kind kind of information the current version of J\cite{ioj} 
-maintains about arrays and the primitive values, like reference counts and bit flags for type information. 
+maintains about arrays and the primitive values, like reference counts and bit flags for type information, 
+and so where in a normal Scala library there would have been operations on primitive values, 
+in Paralell-J these operations were encumbered to work on instances of wrapper classes. 
 The constant creation of new objects for every single integer was likely a bottleneck for performance.
+
 Also, operations that took existing collections and turned them into collections of higher rank 
 were implemented by copying whole collections, operating on them, 
 then concatenating each sub-result to return the final result. 
 This constant copying of sub-arrays could have been avoided through the use of \textit{index transformation} 
-which have been described in Section \ref{repa}.
+which have been described in Section \ref{repa}, potentially improving performance significantly 
+by removing these unnecessary operations.
  
 Additionally, the large number of wrapper classes for primitive values 
 caused the size of the program to cause cache faults to slow down performance significantly. 
@@ -26,24 +30,22 @@ The solutions in C with OpenMP, in contrast, did not display this behavior,
 and instead only began showing significant improvements from parallelism in the same problem 
 at a problem sizes of $1,000,000$.
 
-Finally, this research did not make use of the macros introduced by Scala 2.10\cite{scala210}.
+Finally, this research did not make use of the macros introduced by Scala 2.10\cite{scala210} 
+because Scala 2.10 was released too late in the research's development to be incorporated.
 These macros have the potential to improve performance 
 by replacing at compile time source code expressions that appear to be acting on objects 
 with lower-level expressions acting on primitives, thus avoiding new object creation.
 
 \section{Future Research}
 \subsection{Parallel Implementation of J}
-This research could be useful for future work which provides 
-a parallel alternative of J.
-No matter the implementing language chosen, 
-the considerations in Section \ref{desp} 
-over which language features to include in a prototype, 
-and the discussion in Section \ref{fridp} of the behavior and inherent data parallelism of the rank operator, 
-would likely be useful to those not intimately familiar with the current J implementation.
-
-Also to be taken into consideration should be 
-the forces which lead to the choice of Scala as the language 
-for this research, also listed in Section \ref{desp}. 
+This research would be useful for future work towards a parallel alternative of J.
+Regardless of the language chosen for implementing a parallel J, 
+researchers must still consider which language features to include first in their prototype (Section \ref{desp})
+and must still understand the inherrently data parallel nature of the rank operator (Section \ref{fridp})
+Also the forces that lead to the choice of Scala as the language 
+for this research (also listed in Section \ref{desp}), 
+should suggest to future researchers the kinds of language features desirable 
+for implementing a parallel J. 
 If future work is done in this area in Scala 
 or another language with suitable programming paradigms and libraries 
 for developing a parallel implementation of J, 
@@ -51,12 +53,12 @@ then this research should be used as a prototype
 to help guide development.
 
 Alternatively, a future parallel implementation of J
-could be done in the C programming language. 
+could be done in the C programming language, based on the current implementation of J\cite{ioj}. 
 In order to begin this approach, 
 it is strongly recommended that researchers first 
-familiarize themselves with the working of the current implementation of J\cite{ioj}, 
-the source code and documentation of which 
-is available freely under open source licenses.
+familiarize themselves with Roger Hui's documentation, ``An Implementation of J.''
+Both this documentation and the full source code (under open sources licenses)
+are available freely on the J Programming Website.
 In addition, it seems that there are at least two viable options in such an approach 
 which are possibly not mutually exclusive.
 Future researchers may use shared memory parallel environments
@@ -71,7 +73,7 @@ a distributed memory parallel environment, such as Open MPI\cite{mpi}.
 
 \subsection{Sequential and Parallel Scala Library for Regular Arrays using Function Rank}
 Another possible extension to the work presented here 
-is the development of Scala library for arbitrary dimensional collections which uses function rank. 
+is the development of Scala library for arbitrary dimensional collections that uses function rank. 
 This library would ideally support parallelism in much the same way 
 Scala's current collections library does\cite{pc},
 through conversions between sequential and parallel implementations of each collection type. 

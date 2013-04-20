@@ -6,9 +6,8 @@ dim =: #@$
 base =: #:
 n =: ]
 copies =: #
-memoized =: M.
 
-shiftVals =: decr@(n base integers@(* insert)) memoized
+shiftVals =: decr@(n base integers@(* insert)) 
 shiftBy =: shiftVals@:(dim copies 3:)
 
 NB. Updated to use shiftBy as function, not data

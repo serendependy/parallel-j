@@ -2,8 +2,8 @@
 \label{res}
 
 \section{Methodology}
-To determine the performance of the Parallel-J solutions to the problems listed in Chapter \ref{probs}, 
-each solution was run on varying problem sizes using 1, 2, and 4 threads. 
+Each Parallel-J solution to the problems listed in Chapter \ref{probs} 
+was timed running on varying problem sizes using 1, 2, and 4 threads
 For comparison, the performance of the solutions in 
 C with OpenMP for the same problems are also listed. 
 These C solutions were run on larger problem sizes 
@@ -15,7 +15,8 @@ and forcing the Java garbage collector to run between program runs.
 For the C programs, timing had to be done manually for each program. 
 For all program results, the run time is given in seconds.
 
-All solutions were run (and in the case of the C solutions, compiled) on the Dione00 work station. %TODO get machine specs! 
+All solutions were run (and in the case of the C solutions, compiled) 
+on a workstation with 16 1.0G Hz \textit{AuthenticAMD} processors each with 512 KB cache size.
 For the Parallel-J solutions (all of which can be found in Appendix \ref{apsol}), 
 a single trial consisted of running each program 
 on a specific problem size with a specific number of threads 
@@ -111,7 +112,7 @@ ranging from 100 to 300 by increments of 25.
 		Threads & 1 & 2 & 4 & 1 & 2 & 4 & 1 & 2 & 4 \\
 	\hline
 	\hline
-		Parallel-J & 245.1 & & & & & & & & \\
+		Parallel-J & 2.45014e6 & 3.00412e6 & 2.62603e6 & 3.79871e6 & 3.79696e6 & 4.37458e6 & 5.36684e6 & 5.36859e6 & 6.19567e6 \\
 	\hline
 \end{tabular}
 \caption{Performance results for the Game of Life}

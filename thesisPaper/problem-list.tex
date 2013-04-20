@@ -2,52 +2,51 @@
 \label{probs}
 
 \section{Rationale}
-Each of the following problems was selected to illustrate 
+Each of the following problems illustrates 
 both the advantages in approaching different forms of exploitable concurrency with the notion of function rank, 
-as well as to illustrate how extensions of these problems to higher dimensions can be done easily, safely, 
-and in an automatically data parallel fashion.
+as well as extending these problems to higher ranks can be done easily, safely, and in an automatically data parallel fashion.
 For each of these problems, there is a trivial extension into a higher dimension: 
 gather several rank $n$ inputs to the problem into a rank $n+1$ collection 
 and use the parallel rank operator to evaluate each of these inputs concurrently.
 By specifying the original function operates on rank $n$ elements, 
-this extension can be done automatically.
-Additionally, for each problem there is a discussion 
-of how more complex parallel extensions to higher dimensions are aided through using function rank. 
+this extension is done automatically. 
+However, each section also discusses, when appropriate, 
+the usefullness of function rank when the extension is more complicated.
+Solutions for each of the problems in the following sections using the partial implementation of the Parallel-J system
+are given in Appendix \ref{apsol}.
 
-To demonstrate this, the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
+To demonstrate the usefullness of function rank, 
+the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
 \textit{Design Patterns} are general, reusable solutions to a common class of problems. % TODO cite? (from Wikipedia)
-Software design patterns were first made popular for object-oriented programming through the work of the "Gang of Four,"\cite{designp} 
-and are now seeing interest for applications in parallel computing. \cite{mass} 
-This research has chosen to focus on the pattern language developed by Mattson et. al. \cite{mass}
-presented in their book, \textit{Patterns for Parallel Programming}. % TODO justify?
+Software design patterns were first made popular for object-oriented programming through 
+the work of the ``Gang of Four''\cite{designp},
+and are now seeing interest for applications in parallel computing\cite{mass}.
+This research has chosen to focus on the pattern language developed by Mattson et. al. 
+presented in their book, \textit{Patterns for Parallel Programming}\cite{mass}. % TODO justify?
 Using parallel design patterns to guide the choices and discussion of these problems 
 should allow this limited selection of problems to better represent families of parallel problems.
 
-Solutions for each of the problems below using the partial implementation of the Parallel-J system
-are given in Appendix \ref{apsol}
-
 \section{Calculating Pi with Numerical Integration}
 \subsection{Description}
-One method of calculating $\pi$ is find the area of the unit circle. 
-To do this, one can choose to calculate the area of the top right quadrant of the unit circle in the Cartesian plane, 
-then multiply this area by 4. 
-This is done with the following equation:
+One method of calculating $\pi$ is to find the area under 
+the curve of the equation $frac{1}{1+x^2}$ on the interval $[0,1]$.
+This can be done with the integral in Eq~\ref{eq::pi_int}.
 
-\[\pi = \int_0^1 \frac{4}{1 + x^2} \; dx\]
+\begin{equation} \label{eq::pi_int}
+\pi = \int_0^1 \frac{4}{1 + x^2} \; dx
+\end{equation}
 
-One way to approximate this formula is to use a left-handed Riemann sum. 
+\noindent One way to approximate this integral is using a left-handed Riemann sum. 
 This method works by dividing the desired interval into $n$ sub intervals, 
 evaluating the function of concern at the left hand side of the interval, called $x_i$ (where $0 \le i < n$), 
 and approximates the are underneath the curve by finding the area of a rectangle 
 whose width is the width of the interval and height the value of the function at $x_i$.
 
-\[\frac{1}{n} \cdot \sum_{i=0}^n \frac{4}{1 + x^2} \]
-
-where $x = \frac{i}{n}$
+\[\frac{1}{n} \cdot \sum_{i=0}^n \frac{4}{1 + x^2}, x = \frac{i}{n} \]
 
 \subsection{Relevant Design Pattern}
 This problem was chosen to represent the \textit{Task Parallelism} pattern, 
-in which ``the problem is decomposed into a collection of tasks that can execute concurrently.'' \cite{mass}
+in which ``the problem is decomposed into a collection of tasks that can execute concurrently''\cite{mass}.
 In this problem, the concurrent tasks are calculating $\frac{4}{1 + x^2}$ for the different values of $x$. 
 There is also a task dependency: the multiplication of $\frac{1}{n}$ and the sum of the values produced by each task 
 cannot occur until all tasks have finished. 
@@ -67,7 +66,7 @@ It is based off of the solution given in Appendix A of Mattson et al.\cite{mass}
 \end{small}
 \end{singlespacing}
 
-This solution parallelizes the for loop; 
+\noindent This solution parallelizes the for loop; 
 i.e., it distributes iterations of the loop among threads to execute concurrently.
 The program specifies both that \texttt{x} is a temporary work variable and so should not be shared among threads, 
 and that there is to be a reduction on the variable \texttt{sum} with addition. 
@@ -110,7 +109,7 @@ can be found in Section \ref{pjsPi}.
 
 \subsection{Extensions}
 \label{piext}
-The problem of calculating $\pi$ by finding the area of the unit circle 
+The problem of calculating $\pi$ by finding the area under a specific curve 
 generalizes to calculating any useful value by finding the value of an integral. 
 In general, the domain over which an integral takes place need not be 1-dimensional, 
 as it was in this example (over the closed interval $[0,1]$).
@@ -118,20 +117,17 @@ Instead, the desired value may most naturally be expressed as a volume or hyper-
 Fourier transformations, for example, have many applications in physics and engineering, 
 and can be expressed over arbitrary dimension.
 
-To extend the calculation of $\pi$ to the higher dimensions 3 or 4, 
-we calculate the volume or hyper-volume of the unit sphere or hyper-sphere, respectively. 
-While it is possible to derive from equation 1 % TODO reference equations
-an equation which generalizes calculating the area of the unit circle, 
-the volume of the unit sphere, and the hyper-volume of the hypersphere, 
-it would be somewhat involved to explain how to accomplish this. 
-Instead, in the following discussion it will be assumed 
-that this generalized function is already available as \texttt{unit\_measure}.
-Instead, the discussion will focus on generalizing the generation of 
-the set of points in $n$-dimensional space for the left-handed Riemann sum.
+The following discussion will focus on generalizing the creation of 
+the set of points in $n$-dimensional space over the interval $[0,1]^n$.
+The choice of function $f$ to apply to the points in $n$-space 
+is entirely based upon the value to be calculated, 
+and while it is possible to extend the generation of points in $n$-space 
+to arbitrary intervals, doing so would only complicate the example 
+without significant insight into the use of the rank operator.
 
-The most immediate extension of the C solution to any specific dimension $n$
+The most immediate extension of the C solution to any specific rank $n$ % TODO C pseudo-code example
 would be to wrap the program in the appropriate number of for loops. 
-In C, the function \texttt{unit\_measure} would probably take both 
+In C, the function $f$ would probably take both 
 an array of coordinate values as well as a parameter \texttt{size} specifying the current dimension, 
 so the programmer would also have to make sure to change this parameter in each version for a new dimension.
 
@@ -139,8 +135,11 @@ While this extension only involves changing two parts of the code, it is tedious
 and must be done for every such extension. 
 On the other hand, finding a general solution could be somewhat involved 
 as it is perhaps not clear at first sight how to begin such an approach.
-The solution to this aspect of the problem along with some example uses is given below in J:
+The solution to this aspect of the problem along with some example uses is given in J in Fig~\ref{fig::xs_ext}:
+
 \glsadd{base}
+\begin{figure}
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -169,6 +168,10 @@ The solution to this aspect of the problem along with some example uses is given
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\caption{Extending the creation of coordinates to arbitrary rank}
+\label{fig::xs_ext}
+\end{figure}
 
 The function \texttt{xs} now takes a vector \texttt{vn} of length $n$ 
 specifying how to break up the interval $[0,1]^n$.
@@ -176,14 +179,12 @@ To calculate the appropriate coordinates to do the Riemann sum,
 the function first calculates the total number of points required (reducing \texttt{vn} with multiplication). 
 Then it finds, for each of the integers $i$ between 0 and one less than this total, 
 the array representation of $i$ in base \texttt{vn}. 
-Finally, like the above example, it divides each of these values by the original input 
+Finally, like the above example, \textit{xs} divides each of these values by the original input 
 so that the resulting points are in the appropriate bounds.
 (For more on the behavior of the function \texttt{base}, see Appendix \ref{base}). % TODO footnote
 
-Because of this, no matter the dimension on which the programmer desires to calculate their integral, 
-the points for applying the desired function.
-In this case, the appropriate points to begin approximating the area of the unit circle, sphere, hyper-sphere, etc.,
-can always be represented by at most a rank 2 array with shape \texttt{(* insert vn), n}
+Because of the way \textit{xs} is defined, no matter the dimension on which the programmer desires to calculate their integral, 
+the points for applying the desired function can always be represented by at most a rank 2 array with shape \texttt{(* insert vn), n}
 To approximate the desired integral, apply the appropriate function (in an inherently parallel fashion) 
 to each of the vector elements (which represent the coordinates to calculate the Riemann sum), 
 then multiply the sum of the results by the appropriate value (\texttt{1 div (* insert vn)}).
@@ -215,7 +216,7 @@ Then, to calculate the number of alive neighbors for each give cell,
 one need only sum the values of all of the neighbors.
 
 \subsection{Relevant Design Patterns}
-This problem was chosen to represent the \textit{Geometric Decomposition} design pattern, \cite{mass}
+This problem represents the \textit{Geometric Decomposition} design pattern,\cite{mass}
 in which ``the algorithm [is] organized around a data structure that has been decomposed into concurrently updatable `chunks'.''
 For the bounded version of this problem, 
 the data structure is a regular rank 2 array with shape \textit{n, m}, 
@@ -256,13 +257,15 @@ Like above, the J code below includes only the fragment responsible for updating
 \end{small}
 \end{singlespacing}
 
-One important difference between this solution and the OpenMP version is 
-the approach to calculating the number of neighbor cells which are alive.
+\noindent One important difference between this solution and the OpenMP version is 
+the approach to calculating the number of neighbor cells that are alive.
 Instead of using array indexing at an item by item level, 
 the neighbors are represented as a rank 3 array of shifted versions of the original board. 
 In order to represent that cells near the edges do not have neighbors, 
 0s are shifted in the appropriate places.
-E.g.,
+
+\begin{figure}
+\begin{quote}
 \glsadd{reshape}
 \begin{singlespacing}
 \begin{small}
@@ -289,9 +292,13 @@ E.g.,
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\caption{Neighbors of cells in the Game of Life expressed as a 3D array}
+\label{fig::gol_nei}
+\end{figure}
 
-This is a data parallel approach to the problem,
-in that it now acts on sub-collections of the rank 3 array independently. 
+Calculating the number of live neighbors of a cell by using a rank 3 array 
+is a data parallel approach to the problem, since now the sum acts on every cell in the same position in every rank 2 item. 
 This approach is a safer alternative to requiring 
 that the location of the cell is known to evaluate its neighbors, 
 which potentially causes race conditions on thread-local variables.
@@ -299,9 +306,9 @@ Similarly, instead of specifying a reduction on a work variable \texttt{sum},
 the parallel insert operator parallelize the operation in an automatically safe fashion.
 
 One objection to this approach would be the potentially dramatic increase 
-of memory use in the J approach compared to C with OMP. 
-This can be avoided by using an approach called an \textit{index function}, described in Section \ref{repa}.
-With an index transformation, only one copy of the original rank 2 would be kept, 
+of memory use in the J approach compared to C with OpenMP. 
+This increase in memory use can be avoided by using \textit{index functions}, described in Section \ref{repa}.
+With an index function, only one copy of the original rank 2 would be kept, 
 and instead of direct indexing into a rank 3 array, 
 an index function is used to determine 
 what the direct index into the rank 2 array would be.
@@ -312,16 +319,18 @@ can be found in Section \ref{pjsGol}.
 
 \subsection{Extensions}
 Of the listed problems, the Game of Life perhaps best demonstrates the utility 
-of generalizing the application of functions to higher rank arrays using function rank.
-This is not only because with function rank 
-the problem can be expressed in a data parallel fashion by extending the rank 2 array to a rank 3 array;
+of generalizing the application of functions to higher rank arrays using function rank, 
+not only because the problem is expressed in a data parallel fashion; 
 in general, simulations of cellular automata need not be restricted to two dimensions, 
 but can occur on arbitrary dimensions.
 This discussion of extending the Game of Life to higher dimensions 
 will focus on calculating the number of neighbors in any dimension.
 While it is possibly desirable that the rules governing the life of a cell 
 would also change depending on the dimension, 
-for simplicity it is assumed that the desired rules are already present.
+the particular set of rules used is omitted from the discussion because 
+the decision of which rules govern the life of a cell is 
+dependent on the results the programmer wishes to achieve, 
+and not the general method for achieving them.
 
 In the C solution with OpenMP, 
 the obvious extension of the problem to any specific rank 
@@ -333,7 +342,6 @@ Additionally, if the convenience of the C structure \ttfamily twoD\_array \norma
 the structure must be rewritten for every rank desired. 
 Again, on the other hand, it is may not be easy for a programmer to see 
 how to begin an approach which handles the problem in the general case.
-
 The solution to the general approach in J is given below.
 
 \begin{singlespacing}
@@ -346,38 +354,47 @@ The most significant change from the previous approach
 is changing \ttfamily shiftBy \normalfont to a function 
 that calculates the appropriate values based on the dimension of the board, 
 rather than hard coding them like before.
-This is accomplished using much the same approach 
-as used with the previous problem in Section \ref{piext}, 
-so the details of its behavior will be glossed with a simple illustration:
+This change accomplished with the \textit{base} function using much the same approach 
+as found with the previous problem in Section \ref{piext}, 
+so the details of its behavior will be glossed with a simple illustration, 
+found in Fig~\ref{fig::gol_ext}:
 
+\begin{figure}
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
-   show board =: 3 3 reshape 0 1 1  1 0 0  0 1 0
-0 1 1
-1 0 0
-0 1 0
    show board3D =: 2 2 2 reshape 0 0  0 1  1 0  1 1
 0 0
 0 1
 
 1 0
 1 1
-   0 1 4 7 8 from shiftBy board
-_1 _1
-_1  0
- 0  0
- 1  0
- 1  1
    0 1 13 24 25 from shiftBy board3D
 _1 _1 _1
 _1 _1  0
  0  0  0
  1  1 _1
  1  1  0
+   NB. Box places its arguments in a box
+   NB. This displays each 3D array
+   NB. the shift values from above
+   box =: <
+   box ("3) 0 1 13 24 25 from neighborArray board3D
++---+---+---+---+---+
+|0 0|0 0|0 0|0 1|1 1|
+|0 0|0 0|0 1|0 0|0 0|
+|   |   |   |   |   |
+|0 0|0 0|1 0|0 0|0 0|
+|0 0|0 0|1 1|0 0|0 0|
++---+---+---+---+---+
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\caption{Neighbors in ``Game of Life'', extended to any dimension}
+\label{fig::gol_ext}
+\end{figure}
 
 There is one additional change necessary:
 since the values to shift always include the ``no shift'' vector
@@ -386,9 +403,8 @@ without additional logic live cells will always be counted as
 having one additional neighbor. 
 The listed code handles this by subtracting from 
 the sum of the values the value of the cell itself.
-
 No other changes to the code are necessary for this extension to work, 
-meaning the inherent parallelism of the solution for fixed rank 
+and thus the inherent parallelism of the solution for fixed rank 
 is preserved without additional logic.
 
 \section{Merge Sort}
@@ -414,10 +430,10 @@ However, it will be shown that an advantage of function rank in approaching this
 will be easily extending a given vector to sort into an arbitrarily high dimension.
 
 \subsection{Relevant Design Patterns}
-This problem was chosen to represent the ``Divide and Conquer'' design pattern, \cite{mass}
+This problem represents the ``Divide and Conquer'' design pattern,
 in which, like its sequential equivalent,
 ``the problem is solved by splitting it into a number of smaller sub-problems, 
-solving them independently [concurrently], and merging the sub-solutions.''
+solving them independently [concurrently], and merging the sub-solutions''\cite{mass}.
 Normally, problems that fit this design pattern are difficult to approach with data parallelism.
 Given the constraints mentioned above, however,
 merge sort will always the same number of sub-problems each with the same size, 
@@ -460,8 +476,11 @@ The full solution can be found in Appendix \ref{jmfull}
 This solution takes advantage of the constraints on the length of the array (it must be an integral power of two), 
 expressing the regularity of the sizes of sub-problems through a regular array 
 whose rank grows as the number of sub-problems does.
-For example: 
+For example, consider the code in Fig~\ref{fig::divide}: 
+
 \glsadd{deal}
+\begin{figure}[pht]
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -472,12 +491,14 @@ For example:
 0 5 1 2 3 4 7 6
    show vec16 =: deal 16
 11 8 3 10 12 1 15 9 4 13 7 14 6 5 2 0
+   NB. Converts v8 into a 2 by 2 by 2 array
    divide vec8
 0 5
 1 2
 
 3 4
 7 6
+   NB. Converts v16 into a 2 by 2 by 2 by 2 array
    divide vec16
 11  8
  3 10
@@ -494,6 +515,10 @@ For example:
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\caption{Divide and conquer by reshaping to an arbitrary rank array}
+\label{fig::divide}
+\end{figure}
 
 Unlike the high level description of the problem given at the beginning of this section (but equivalently), 
 this solution first sorts each two item vectors, 
@@ -502,12 +527,16 @@ Then, vectors are repeatedly merged via an insert of the \texttt{merge} function
 (which always consist of two vector elements).
 Again, while repeated function application doesn't quite fall into the bounds of data parallelism, 
 each merge operation on the rank 2 items is itself data parallel. 
-The following example illustrates this possibly unintuitive result of finding data parallelism 
+The example in Fig~\ref{fig::conquer} illustrates this possibly unintuitive result of finding data parallelism 
 in a traditionally divide and conquer problem.
 
+\begin{figure}[hp]
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
+   NB. Visualizing the application of the first
+   NB. merge operation on vec16
    'merging' link ("2) sort2 ("1) divide vec16
 +-------+----+
 |merging|8 11|
@@ -524,6 +553,8 @@ in a traditionally divide and conquer problem.
 |merging|5 6 |
 |       |0 2 |
 +-------+----+
+   NB. Visualizing the application of the second
+   NB. merge operation on vec16
    'merging' link ("2) (merge insert)(p_rank 2) sort2 ("1) divide vec16 
 +-------+---------+
 |merging|3 8 10 11|
@@ -535,3 +566,8 @@ in a traditionally divide and conquer problem.
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\caption{Merging each of the vector elements of every matrix}
+\label{fig::conquer}
+\end{quote}
+
+\end{figure}
