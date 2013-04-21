@@ -128,10 +128,10 @@ int main(int argc, char* argv[]) {
     clear_border(new_board);
 
     /* print initial configuration */
-    fprintf(stdout, "\nInitial board\n\n");
+/*    fprintf(stdout, "\nInitial board\n\n");
     print_board(stdout, board);
     fprintf(stdout, "\n\n");
-
+*/
     init_done_time = get_time();
 
     /* loop to update board and print */
@@ -139,11 +139,11 @@ int main(int argc, char* argv[]) {
         /* update (results in new_board) */
         update_board(board, new_board);
         /* print */
-        if (((step+1) % print_interval) == 0) {
+ /*       if (((step+1) % print_interval) == 0) {
             fprintf(stdout, "Board after step %d\n\n", step+1);
             print_board(stdout, new_board);
             fprintf(stdout, "\n\n");
-        }
+        }*/
         /* swap old and new boards */
         {
             twoD_array_t *temp = board;

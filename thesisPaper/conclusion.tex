@@ -41,8 +41,8 @@ with lower-level expressions acting on primitives, thus avoiding new object crea
 This research would be useful for future work towards a parallel alternative of J.
 Regardless of the language chosen for implementing a parallel J, 
 researchers must still consider which language features to include first in their prototype (Section \ref{desp})
-and must still understand the inherrently data parallel nature of the rank operator (Section \ref{fridp})
-Also the forces that lead to the choice of Scala as the language 
+and must still understand the inherently data parallel nature of the rank operator (Section \ref{fridp})
+Also, the forces that lead to the choice of Scala as the language 
 for this research (also listed in Section \ref{desp}), 
 should suggest to future researchers the kinds of language features desirable 
 for implementing a parallel J. 
@@ -61,19 +61,18 @@ Both this documentation and the full source code (under open sources licenses)
 are available freely on the J Programming Website.
 In addition, it seems that there are at least two viable options in such an approach 
 which are possibly not mutually exclusive.
-Future researchers may use shared memory parallel environments
-such as the OpenMP library 
-to parallelize operations within a single instance of a parallel J.
-
-Also, the current implementation of J already includes 
-functionality to allow for multiple instances of J to be running in the same process 
-without race conditions.
-Therefore, it may be possible to approach future work using 
-a distributed memory parallel environment, such as MPI\cite{mpi}.
+One option is to use a shared memory parallel environment such
+OpenMP to parallelize operations within a single instance of a
+parallel J. 
+Another is to take advantage of the fact that the
+current implementation of J already includes functionality to allow
+for multiple instances of J to be running in the same process without
+race conditions and approach future work using a distributed memory
+parallel environment, such as MPI\cite{mpi}.
 
 \subsection{Sequential and Parallel Scala Libraries for Regular Arrays using Function Rank}
 Another possible extension to the work presented here 
-is the development of Scala library for arbitrary dimensional collections that uses function rank. 
+is the development of a Scala library for arbitrary dimensional collections that uses function rank. 
 This library would ideally support parallelism in much the same way 
 Scala's current collections library does\cite{pc},
 through conversions between sequential and parallel implementations of each collection type. 
@@ -100,7 +99,7 @@ This paper demonstrates that, conceptually,
 the formalization of function rank found in the functional and collections oriented 
 J programming language and Parallel-J Scala library 
 can help programmers exploit potential concurrency in the form of data parallelism, 
-because it allows programmers take existing functions and, in an inherently data parallel fashion, 
+because it allows programmers a take existing functions and, in an inherently data parallel fashion, 
 both apply them to specific ranks of a collection and 
 extend them to similar problems in higher dimensions. 
 There may be other, equivalent models of function rank expressed in other programming paradigms, 

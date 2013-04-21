@@ -2,20 +2,20 @@
 \label{probs}
 
 \section{Rationale}
-Each of the following problems illustrates 
-both the advantages in approaching different forms of exploitable concurrency with the notion of function rank, 
-as well as extending these problems to higher ranks can be done easily, safely, and in an automatically data parallel fashion.
+The solutions to each of the following problems illustrate how the notion function rank both
+provides advantages in approaching different forms of exploitable concurrency, 
+as well as allows for extensions to similar problems in higher dimensions easily, safely, and often automatically.
 For each of these problems, there is a trivial extension into a higher dimension: 
 gather several rank $n$ inputs to the problem into a rank $n+1$ collection 
 and use the parallel rank operator to evaluate each of these inputs concurrently.
 By specifying that the original function operates on rank $n$ elements, 
 this extension is done automatically. 
 However, each section also discusses, when appropriate, 
-the usefullness of function rank when the extension is more complicated.
+the usefulness of function rank when the extension is more complicated.
 Solutions for each of the problems in the following sections using the partial implementation of the Parallel-J system
 are given in Appendix \ref{apsol}.
 
-To demonstrate the usefullness of function rank, 
+To demonstrate the usefulness of function rank, 
 the problems were chosen so as to illustrate different kinds of \textit{parallel design patterns}. 
 \textit{Design Patterns} are general, reusable solutions to a common class of problems. % TODO cite? (from Wikipedia)
 Software design patterns were first made popular for object-oriented programming through 
@@ -58,7 +58,7 @@ meaning no sophisticated scheduling is required in order to exploit concurrency 
 \subsection{Solutions}
 \subsubsection{C with OpenMP}
 A parallel solution to this problem using C with the OpenMP libraries is given below. 
-It is based off of the solution given in Appendix A of Mattson et al.\cite{mass}.
+It is based on the solution given in Appendix A of Mattson et al.\cite{mass}.
 
 \begin{singlespacing}
 \begin{small}
@@ -114,8 +114,8 @@ generalizes to calculating any useful value by finding the value of an integral.
 In general, the domain over which an integral takes place need not be 1-dimensional, 
 as it was in this example (over the closed interval $[0,1]$).
 Instead, the desired value may most naturally be expressed as a volume or hyper-volume. 
-Fourier transformations, for example, have many applications in physics and engineering, 
-and can be expressed over arbitrary dimension.
+For this example problem, the extension to higher dimensions would be
+calculating $\pi$ by finding a volume or hyper-volume.
 
 The following discussion will focus on generalizing the creation of 
 the set of points in $n$-dimensional space over the interval $[0,1]^n$.
@@ -187,7 +187,7 @@ Because of the way \textit{xs} is defined, no matter the dimension on which the 
 the points for applying the desired function can always be represented by at most a rank 2 array 
 
 \glsadd{shapeOf}
-\[\textit{shapeOf xs vn} ; \Leftrightarrow ; \texttt{(* insert vn), n} \]
+\[\texttt{shapeOf xs vn} ; \Leftrightarrow ; \texttt{(* insert vn), n} \]
 
 To approximate the desired integral, apply the appropriate function (in an inherently parallel fashion) 
 to each of the vector elements (which represent the coordinates to calculate the Riemann sum), 
@@ -246,7 +246,8 @@ avoiding the potential race condition mentioned above.
 \end{small}
 \end{singlespacing}
 
-Parallelism is specified on each of the row elements, indexed by $i$.
+In the code given above, the tasks given to threads are the iterations of the outermost for loop, 
+i.e. the operations on each of the row elements, indexed by $i$.
 Again, we see that a safeguard for the index $j$ is required in order to avoid race conditions. 
 This safeguard, as well as the swapping back and forth of grids (which would be required in a sequential solution similar to this), 
 are changes in code which have to be made not because of the nature of the computation itself, 
@@ -302,7 +303,8 @@ In order to represent that cells near the edges do not have neighbors,
 \end{figure}
 
 Calculating the number of live neighbors of a cell by using a rank 3 array 
-is a data parallel approach to the problem, since now the sum acts on every cell in the same position in every rank 2 item. 
+is a data parallel approach to the problem, 
+since now the sum acts on every cell in the same position in every rank 2 item. 
 This approach is a safer alternative to requiring 
 that the location of the cell is known to evaluate its neighbors, 
 which potentially causes race conditions on thread-local variables.
@@ -533,7 +535,8 @@ expressing the recursive base-case of the merge sort algorithm as a data paralle
 Then, vectors are repeatedly merged via an insert of the \texttt{merge} function on the rank 2 items 
 (which always consist of two vector elements).
 Again, while repeated function application doesn't quite fall into the bounds of data parallelism, 
-each merge operation on the rank 2 items is itself data parallel. 
+each merge operation on the rank 2 items is itself data parallel, 
+since the operation acts on the two-dimensional sub-collections concurrently. 
 The example in Fig~\ref{fig::conquer} illustrates this possibly unintuitive result of finding data parallelism 
 in a traditionally divide and conquer problem.
 
