@@ -26,8 +26,8 @@ fundamentally operate on scalar values, and thus usually have the function rank 
 These arithmetic functions, and all others which operate on scalar values, 
 must be extended, whether manually by the programmer or automatically by the J environment, 
 to operate on collections of rank $n \ge 1$.
-On the other hand, most collective operations, such as using an integer to index into collection (\texttt{0 \_}), 
-sorting a collection (\texttt{\_}), and getting the shape of an array (\texttt{\_}), operate on whole collections at once.
+On the other hand, most collective operations, such as using an integer to index into collection (which has rank \texttt{0 \_}), 
+sorting a collection, and getting the shape of an array (both of which have rank \texttt{\_}), operate on whole collections at once.
 In the above example, function ranks with only 2 elements represent the J primitive's dyadic use cases; 
 similarly for the function ranks with only 1 element and J's monads. % TODO footnote?
 
@@ -390,7 +390,7 @@ guaranteeing the absence of rank-related runtime errors''\cite{dph}.
 It is implemented as a list of the type \textit{Int} and 
 uses Haskell's pattern-matching capabilities and some language extensions to analyze the structure of this list.
 However, unlike J, Repa appears to lack a rank operator.
-Instead, functions must be extended manually in order to operate of arrays of higher rank. 
+Instead, functions must be extended manually in order to operate on arrays of higher rank. 
 While \textit{Repa}'s manual extensions are 
 safer from error than extending through nested \textit{maps} or \textit{for loops} 
 due to its type safety and due to reducing some of the boilerplate code of the latter 

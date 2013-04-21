@@ -20,39 +20,18 @@
 \end{center}
 
 \noindent
-Many scientific and business applications operate on 
-data conceptually contained in regular, multidimensional collections.
-Frequently, operations on these collections are inherently data parallel.
-However, most languages and parallel environments 
-provide tools for exploiting data parallelism only for collections of one dimension.
-Programmers who wish to use such tools on existing programs to operate on regular, multidimensional collections
-often must write non-generalized code that can be difficult to maintain and 
-that cannot automatically scale to collections of higher dimensions.
+The notion of function rank has important implications for the field of parallel computing.
+In particular, certain formalizations of function rank can be helpful 
+for exploiting potential concurrency in the form of data parallelism, 
+because function rank can allow the programmer to express safely, easily, and in an automatically data parallel fashion  
+both the application of a function to subcollections of a regularly shaped multidimensional collection and 
+the extension of a function to similar problems in higher dimensions.
 
-Function rank, first developed by K. Iverson and implemented in the programming language J, 
-formalizes the dimension (\textit{rank}) of the arguments to a function in such a way 
-that functions can be easily extended to collections of higher dimensions using 
-a higher-order function (the \textit{rank operator}).
-This extension is relatively simple, inherently parallel, and provably safe 
-from certain kinds of indexing errors which stem from not knowing the dimension, shape, or possible irregularity of the collection.
-However, this last property can be difficult to capture at compile-time.
-
-Presented is a prototype for a parallel regular collections library that supports function rank 
-to demonstrate that function rank allows a programmer to easily exploit potential concurrency 
-in problems involving inherently data parallel operations on regular collections.
-The programming language Scala was selected to implement this library because it is modern, multi-paradigm, 
-and in particular it provides a parallel collections framework that 
-allows programmers to easily write data parallel programs for 1 dimensional collectons.
-Also presented are three proposals that could be included in 
-possible future parallel implementations of the J programming language:
-two new operators, parallel rank and parallel insert;
-and an extension to the J environment library to include functions which affect a parallel environment.
-Each proposal includes a sketch of its use.
-
-Finally, we use a suite of example problems, 
-solved in J, C using OpenMP, and in Scala using the presented library, 
-to compare conceptual ease of use and scalability of the applications to related problems in higher dimensions.
-Each problem is discussed in the context of wider parallel design patterns, 
-to show that function rank can be useful to a broad class of parallel problems.
-Performance results are included, but do not show much significance in improved performance 
-due to a lack of optimization; this work is intended as a proof-of-concept for future research.
+This paper illustrates this importance 
+by discussing solutions using function rank to three parallel problems, 
+each chosen to represent different parallel design patterns. 
+Additionally, included are both a set of proposals for a parallel implementation of J, 
+which is an array-oriented, functional programming language with function rank, 
+as well as a prototype implementation of a parallel regular collections library using function rank in Scala. 
+Performance results for solutons using the prototype Scala library (as well as C with OpenMP, for comparison) 
+to each of the problems are also given, though this work is intended only as a proof-of-concept.

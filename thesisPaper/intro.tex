@@ -54,7 +54,7 @@ To put it another way, if an existing function that operates on regular collecti
 needs to be extended to a collection of higher rank, 
 or if the function only operates on scalar values but needs to be extended to some regular collection, 
 the programmer usually must wrap the function in nested for loops.
-Without abstraction in the language or library to deal with the general cases of such extensions, 
+Without abstractions in the language or a library to deal with the general cases of such extensions, 
 this activity is tedious in the trivial cases, adding unnecessary overhead to the programming process,
 and prone to error because programmers must instead write boilerplate code in order to accomplish it.
 Moreover, in some cases these extensions are data parallel, 
@@ -76,8 +76,12 @@ than if the same operations were done imperatively using for loops
 because they capture the essence of what the operations \textit{are}, more than how the operations are \textit{implemented}.
 As a consequence, they also can allow programmers 
 to see more easily where there is inherent data parallelism in the algorithm, 
-such as all calls to \textit{map}, or calls to \textit{reduce} with associative operations, on large collections.
-However, since these higher-order functions are usually designed to return functions that operate on only one dimension at a time, 
+such as all calls to \textit{map}, or calls to \textit{reduce} with associative operations, on large collections. 
+The level of abstraction they provide programmers, 
+as well as their lack of side-effects (an thus most sources of race conditions), 
+make functional languages ideal for solving many kinds of parallel problems.
+However, since the higher order functions most functional languages provide for operating on collections 
+are usually designed to operate on only one dimension at a time, 
 they too must be nested in order to extend existing functions to collections of higher rank, 
 with the same, though usually reduced, problem of unnecessary overhead and boilerplate code mentioned above.
 
@@ -188,8 +192,8 @@ The Scala programming language was chosen to implement this parallel subset of J
 	\begin{itemize}
 		\item support for many higher-order operations such as \textit{map} and \textit{reduce}, 
 			common to many solutions to data parallel problems\cite{scala28col}, and
-		\item a library for parallel collections that exploits the concurrency inherently data parallel operations\cite{pc},
-			which, being similar to the use-cases in this research, were anticipated to make parallelizing the implementation relatively easy.
+		\item a library for parallel collections that exploits the concurrency in data parallel operations\cite{pc},
+			which, being similar to the use-cases in this research, promised to make the parallel implementation relatively easy.
 	\end{itemize}
 \end{enumerate}
 

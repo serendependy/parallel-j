@@ -69,9 +69,9 @@ Also, the current implementation of J already includes
 functionality to allow for multiple instances of J to be running in the same process 
 without race conditions.
 Therefore, it may be possible to approach future work using 
-a distributed memory parallel environment, such as Open MPI\cite{mpi}.
+a distributed memory parallel environment, such as MPI\cite{mpi}.
 
-\subsection{Sequential and Parallel Scala Library for Regular Arrays using Function Rank}
+\subsection{Sequential and Parallel Scala Libraries for Regular Arrays using Function Rank}
 Another possible extension to the work presented here 
 is the development of Scala library for arbitrary dimensional collections that uses function rank. 
 This library would ideally support parallelism in much the same way 
@@ -85,12 +85,29 @@ or which are naturally expressed in a higher dimension than the original problem
 At the time this research was conducted, 
 the author was not aware of current work being done in 
 generic and polytipic programming in Scala by Miles Sabin. 
-In particular this work, which is collectively called ``Shapeless''\cite{shapeless}
-, supports collections whose sizes are known statically. 
+In particular this work, which is collectively called ``Shapeless''\cite{shapeless}, 
+supports collections whose sizes are known statically. 
 This functionality would be useful for future work in developing 
 a library of collections whose dimensions are known statically, 
 possibly granting some or all of the advantages give when discussing 
-the Haskell library Repa \cite{dph} in Section \ref{repa}.
+the Haskell library \textit{Repa} in Section \ref{repa}\cite{dph}.
 Combining these advantages with functions supporting function rank into a single Scala library
 would lead to significant expressiveness and reduced boiler-plate code, 
 and could lend itself to a future parallel implementation for good performance, as well.
+
+\subsection{Implications for Other Work in Data Parallelism}
+This paper demonstrates that, conceptually, 
+the formalization of function rank found in the functional and collections oriented 
+J programming language and Parallel-J Scala library 
+can help programmers exploit potential concurrency in the form of data parallelism, 
+because it allows programmers take existing functions and, in an inherently data parallel fashion, 
+both apply them to specific ranks of a collection and 
+extend them to similar problems in higher dimensions. 
+There may be other, equivalent models of function rank expressed in other programming paradigms, 
+such as object oriented programming, used in Parallel-J to express the rank operator; 
+developments in type theory may lead to elegant static expressions of 
+the shape of regular collections and a function's shape (instead of just rank) requirements and transformations of its data. 
+Whatever the future holds in the field of parallel computing, 
+this paper hopes to make researchers aware that an elegant (and race-condition safe) solution 
+already exists to an entire class of data parallel problems 
+and is waiting for its time to be acknowledged as, and used in conjunction with, other great ideas in the field.

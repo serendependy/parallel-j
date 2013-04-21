@@ -8,7 +8,7 @@ as well as extending these problems to higher ranks can be done easily, safely, 
 For each of these problems, there is a trivial extension into a higher dimension: 
 gather several rank $n$ inputs to the problem into a rank $n+1$ collection 
 and use the parallel rank operator to evaluate each of these inputs concurrently.
-By specifying the original function operates on rank $n$ elements, 
+By specifying that the original function operates on rank $n$ elements, 
 this extension is done automatically. 
 However, each section also discusses, when appropriate, 
 the usefullness of function rank when the extension is more complicated.
@@ -184,7 +184,11 @@ so that the resulting points are in the appropriate bounds.
 (For more on the behavior of the function \texttt{base}, see Appendix \ref{base}). % TODO footnote
 
 Because of the way \textit{xs} is defined, no matter the dimension on which the programmer desires to calculate their integral, 
-the points for applying the desired function can always be represented by at most a rank 2 array with shape \texttt{(* insert vn), n}
+the points for applying the desired function can always be represented by at most a rank 2 array 
+
+\glsadd{shapeOf}
+\[\textit{shapeOf xs vn} ; \Leftrightarrow ; \texttt{(* insert vn), n} \]
+
 To approximate the desired integral, apply the appropriate function (in an inherently parallel fashion) 
 to each of the vector elements (which represent the coordinates to calculate the Riemann sum), 
 then multiply the sum of the results by the appropriate value (\texttt{1 div (* insert vn)}).
@@ -451,16 +455,19 @@ was taken from an article on parallelism in OpenMP and MPI\cite{mergeomp}.
 \end{small}
 \end{singlespacing}
 
-The \texttt{sections} compiler directive\cite{openmp}
+\noindent The \texttt{sections} compiler directive
 specifies that the following blocks of code (each begin with a \texttt{section} directive) 
-are to be executed independently of each other.
+are to be executed independently of each other\cite{openmp}. 
+Then, after each sub-array is sorted, each thread (spawned by the different \textit{section} directives) 
+recursively merges (in-order) its sub-arrays in parallel, resulting in the original array being sorted.
 
-Similarly to the Game of Life example in C, 
-in order to avoid race conditions on the array a temporay array (\texttt{temp}) must be introduced
-so that intermediate mutations do not affect the original array.
-However, in this situation a similar serial program would also have to take the same precautions, 
-meaning this is more of a limitation of the C programming language itself, 
-and other imperative languages like it, rather than a limitation of OpenMP.
+While this solution is expressed very imperatively, most likely for performance reasons, it need not have been. 
+Instead, each thread could have allocated memory and returned a new array with all the elements of the previous array in sort order.
+However, in either of these cases the programmer must explicitly work around the 
+imperative nature of the programming language, either by manually requesting new memory safe for the stateful operations, 
+or by manually keeping track of memory locations to avoid operating on data in use by other threads.
+However, this added effort would remain regardless of whether the solution were sequential or parallel, 
+since it comes from the C programming language.
 
 \subsubsection{J}
 \label{jmerge}
@@ -473,7 +480,7 @@ The full solution can be found in Appendix \ref{jmfull}
 \end{small}
 \end{singlespacing}
 
-This solution takes advantage of the constraints on the length of the array (it must be an integral power of two), 
+\noindent This solution takes advantage of the constraints on the length of the array (it must be an integral power of two), 
 expressing the regularity of the sizes of sub-problems through a regular array 
 whose rank grows as the number of sub-problems does.
 For example, consider the code in Fig~\ref{fig::divide}: 
@@ -521,7 +528,7 @@ For example, consider the code in Fig~\ref{fig::divide}:
 \end{figure}
 
 Unlike the high level description of the problem given at the beginning of this section (but equivalently), 
-this solution first sorts each two item vectors, 
+this solution first sorts each two item vector, 
 expressing the recursive base-case of the merge sort algorithm as a data parallel operation.
 Then, vectors are repeatedly merged via an insert of the \texttt{merge} function on the rank 2 items 
 (which always consist of two vector elements).

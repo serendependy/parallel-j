@@ -68,6 +68,16 @@ Table \ref{tnip} below gives the outcomes.
 		Parallel-J & 651.6 & 653.7 & 653.3 & 826.1 & 769.3 & 814.5 & 1017.5 & 1020.0 & 1021.5 \\
 	\hline
 \end{tabular}
+\begin{tabular}{|r|c|c|c||}
+	\hline
+		& \multicolumn{3}{|c|}{$x=1,000,000$} \\
+	\hline
+		Threads & 1 & 2 & 4 \\
+	\hline
+	\hline
+		C with OpenMP & 0.0233465 & 0.0117569 & 0.01764 \\
+	\hline
+\end{tabular}
 \caption{Performance results for calculating $\pi$}
 \label{tnip}
 \end{table}
@@ -115,6 +125,16 @@ ranging from 100 to 300 by increments of 25.
 		Parallel-J & 2.45014e6 & 3.00412e6 & 2.62603e6 & 3.79871e6 & 3.79696e6 & 4.37458e6 & 5.36684e6 & 5.36859e6 & 6.19567e6 \\
 	\hline
 \end{tabular}
+\begin{tabular}{|r||c|c|c||}
+	\hline
+		& \multicolumn{3}{|c|}{$x=1000$} \\
+	\hline
+		Threads & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & 1.22818 & 0.684292 & 0.683609 \\
+	\hline
+\end{tabular}
 \caption{Performance results for the Game of Life}
 \label{tgol}
 \end{table}
@@ -140,6 +160,16 @@ Table \ref{tmrg} below gives the outcomes.
 	\hline
 	\hline
 		Parallel-J & 2.9 & 2.5 & 2.5 & 10.6 & 9.2 & 9.2 & 41.1 & 35.5 & 35.7 \\
+	\hline
+\end{tabular}
+\begin{tabular}{|r||c|c|c||}
+	\hline
+		& \multicolumn{3}{|c|}{$x=1000$} \\
+	\hline
+		Threads & 1 & 2 & 4 \\
+	\hline
+	\hline
+		Parallel-J & 0.413132 & 0.218665 & 0.222577 \\
 	\hline
 \end{tabular}
 \caption{Performance results for merge sort}
