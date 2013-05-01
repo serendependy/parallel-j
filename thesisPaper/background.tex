@@ -33,13 +33,21 @@ similarly for the function ranks with only 1 element and J's monads. % TODO foot
 
 \subsection{Shape Agreement}
 In the trivial cases, where a function \texttt{f} is given arguments with ranks matching \texttt{f}'s function rank, 
-J behaves much like any programming language without function rank. 
+J behaves much like any programming language without formalized function rank (c.f. Fig~\ref{fig:j-ig-fr}). 
+In some cases, when the arguments to \texttt{f} do not match its function rank, 
+\texttt{f} is automatically extended to the appropriate dimensions.
+For example, if \texttt{x} is a scalar, addition can always be extended 
+so that \texttt{x} is added to every element of a collection \texttt{c} no matter \texttt{c}'s rank or shape. 
+This automatic extension is demonstrated in Fig~\ref{fig:j-def-fr}
 
 \glsadd{show}
 \glsadd{integers}
 \glsadd{from}
 \glsadd{NB.}
+
+\begin{figure}[htbp]
 \begin{quote}
+\HRule
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -59,14 +67,15 @@ J behaves much like any programming language without function rank.
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\HRule
 \end{quote}
+\caption{Example of J, ignoring function rank}
+\label{fig:j-ig-fr}
+\end{figure}
 
-\noindent In some cases, when the arguments to \texttt{f} do not match its function rank, 
-\texttt{f} is automatically extended to the appropriate dimensions.
-For example, if \texttt{x} is a scalar, addition can always be extended so that \texttt{x} is added to every element of a collection \texttt{c} 
-no matter \texttt{c}'s rank or shape. 
-
+\begin{figure}[htbp]
 \begin{quote}
+\HRule
 \begin{singlespacing}
 \begin{small}
 \begin{verbatim}
@@ -76,7 +85,11 @@ no matter \texttt{c}'s rank or shape.
 \end{verbatim}
 \end{small}
 \end{singlespacing}
+\HRule
+\caption{Example of J with automatic function rank extension}
+\label{fig:j-def-fr}
 \end{quote}
+\end{figure}
 
 In general, addition (and all other scalar functions) can be extended automatically over two regular collections \texttt{x} and \texttt{y}  
 if the shape of one collection \textit{prefixes} the other.
@@ -90,182 +103,66 @@ a scalar, a vector of 2 elements, and another 2 by 3 matrix will agree with \tex
 since the shapes of the scalar (empty shape), the vector, and the other matrix would prefix the shape of \texttt{mat2\_3}; 
 any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also agree with 
 \texttt{mat2\_3} under addition, since the shape of \texttt{mat2\_3} would prefix its shape.
-
-\glsadd{agreement}
-\begin{figure}[hp]
-\begin{quote}
-\begin{singlespacing}
-\begin{small}
-\begin{verbatim}
-   100 200 + mat2_3
-100 101 102
-203 204 205
-   NB. agreement: visualizes
-   NB. how the cells of each 
-   NB. collection are paired with each other
-   NB. before performing the desired operation
-   agreement =: ; "
-
-   NB. Show agreement of two collections above
-   NB. under adition
-   NB. The shape 2 is the frame;
-   NB. the scalars are expanded to
-   NB. vectors of 3 to match 
-   NB. the shape of mat2_3
-   100 200 (+ agreement) mat2_3
-+---+-+
-|100|0|
-+---+-+
-|100|1|
-+---+-+
-|100|2|
-+---+-+
-
-+---+-+
-|200|3|
-+---+-+
-|200|4|
-+---+-+
-|200|5|
-+---+-+
-\end{verbatim}
-\end{small}
-\end{singlespacing}
-\end{quote}
-\caption{Visualizing shape agreement, part 1}
-\label{fig:agree1}
-\end{figure}
-%
-\pagebreak
-%
-\begin{figure}[hp]
-\begin{quote}
-\begin{singlespacing}
-\begin{small}
-\begin{verbatim}
-   mat2_3 + mat2_3
-0 2  4
-6 8 10
-   NB. The frame is 2 3;
-   NB. the scalar cells of both collections
-   NB. are paired with each other
-   mat2_3 (+ agreement) mat2_3
-+-+-+
-|0|0|
-+-+-+
-|1|1|
-+-+-+
-|2|2|
-+-+-+
-
-+-+-+
-|3|3|
-+-+-+
-|4|4|
-+-+-+
-|5|5|
-+-+-+
-\end{verbatim}
-\end{small}
-\end{singlespacing}
-\end{quote}
-\caption{Visualizing shape agreement, part 2}
-\label{fig:agree2}
-\end{figure}
-%
-\pagebreak
-%
-\begin{figure}[hp]
-\begin{quote}
-\begin{singlespacing}
-\begin{small}
-\begin{verbatim}
-   show arr2_3_2 =: integers 2 3 2
- 0  1
- 2  3
- 4  5
-
- 6  7
- 8  9
-10 11
-   arr2_3_2 + mat2_3
- 0  1
- 3  4
- 6  7
-
- 9 10
-12 13
-15 16
-\end{verbatim}
-\end{small}
-\end{singlespacing}
-\end{quote}
-\caption{Visualizing shape agreement, part 3.
-Continues in Fig~\ref{fig:agree4}}
-\label{fig:agree3}
-\end{figure}
-%
-\begin{figure}[hp]
-\begin{quote}
-\begin{singlespacing}
-\begin{small}
-\begin{verbatim}
-   NB. The frame is 2 3;
-   NB. The scalar cells of mat2_3
-   NB. are expanded to vectors of 2
-   NB. to match the shape of
-   NB. arr2_3_2
-   arr2_3_2 + agreement mat2_3
-+--+-+
-|0 |0|
-+--+-+
-|1 |0|
-+--+-+
-
-+--+-+
-|2 |1|
-+--+-+
-|3 |1|
-+--+-+
-
-+--+-+
-|4 |2|
-+--+-+
-|5 |2|
-+--+-+
-
-
-+--+-+
-|6 |3|
-+--+-+
-|7 |3|
-+--+-+
-
-+--+-+
-|8 |4|
-+--+-+
-|9 |4|
-+--+-+
-
-+--+-+
-|10|5|
-+--+-+
-|11|5|
-+--+-+
-\end{verbatim}
-\end{small}
-\end{singlespacing}
-\end{quote}
-\caption{Visualizing shape agreement, part 4}
-\label{fig:agree4}
-\end{figure}
-
-\noindent In this last example in Figure~\ref{fig:agree3} and Figure~\ref{fig:agree4}, 
+In this last example in Figure~\ref{fig:agree3}, 
 every scalar of \texttt{mat2\_3} was added to both scalars of each vector in \texttt{arr2\_3\_2}. 
 Another way to conceptualize this is that J made an implicit \textit{map} on the scalar elements of \texttt{mat2\_3}, 
 expanding each into a vector of 2 scalars.
 J could do this because, with a \textit{frame} of \texttt{2 3}, \texttt{mat2\_3}'s \textit{cells} were scalars and 
 \texttt{arr2\_3\_2}'s \textit{cells} were vectors of two scalars.
+
+\glsadd{agreement}
+
+\begin{figure}[htbp]\ContinuedFloat*
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\framebox[\linewidth][l]{
+\BVerbatimInput{agree-long-1.txt}
+}
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{Visualizing shape agreement. Continued in Fig~\ref{fig:agree2}}
+\label{fig:agree1}
+\end{figure}
+
+\begin{figure}[htbp]\ContinuedFloat
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\framebox[\linewidth][l]{
+\BVerbatimInput{agree-long-2.txt}
+}
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{Visualizing shape agreement. Continued in Fig~\ref{fig:agree3}}
+\label{fig:agree2}
+\end{figure}
+
+\begin{figure}[hptbp]\ContinuedFloat
+\begin{quote}
+\begin{singlespacing}
+\begin{small}
+\subcaptionbox{Addition of \texttt{mat2\_3} and \texttt{arr2\_3\_2}.\label{fig:agree3-1}}[\PartLineWidth]{
+	\framebox[\PartLineWidth][c]{
+	\BVerbatimInput{agree-long-3.txt}
+	}
+}% 
+\hfill%
+\subcaptionbox{Agreement of \texttt{mat2\_3} and \texttt{arr2\_3\_2}.\label{fig:agree3-2}}[\PartLineWidth]{
+	\framebox[\PartLineWidth][c]{
+	\BVerbatimInput{agree-long-4.txt}
+	}
+} 
+\end{small}
+\end{singlespacing}
+\end{quote}
+\caption{Visualizing shape agreement, part 3.}
+\label{fig:agree3}
+\end{figure}
+
+\pagebreak
 
 \subsection{Rank Operator}
 With what we have developed so far, we are still unable to perform the operation of 

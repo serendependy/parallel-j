@@ -60,6 +60,23 @@
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
 
+\usepackage{fancybox}
+
+% FIXME?  somewhat ugly hack 
+%\fboxrule=2pt 
+%\fboxsep=10pt 
+\fboxsep=0.5\baselineskip
+
+\def\HRule{\noindent\rule{\linewidth}{0.4pt}}
+\def\HSpace{\noindent\rule{\linewidth}{0pt}}
+\def\PartLineWidth{0.48\linewidth}
+
+\usepackage{caption}
+\usepackage{subcaption}
+\renewcommand\theContinuedFloat{\alph{ContinuedFloat}}
+
+\usepackage{longtable}
+
 \newcommand{\theAuthor}{Christopher Jenkins}
 \newcommand{\theTitle}{Toward a Parallel Implementation of J: Data Parallelism in Functional, Array-Oriented Languages with Function Rank\par}
 \newcommand{\theDate}{April 19, 2013}

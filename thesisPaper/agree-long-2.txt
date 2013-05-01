@@ -1,0 +1,22 @@
+   mat2_3 + mat2_3
+0 2  4
+6 8 10
+   NB. The frame is 2 3;
+   NB. the scalar cells of both collections
+   NB. are paired with each other
+   mat2_3 (+ agreement) mat2_3
++-+-+
+|0|0|
++-+-+
+|1|1|
++-+-+
+|2|2|
++-+-+
+
++-+-+
+|3|3|
++-+-+
+|4|4|
++-+-+
+|5|5|
++-+-+
