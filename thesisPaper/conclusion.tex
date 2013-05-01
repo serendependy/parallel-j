@@ -8,11 +8,11 @@ Probably the most significant reason for these results is that the body of code 
 potentially creates a large number of permanent and temporary objects, 
 meaning that there are multiple requests for memory from the Java run-time heap. 
 For example, since this work was originally intended to be a parallel implementation of J, 
-several wrapper classes for were created to hold the same kind kind of information the current version of J\cite{ioj} 
+several wrapper classes for were created to hold the same kind of information the current version of J\cite{ioj} 
 maintains about arrays and the primitive values, like reference counts and bit flags for type information, 
 and so where in a normal Scala library there would have been operations on primitive values, 
-in Paralell-J these operations were encumbered to work on instances of wrapper classes. 
-The constant creation of new objects for every single integer was likely a bottleneck for performance.
+in Parallel-J these operations were encumbered by having to work on instances of wrapper classes. 
+The constant creation of new objects for every single integer likely lengthened program run-time significantly.
 
 Also, operations that took existing collections and turned them into collections of higher rank 
 were implemented by copying whole collections, operating on them, 
@@ -22,7 +22,8 @@ which have been described in Section \ref{repa}, potentially improving performan
 by removing these unnecessary operations.
  
 Additionally, the large number of wrapper classes for primitive values 
-caused the size of the program to cause cache faults to slow down performance significantly. 
+increased each Parallel-J solution's memory requirements such that even comparatively modest problem sizes
+would not fit in cache, degrading performance significantly. 
 This was first discovered when analyzing the performance results in Section \ref{respi}, 
 in which increasing the problem size by a factor of 10, from $10,000$ to $100,000$, 
 caused the program's run time to increase by a factor of 100. 
@@ -58,7 +59,7 @@ In order to begin this approach,
 it is strongly recommended that researchers first 
 familiarize themselves with Roger Hui's documentation, ``An Implementation of J.''
 Both this documentation and the full source code (under open sources licenses)
-are available freely on the J Programming Website.
+are available freely on the J Programming web site\cite{jweb}.
 In addition, it seems that there are at least two viable options in such an approach 
 which are possibly not mutually exclusive.
 One option is to use a shared memory parallel environment such

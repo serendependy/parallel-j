@@ -21,7 +21,7 @@ the problems were chosen so as to illustrate different kinds of \textit{parallel
 Software design patterns were first made popular for object-oriented programming through 
 the work of the ``Gang of Four''\cite{designp},
 and are now seeing interest for applications in parallel computing\cite{mass}.
-This research has chosen to focus on the pattern language developed by Mattson et. al. 
+This research has chosen to focus on the pattern language developed by Mattson et al. 
 presented in their book, \textit{Patterns for Parallel Programming}\cite{mass}. % TODO justify?
 Using parallel design patterns to guide the choices and discussion of these problems 
 should allow this limited selection of problems to better represent families of parallel problems.
@@ -458,9 +458,9 @@ was taken from an article on parallelism in OpenMP and MPI\cite{mergeomp}.
 \end{singlespacing}
 
 \noindent The \texttt{sections} compiler directive
-specifies that the following blocks of code (each begin with a \texttt{section} directive) 
+specifies that the following blocks of code (each beginning with a \texttt{section} directive) 
 are to be executed independently of each other\cite{openmp}. 
-Then, after each sub-array is sorted, each thread (spawned by the different \textit{section} directives) 
+Then, after each sub-array is sorted, each thread (spawned by a different \textit{section} directives) 
 recursively merges (in-order) its sub-arrays in parallel, resulting in the original array being sorted.
 
 While this solution is expressed very imperatively, most likely for performance reasons, it need not have been. 
@@ -469,7 +469,7 @@ However, in either of these cases the programmer must explicitly work around the
 imperative nature of the programming language, either by manually requesting new memory safe for the stateful operations, 
 or by manually keeping track of memory locations to avoid operating on data in use by other threads.
 However, this added effort would remain regardless of whether the solution were sequential or parallel, 
-since it comes from the C programming language.
+since it comes from the C programming language, and is typical of many imperative programming languages.
 
 \subsubsection{J}
 \label{jmerge}

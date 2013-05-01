@@ -55,7 +55,7 @@ needs to be extended to a collection of higher rank,
 or if the function only operates on scalar values but needs to be extended to some regular collection, 
 the programmer usually must wrap the function in nested for loops.
 Without abstractions in the language or a library to deal with the general cases of such extensions, 
-this activity is tedious in the trivial cases, adding unnecessary overhead to the programming process,
+this activity is tedious in the trivial cases, adding unnecessary syntactic overhead to the programming process,
 and prone to error because programmers must instead write boilerplate code in order to accomplish it.
 Moreover, in some cases these extensions are data parallel, 
 and can be done automatically and automatically exploit potential concurrency.
@@ -136,8 +136,8 @@ The rest of the paper is organized as follows:
     \item Chapter \ref{conc} presents our conclusions of this research and discusses future work. 
 \end{itemize}
 \noindent
-In addition, appendecies and a glossary of J functions used throughout the remaining chapters 
-are given at the end of this paper, as aides to the reader.
+In addition, appendices and a glossary of J functions used throughout the remaining chapters 
+are given at the end of this paper, as aids to the reader.
 
 \section{Design Plan}
 \label{desp}
@@ -179,7 +179,8 @@ for example specifying the number of threads to use in executing a piece of code
 Although not entirely related to function rank, such environmental controls as would be included in the parallel environment 
 are to be expected from any serious parallel computing language or library.
 
-The Scala programming language was chosen to implement this parallel subset of J for the following reasons\cite{scala}:
+Scala, a programming language developed by Odersky et al.\cite{scala}, 
+was chosen to implement this parallel subset of J for the following reasons:
 \begin{enumerate} 
 	\item Scala supports multiple programming paradigms, such as
 	\begin{itemize}
