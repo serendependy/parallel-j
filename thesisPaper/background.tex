@@ -311,7 +311,7 @@ that \texttt{f (" 3)} means ``apply f on the rank 3 items'', than it is to under
 
 \[\texttt{f :: (Shape sh, Elt e) => Array (sh :. Int :. Int :. Int) e -> Array sh e} \]
 
-\noindent \textit{Reap}'s greater verbosity is partially due to Haskell being statically typed, 
+\noindent \textit{Repa}'s greater verbosity is partially due to Haskell being statically typed, 
 which is what also allows \textit{Repa} to capture the effects operations have on data rank at compile time. 
 J, in contrast, is dynamically typed, and while this means J does not provide any mechanisms for catching errors before runtime, 
 its functions also do not need to statically document their effects on data, simplifying the way programmers write and use code.

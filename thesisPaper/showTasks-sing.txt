@@ -1,0 +1,35 @@
+   NB. increment: increments the scalar elements of a numeric array
+   increment =: >:
+   increment mat2_3
+1 2 3
+4 5 6
+
+   NB. Eventually increment will always
+   NB. operate on scalars, regardless 
+   NB. of the rank specified
+   increment"1 mat2_3
+1 2 3
+4 5 6
+
+   NB. showTasks: illustrates the tasks 
+   NB. that would be created with 
+   NB. the parallel rank operator
+   showTasks =: agreement (< @)
+
+   NB. tasks created by regular
+   NB. use of increment would be
+   NB. one for every scalar (6)
+   (increment showTasks) mat2_3
+┌─┬─┬─┐
+│0│1│2│
+├─┼─┼─┤
+│3│4│5│
+└─┴─┴─┘
+
+   NB. tasks created by applying
+   NB. increment on rank 1
+   NB. would be one for every vector (2)
+   (increment"1 showTasks) mat2_3
+┌─────┬─────┐
+│0 1 2│3 4 5│
+└─────┴─────┘

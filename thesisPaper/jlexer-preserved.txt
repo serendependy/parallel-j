@@ -1,0 +1,8 @@
+   NB. The J Lexer as a primitive
+   NB. Takes a character string and 
+   NB. puts each lexeme in a `box'
+   jlexer =: ;:
+   jlexer '+/::("1) mat2_3 +("::1)("2) arr2_2_3'
+┌─┬───┬─┬─┬─┬─┬──────┬─┬─┬───┬─┬─┬─┬─┬─┬─┬────────┐
+│+│/::│(│"│1│)│mat2_3│+│(│"::│1│)│(│"│2│)│arr2_2_3│
+└─┴───┴─┴─┴─┴─┴──────┴─┴─┴───┴─┴─┴─┴─┴─┴─┴────────┘

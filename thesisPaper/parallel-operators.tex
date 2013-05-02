@@ -22,22 +22,21 @@ The spellings \texttt{"::}  and \texttt{/::} for the two parallel operators were
 Mnemonically, each uses the same base character as their sequential analogs, (\texttt{"} and \texttt{/}), 
 as well as two ``parallel'' colons, making it easier to remember their functions.
 They also require no changes be made to the existing J lexer\cite{ioj}, 
-as demonstrated below:
+as demonstrated below in Fig~\ref{fig:jlexer-pres}
 
+\begin{figure}[htbp]
+\begin{quote}
 \begin{singlespacing}
 \begin{small}
-\begin{verbatim}
-   NB. The J Lexer as a primitive
-   NB. Takes a character string and 
-   NB. puts each lexeme in a `box'
-   jlexer =: ;:
-   jlexer '+/::("1) mat2_3 +("::1)("2) arr2_2_3'
-+-+---+-+-+-+-+------+-+-+---+-+-+-+-+-+-+--------+
-|+|/::|(|"|1|)|mat2_3|+|(|"::|1|)|(|"|2|)|arr2_2_3|
-+-+---+-+-+-+-+------+-+-+---+-+-+-+-+-+-+--------+
-\end{verbatim}
+\framebox[\linewidth][l]{
+\BVerbatimInput{jlexer-preserved.txt}
+}
 \end{small}
 \end{singlespacing}
+\end{quote}
+\caption{Demonstration that the current lexer for J already recognizes \texttt{"::} and \texttt{/::}}
+\label{fig:jlexer-pres}
+\end{figure}
 
 For the purposes of this discussion, the important result the above example demonstrates 
 is that the string of characters \texttt{"::} is read as a whole lexeme, and is placed entirely in a box, 
@@ -89,29 +88,9 @@ the six scalars, the two vectors, and the one matrix.
 \begin{quote}
 \begin{singlespacing}
 \begin{small}
-\begin{verbatim}
-   NB. increment: increments the values of a numeric array
-   increment =: >:
-   increment mat2_3
-1 2 3
-4 5 6
-   NB. Link places both its arguments in `boxes'
-   NB. This demonstrates that incrementing a collection
-   NB. is the same regardless of the rank applied
-   (increment"0 link increment"1 (link =: ;) increment"2) mat2_3
-+-----+-----+-----+
-|1 2 3|1 2 3|1 2 3|
-|4 5 6|4 5 6|4 5 6|
-+-----+-----+-----+
-   NB. showTasks visualizes how the subcollections of mat2_3
-   NB. would be broken up into tasks that would then be 
-   NB. concurrently operated on ny threads
-   showTasks =: agreement (< @)
-      (increment (" 1) showTasks) mat2_3
-+-----+-----+
-|0 1 2|3 4 5|
-+-----+-----+
-\end{verbatim}
+\framebox[\linewidth][l]{
+\BVerbatimInput{showTasks-sing.txt}
+}
 \end{small}
 \end{singlespacing}
 \end{quote}
@@ -129,43 +108,9 @@ Using the parallel rank operator, the line of code
 \begin{quote}
 \begin{singlespacing}
 \begin{small}
-\begin{verbatim}
-   show arr2_2_3 =: integers 2 2 3
-0  1  2
-3  4  5
-
-6  7  8
-9 10 11
-   mat2_3 +"2 arr2_2_3
-0  2  4
-6  8 10
-
-6  8 10
-12 14 16
-   mat2_3 +("1)("2) arr2_2_3
-0  2  4
-6  8 10
-
- 6  8 10
-12 14 16
-   mat2_3 (+("2) showTasks) arr2_2_3
-+-------------+---------------+
-|+-----+-----+|+-----+-------+|
-||0 1 2|0 1 2|||0 1 2|6  7  8||
-||3 4 5|3 4 5|||3 4 5|9 10 11||
-|+-----+-----+|+-----+-------+|
-+-------------+---------------+
-   mat2_3 (+("1) showTasks) arr2_2_3
-+-------------+---------------+
-|+-----+-----+|+-----+-----+  |
-||0 1 2|0 1 2|||3 4 5|3 4 5|  |
-|+-----+-----+|+-----+-----+  |
-+-------------+---------------+
-|+-----+-----+|+-----+-------+|
-||0 1 2|6 7 8|||3 4 5|9 10 11||
-|+-----+-----+|+-----+-------+|
-+-------------+---------------+
-\end{verbatim}
+\framebox[\linewidth][l]{
+\BVerbatimInput{showTasks-doub.txt}
+}
 \end{small}
 \end{singlespacing}
 \end{quote}
@@ -182,6 +127,8 @@ leading to unparallelizing previously parallelized programs when they are used i
 Either possibility could have significant impact on program run time.
 One solution may be to allow the programmer to chose which behavior best suites their needs 
 using the parallel environment libary, described in Section \ref{pfor}.
+
+\pagebreak
 
 \section{Parallel Insert Operator: \texttt{/::}}
 \label{pins}
