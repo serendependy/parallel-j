@@ -1,0 +1,21 @@
+   insert =: /
+   show vec10 =: integers 10
+0 1 2 3 4 5 6 7 8 9
+   + insert vec10
+45
+   NB. greaterOf takes two numbers
+   NB. and returns the greater of them
+   100 (greaterOf =: >.) 10
+100
+   greaterOf insert vec10
+9
+   + insert mat2_3
+3 5 7
+   NB. Flatten takes any array
+   NB. and converts it to a vector
+   + insert (flatten =: ,) mat2_3
+15
+   NB. sum each of the vectors
+   NB. in mat2_3
+   + insert ("1) mat2_3
+3 12

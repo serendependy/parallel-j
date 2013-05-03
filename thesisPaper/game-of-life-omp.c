@@ -8,11 +8,7 @@ typedef struct twoD_array {
     int ** elems;
 } twoD_array_t;
 
-void update_board(twoD_array_t *board, twoD_array_t *new_board);
-
-/*
- * updates board configuration
- */
+/* updates board configuration */
 void update_board(twoD_array_t *board, twoD_array_t *new_board) {
     int i, j;
    
@@ -22,29 +18,22 @@ void update_board(twoD_array_t *board, twoD_array_t *new_board) {
         int neighbs = 0;
         int mycell = board->elems[i][j];
         int k, l;
-	    
-	    /*count neighbors*/
-	    for (k = i - 1; k <= i+1; ++k) {
-    	for (l = j - 1; l <= j+1; ++l) {
+        
+        /*count neighbors*/
+        for (k = i - 1; k <= i+1; ++k) {
+        for (l = j - 1; l <= j+1; ++l) {
             if (!(k == i && l == j) ) {
                 neighbs += board->elems[k][l];
             }
-        }
-        }
+        }}
 
-	    /*Logic of game*/
-	    if (mycell) {
-            if (!(neighbs == 2 || neighbs == 3))
-                mycell = 0;
-	    }
+        /*Logic of game*/
+        if (mycell) 
+            if (!(neighbs == 2 || neighbs == 3)) mycell = 0;
 
-        else {
-            if (neighbs == 3)
-                mycell = 1;
-        }
+        else if (neighbs == 3)  mycell = 1;
 
-	    /*Update board*/
+        /*Update board*/
         new_board->elems[i][j] = mycell;
-    }
-    }
+    }}
 }

@@ -1,0 +1,28 @@
+   NB. Deal: Create a list of integers
+   NB. from the argument, and shuffle them
+   deal =: ?~
+   show vec8 =: deal 8
+0 5 1 2 3 4 7 6
+   show vec16 =: deal 16
+11 8 3 10 12 1 15 9 4 13 7 14 6 5 2 0
+   NB. Converts v8 into a 2 by 2 by 2 array
+   divide vec8
+0 5
+1 2
+
+3 4
+7 6
+   NB. Converts v16 into a 2 by 2 by 2 by 2 array
+   divide vec16
+11  8
+ 3 10
+
+12  1
+15  9
+
+
+ 4 13
+ 7 14
+
+ 6  5
+ 2  0

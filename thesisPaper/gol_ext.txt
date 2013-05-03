@@ -1,0 +1,24 @@
+   show board3D =: 2 2 2 reshape 0 0  0 1  1 0  1 1
+0 0
+0 1
+
+1 0
+1 1
+   0 1 13 24 25 from shiftBy board3D
+_1 _1 _1
+_1 _1  0
+ 0  0  0
+ 1  1 _1
+ 1  1  0
+   NB. Box places its arguments in a box
+   NB. This displays each 3D array
+   NB. the shift values from above
+   box =: <
+   box ("3) 0 1 13 24 25 from neighborArray board3D
+┌───┬───┬───┬───┬───┐
+│0 0│0 0│0 0│0 1│1 1│
+│0 0│0 0│0 1│0 0│0 0│
+│   │   │   │   │   │
+│0 0│0 0│1 0│0 0│0 0│
+│0 0│0 0│1 1│0 0│0 0│
+└───┴───┴───┴───┴───┘

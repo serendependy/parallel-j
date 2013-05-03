@@ -1,0 +1,28 @@
+   NB. Visualizing the application of the first
+   NB. merge operation on vec16
+   'merging' link ("2) sort2 ("1) divide vec16
+┌───────┬────┐
+│merging│8 11│
+│       │3 10│
+├───────┼────┤
+│merging│1 12│
+│       │9 15│
+└───────┴────┘
+
+┌───────┬────┐
+│merging│4 13│
+│       │7 14│
+├───────┼────┤
+│merging│5 6 │
+│       │0 2 │
+└───────┴────┘
+   NB. Visualizing the application of the second
+   NB. merge operation on vec16
+   'merging' link ("2) (merge insert)(p_rank 2) sort2 ("1) divide vec16
+┌───────┬─────────┐
+│merging│3 8 10 11│
+│       │1 9 12 15│
+├───────┼─────────┤
+│merging│4 7 13 14│
+│       │0 2  5  6│
+└───────┴─────────┘

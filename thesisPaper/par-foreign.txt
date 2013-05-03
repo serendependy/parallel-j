@@ -1,0 +1,19 @@
+   (111 !: 0) '' NB. Get number of threads.
+1
+   (111 !: 1) 4 NB. Set number of available threads to 4.
+
+   (111 !: 2) '' NB. Get numeric encoding of thread scheduling scheme.
+0
+   (111 !: 3) 1 NB. Set thread scheduling to, for example, round robin.
+
+   (111 !: 4) '' NB. Get parallel rank nested thread creation flag
+0
+   (111 !: 5) 1 NB. Enable nested thread creation
+
+   (111 !: 6) '' NB. Get parallel insert restriction flag
+0
+   (111 !: 7) 1 NB. Enable restrictions on insert
+
+   +/::("1) mat2_3 +("::1)("2) arr2_2_3
+ 6 24
+24 42

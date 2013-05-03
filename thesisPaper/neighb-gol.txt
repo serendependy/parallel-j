@@ -1,0 +1,19 @@
+   NB. Reshape: binds a shape vector to a rank 1 array
+   reshape =: $
+   show board =: 3 3 reshape 0 1 1  0 1 0  1 0 0
+0 1 1
+0 1 0
+1 0 0
+   NB. The up-left, up, and up-right neighbors
+   0 1 2 from neighborArray board 
+0 0 0
+0 0 1
+0 0 1
+
+0 0 0
+0 1 1
+0 1 0
+
+0 0 0
+1 1 0
+1 0 0

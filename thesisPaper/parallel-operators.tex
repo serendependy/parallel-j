@@ -84,6 +84,7 @@ the six scalars, the two vectors, and the one matrix.
 
 \glsadd{increment}
 \glsadd{showTasks}
+
 \begin{figure}[h]
 \begin{quote}
 \begin{singlespacing}
@@ -151,33 +152,14 @@ Thus, the J session depicted in Fig~\ref{fig::pinsert} would have the same resul
 regardless of whether \texttt{insert} was assigned to be \texttt{/::} or \texttt{/}
 
 \glsadd{insert}
+
 \begin{figure}[h]
 \begin{quote}
 \begin{singlespacing}
 \begin{small}
-\begin{verbatim}
-   insert =: /
-   show vec10 =: integers 10
-0 1 2 3 4 5 6 7 8 9
-   + insert vec10
-45
-   NB. greaterOf takes two numbers
-   NB. and returns the greater of them
-   100 (greaterOf =: >.) 10
-100
-   greaterOf insert vec10
-9
-   + insert mat2_3
-3 5 7
-   NB. Flatten takes any array
-   NB. and converts it to a vector
-   + insert (flatten =: ,) mat2_3
-15
-   NB. sum each of the vectors
-   NB. in mat2_3
-   + insert ("1) mat2_3
-3 12
-\end{verbatim}
+\framebox[\linewidth][l]{
+\BVerbatimInput{par-insert.txt}
+}
 \end{small}
 \end{singlespacing}
 \end{quote}
@@ -234,31 +216,13 @@ They are:
 the default behavior of the parallel rank operator and/or parallel insert operator, 
 in order to parallelize on user-defined associative operators.
 
-\begin{figure}
+\begin{figure}[h]
 \begin{quote}
 \begin{singlespacing}
 \begin{small}
-\begin{verbatim}
-   (111 !: 0) '' NB. Get number of threads.
-1
-   (111 !: 1) 4 NB. Set number of available threads to 4.
-
-   (111 !: 2) '' NB. Get numeric encoding of thread scheduling scheme.
-0
-   (111 !: 3) 1 NB. Set thread scheduling to, for example, round robin.
-
-   (111 !: 4) '' NB. Get parallel rank nested thread creation flag
-0
-   (111 !: 5) 1 NB. Enable nested thread creation
-
-   (111 !: 6) '' NB. Get parallel insert restriction flag
-0
-   (111 !: 7) 1 NB. Enable restrictions on insert
-
-   +/::("1) mat2_3 +("::1)("2) arr2_2_3
- 6 24
-24 42
-\end{verbatim}
+\framebox[\linewidth][l]{
+\BVerbatimInput{par-foreign.txt}
+}
 \end{small}
 \end{singlespacing}
 \end{quote}
