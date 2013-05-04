@@ -2,43 +2,43 @@
 \label{back}
 
 \section{Function Rank}
-This section provides background information necessary to understand 
-the advantages function rank has in exploiting data parallelism over other approaches.
+This section provides background information to help the reader understand 
+what function rank is and how it can help programmers exploit data parallelism.
 
 \subsection{History and Definition}
 \textit{Function rank} was first developed and described by Kenneth Iverson in a series of research reports written at IBM\cite{rapl}\cite{opandfunc}. 
-In one such report, Iverson described it as 
+In one report, Iverson described it as 
 ``the most important notion needed to provide a simple and systematic basis for the uniform treatment of all `mixed' or non-scalar functions''\cite{rapl}. % TODO footnote of next comment
 Since that time, the idea of function rank has matured and found its way into many dialects of APL, including J.
 
-J's model of function rank is slightly different from what was first presented by Iverson\cite{rankanduni}\cite{jvocab}. 
-The rank of a function \texttt{f} in J is a vector \texttt{v} of three values representing the data rank of \texttt{f}'s expected arguments.
+J's model of function rank is slightly different from the model originally presented by Iverson\cite{rankanduni}\cite{jvocab}. 
+In J, the rank of a function \texttt{f} is a vector \texttt{v} of three values that represents the data rank of \texttt{f}'s expected arguments.
 Since in J functions take either one or two arguments, 
-the first value of \texttt{v} represents the expected data rank of \texttt{f}'s one-argument case (in J referred to as the \textit{monadic} case);
-the second and third values in \texttt{v} represent the expected data rank of \texttt{f}'s two-argument (\textit{dyadic}) case.
-If \texttt{f} has no restrictions on some or all of its arguments, 
-this is represented in \texttt{v} with the value for infinity, spelled \texttt{\_} ;
-if \texttt{f} operates on scalar values, this is represented as an entry in \texttt{v} of 0 
-(in J, scalars are collections of rank 0 and an empty shape vector). % TODO make footnote
+the first value of \texttt{v} represents the rank of \texttt{f}'s argument in \textit{f's} single argument case 
+(in J referred to as the \textit{monadic} case);
+the second and third values in \texttt{v} represent the ranks of \texttt{f}'s arguments in \textit{f's} two-argument (\textit{dyadic}) case.
+If \texttt{f} has no rank expectations on one of its arguments, 
+the corresponding entry for that argument in \texttt{v} is infinity (spelled in J \texttt{\_});
+if one of \texttt{f}'s arguments is a scalar, 
+the corresponding value is 0 
+(in J, scalars are collections of rank 0). %TODO make footnote
 
-Thus, for example, most arithmetic functions, such as addition, 
-fundamentally operate on scalar values, and thus usually have the function rank \texttt{0 0 0}.
-These arithmetic functions, and all others which operate on scalar values, 
-must be extended, whether manually by the programmer or automatically by the J environment, 
-to operate on collections of rank $n \ge 1$.
-On the other hand, most collective operations, such as using an integer to index into collection (which has rank \texttt{0 \_}), 
-sorting a collection, and getting the shape of an array (both of which have rank \texttt{\_}), operate on whole collections at once.
-In the above example, function ranks with only 2 elements represent the J primitive's dyadic use cases; 
-similarly for the function ranks with only 1 element and J's monads. % TODO footnote?
+For example, most arithmetic functions (such as addition) 
+operate on scalar values, and thus have the function rank \texttt{0 0 0}.
+These arithmetic functions, and all other functions that operate on scalar values, 
+must be extended to operate on collections of rank $n \ge 1$ 
+(fortunately, in J these extensions are done automatically).
+On the other hand, some functions (like a sort function) take a whole collection as their argument, 
+and thus might have the function rank \texttt{\_ \_ \_}.
 
 \subsection{Shape Agreement}
-In the trivial cases, where a function \texttt{f} is given arguments with ranks matching \texttt{f}'s function rank, 
-J behaves much like any programming language without formalized function rank (c.f. Fig~\ref{fig:j-ig-fr}). 
-In some cases, when the arguments to \texttt{f} do not match its function rank, 
-\texttt{f} is automatically extended to the appropriate dimensions.
-For example, if \texttt{x} is a scalar, addition can always be extended 
-so that \texttt{x} is added to every element of a collection \texttt{c} no matter \texttt{c}'s rank or shape. 
-This automatic extension is demonstrated in Fig~\ref{fig:j-def-fr}
+In the cases where a J function \texttt{f} operates on arguments whose ranks match \texttt{f}'s rank, 
+\texttt{f} behaves much like a function in programming languages without formalized function rank (c.f. Fig~\ref{fig:j-ig-fr}).
+When \texttt{f}'s arguments do not match its function rank, 
+J can sometimes automatically extend \texttt{f} to match its arguments.
+For example, if \texttt{x} is a scalar and \texttt{c} is a collection of numbers, 
+J will automatically extend addition so that \texttt{x} is added to every element of \texttt{c} no matter the rank or shape of \texttt{c} 
+(c.f. Fig~\ref{fig:j-def-fr}).
 
 \glsadd{show}
 \glsadd{integers}
@@ -53,15 +53,21 @@ This automatic extension is demonstrated in Fig~\ref{fig:j-def-fr}
 \begin{verbatim}
    1 + 1
 2
-   show =: ] NB. Identity, used to display results
-   integers =: i. NB. creates array with shape of argument
-   NB.                populated with an incrementing value
-   NB.                starting at 0
+   NB. show. Identity function, used to display results
+   show =: ] 
+
+   NB. integers. creates an array with shape given by
+   NB. its argument, populated with incrememting values
+   NB. starting at 0
+   integers =: i. 
+
    show mat2_3 =: integers 2 3
 0 1 2
 3 4 5
-   from =: { NB. Indexing into an array
-   NB.           expressed as a function
+
+   NB. from. Indexing into an array, 
+   NB. expressed as a function
+   from =: { 
    1 from mat2_3
 3 4 5
 \end{verbatim}
@@ -91,24 +97,25 @@ This automatic extension is demonstrated in Fig~\ref{fig:j-def-fr}
 \end{quote}
 \end{figure}
 
-In general, addition (and all other scalar functions) can be extended automatically over two regular collections \texttt{x} and \texttt{y}  
+In general, J can automatically extend addition (and all other functions on scalars) over two regular collections \texttt{x} and \texttt{y}
 if the shape of one collection \textit{prefixes} the other.
-This is called \textit{prefix shape agreement}, or just \textit{shape agreement}, 
-and in this paper we will say when this happens that ``the shapes of \texttt{x} and \texttt{y} agree under addition''\cite{rankanduni}.
-We also say that this prefix is the \textit{frame} for the two collections,
-and what remains of the shape vectors of \texttt{x} and \texttt{y} after dropping the prefix are their respective \textit{cells}.
+Hui called this prefix the frame for the two collections 
+and called what remains of the shape vectors of \texttt{x} and \texttt{y} 
+after dropping the prefix their respective \texttt{cells}\cite{rankanduni}. 
+In this paper we will also say that when a suitable prefix can be found, 
+the shapes of \texttt{x} and \texttt{y} agree under the function (e.g., addition).
 
-Going back to the above example: 
-a scalar, a vector of 2 elements, and another 2 by 3 matrix will agree with \texttt{mat2\_3} under addition, 
-since the shapes of the scalar (empty shape), the vector, and the other matrix would prefix the shape of \texttt{mat2\_3}; 
+The examples in Figs~\ref{fig:j-def-fr}, \ref{fig:agree1}, \ref{fig:agree2} illustrate that 
+a scalar, a vector of 2 elements, and another 2 by 3 matrix will all agree with \texttt{mat2\_3} under addition, 
+since the shapes of the scalar (the empty shape), the vector, and the other matrix would prefix the shape of \texttt{mat2\_3}; 
 any collection of rank $n \ge 2$ whose shape begins with $2$ $3$ will also agree with 
-\texttt{mat2\_3} under addition, since the shape of \texttt{mat2\_3} would prefix its shape.
-In this last example in Figure~\ref{fig:agree3}, 
-every scalar of \texttt{mat2\_3} was added to both scalars of each vector in \texttt{arr2\_3\_2}. 
-Another way to conceptualize this is that J made an implicit \textit{map} on the scalar elements of \texttt{mat2\_3}, 
-expanding each into a vector of 2 scalars.
-J could do this because, with a \textit{frame} of \texttt{2 3}, \texttt{mat2\_3}'s \textit{cells} were scalars and 
-\texttt{arr2\_3\_2}'s \textit{cells} were vectors of two scalars.
+\texttt{mat2\_3} under addition, since the shape of \texttt{mat2\_3} prefixes its shape.
+In the last example in Figure~\ref{fig:agree3}, 
+every scalar of \texttt{mat2\_3} is added to both of the scalars in each vector of \texttt{arr2\_3\_2}. 
+Another way to say this is that J made an implicit \textit{map} on the scalar elements of \texttt{mat2\_3}, 
+expanding each into a vector of 2 copies of the original scalar.
+J can do this because, with a \textit{frame} of \texttt{2 3}, \texttt{mat2\_3}'s \textit{cells} are scalars and 
+\texttt{arr2\_3\_2}'s \textit{cells} are vectors of two scalars.
 
 \glsadd{agreement}
 
