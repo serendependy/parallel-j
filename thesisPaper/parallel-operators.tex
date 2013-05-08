@@ -2,27 +2,31 @@
 \label{paraop}
 
 \section{Rationale}
-Ideally, using a parallel library would automatically reduce a program's runtime
+Ideally, a parallel library would automatically exploit potential concurrency, 
+and thus reduce a program's runtime, 
 without requiring the programmer to write a single line of parallelizing code. 
-However, this is often not the case. 
-Frequently, programmers must use domain knowledge of the problem or platform to achieve good run-time results. 
+However, this is often not the case,  
+because frequently programmers must use domain knowledge 
+of the problem or platform to achieve good run-time results. 
 
-In order to grant this flexibility in future parallel implementations of J, 
-we propose introducing two new operators, called the \textit{parallel rank operator} 
+To grant this flexibility in future parallel implementations of J, 
+this section introduces two new operators, called the \textit{parallel rank operator} 
 and the \textit{parallel insert operator}.
 The \textit{parallel rank operator}, described in Section \ref{prank}, 
-would allow the programmer to specify the ranks on which to parallelize code.
+would allow the programmer to specify the data ranks on which to parallelize code.
 The \textit{parallel insert operator}, described in Section \ref{pins}, 
-would allow the programmer to parallelize reduction operations with associative functions.
-Additionally, we propose a new system library
-that would allow the programmer to give annotations or force changes in the underlying parallel environment,
+would allow the programmer to parallelize reducing operations with associative functions.
+Also included is a new system library 
+that would allow the programmer to change the underlying parallel environment,
 described in Section \ref{pfor}
 
-The spellings \texttt{"::}  and \texttt{/::} for the two parallel operators were chosen for mnemonic and compliance reasons.
-Mnemonically, each uses the same base character as their sequential analogs, (\texttt{"} and \texttt{/}), 
-as well as two ``parallel'' colons, making it easier to remember their functions.
-They also require no changes be made to the existing J lexer\cite{ioj}, 
-as demonstrated below in Fig~\ref{fig:jlexer-pres}
+The spellings \texttt{"::} and \texttt{/::} for the two parallel operators 
+require no changes to the existing J lexer\cite{ioj}.
+Fig~\ref{fig:jlexer-pres} demonstrates this, showing that the strings 
+\texttt{"::} and \texttt{\::} are whole lexemes and so are placed entirely in their own boxes, 
+instead of being split between several boxes.
+Also, the spellings use the same base character as their sequential analogs, (\texttt{"} and \texttt{/}), 
+as well as two ``parallel'' colons, making it easier for the programmer to remember their functions.
 
 \begin{figure}[htbp]
 \begin{quote}
@@ -34,24 +38,19 @@ as demonstrated below in Fig~\ref{fig:jlexer-pres}
 \end{small}
 \end{singlespacing}
 \end{quote}
-\caption{Demonstration that the current lexer for J already recognizes \texttt{"::} and \texttt{/::}}
+\caption{The current J lexer recognizes \texttt{"::} and \texttt{/::} as lexemes}
 \label{fig:jlexer-pres}
 \end{figure}
 
-For the purposes of this discussion, the important result the above example demonstrates 
-is that the string of characters \texttt{"::} is read as a whole lexeme, and is placed entirely in a box, 
-rather than being interpreted as several lexemes, 
-which would result in the characters being split into several boxes.
-For more detail on the behavior of the J language, consult Appendix \ref{jlex}. % TODO footnote!
-
 For the parallel environment library, 
-it seemed best to augment the existing ``\gls{foreign}'' operator (spelled \texttt{!:}).  
-The foreign operator was designed to 
-allow the programmer to change environmental parameters 
+it seems best to augment the existing ``\gls{foreign}'' operator (spelled \texttt{!:}).  
+The foreign operator allows
+the programmer to change environmental parameters 
 such as print precision, file I/O, etc\cite{jvocab}, 
-and so fits conceptually with the idea of changing the state of a parallel environment. 
-We chose $111$ as the numeric encoding for the parallel environment library, again for mnemonic reasons: 
-$111$ looks like three parallel lines ($11$ was already taken).
+and so fits the idea of changing the state of a parallel environment. 
+\texttt{111} is a suitable numeric encoding for the parallel library because 
+it lies within the range of used values, is not already in use, and 
+mnemonically it looks like three parallel lines (\texttt{11} was already taken)\cite{jvocab}.
 
 \section{Parallel Rank Operator: \texttt{"::}}
 \label{prank}
@@ -60,32 +59,36 @@ $111$ looks like three parallel lines ($11$ was already taken).
 The proposed parallel rank operator is a conjunction 
 whose first argument is a function 
 and whose second argument is the ranks to both apply the function and to parallelize it. 
-It would be functionally equivalent to the rank operator, i.e. 
+Its output would be functionally equivalent to the (sequential) rank operator, i.e. 
 \[\texttt{f (":: r) y} \Leftrightarrow \texttt{f (" r) y}\] and
 \[\texttt{x f (":: r) y} \Leftrightarrow \texttt{x f (" r) y}\]
 
 for all $f, r, s$, and $y$
 
-Its purpose would be to override other parallel system defaults for automatic parallelization
-to guarantee that the resulting function would create parallelizable tasks from 
-the operations on sub-arrays of the given rank that would then be distributed to the available threads.
-To illustrate, consider the examples in Fig~\ref{fig::pr_tasks}.
-Incrementing numeric values always applies to scalars, so the function \texttt{increment} always gives the same result, 
-regardless of the rank of the sub-collections to which it is applied. 
-Using the parallel rank operator, the behavior increment of 
-always having the same result regardless of the rank applied would remain; 
-however, as the last example visually illustrates, 
-specifying \texttt{increment (":: 1)} would result in the environment parallelizing 
-the operation of incrementing each of the vector elements of \texttt{mat2\_3}.
-In this example, a programmer could create parallelizable tasks from incrementing 
-the six scalars, the two vectors, and the one matrix.
+\noindent The parallel rank operator would 
+override defaults for automatic parallelization 
+to guarantee the resulting function creates parallelizable tasks 
+on the specified cells of its arguments.
+These tasks would then be distributed to the available threads.
+
+To illustrate, consider the examples in Fig~\ref{fig::pr_tasks}. 
+Fundamentally \texttt{increment} always operates on numeric scalars, 
+so it always yields the same result regardless of the size of the cells to which it is applied. 
+This property would also hold when using the parallel rank operator as well. 
+However, while the results of \texttt{increment} would be independent of rank, 
+the tasks created by \texttt{"::} would not be.
+As Fig~\ref{fig::pr_tasks} shows, 
+the line \texttt{increment (":: 1)} would create tasks 
+for incrementing each of the vector elements of \texttt{mat2\_3} in parallel.
+In general, the programmer could create parallelizable tasks from incrementing
+the six scalars, the two vectors, and the one matrix of \texttt{mat2\_3}.
 
 \pagebreak
 
 \glsadd{increment}
 \glsadd{showTasks}
 
-\begin{figure}[h]
+\begin{figure}[hptb]
 \begin{quote}
 \begin{singlespacing}
 \begin{small}
@@ -99,11 +102,13 @@ the six scalars, the two vectors, and the one matrix.
 \label{fig::pr_tasks}
 \end{figure}
 
-A more complex example involving functions of two arguments, 
-as well as repeated applications of the rank operator, is given in Fig~\ref{fig::pr_tasks2}.
+Fig~\ref{fig::pr_tasks2} gives a more complex example of how parallel tasks would be created by \texttt{"::},
+involving functions of two arguments as well as repeated applications of the rank operator,
 Using the parallel rank operator, the line of code
-\texttt{mat2\_3 +("::2) arr2\_2\_3} would create parallelizable tasks for adding the elements of each of the two matrices, whereas 
-\texttt{mat2\_3 +("::1)("2) arr2\_2\_3} would create parallelizable tasks for adding the elements of each of the four vectors.
+\texttt{mat2\_3 +("::2) arr2\_2\_3} would create parallelizable tasks for adding \texttt{mat2\_3} to 
+each of the matrix (rank 2) items of \texttt{arr2\_2\_3}, 
+whereas \texttt{mat2\_3 +("::1)("2) arr2\_2\_3} would parallelize addition 
+of each of the vectors in both arrays.
 
 \begin{figure}[p]
 \begin{quote}
@@ -119,7 +124,7 @@ Using the parallel rank operator, the line of code
 \label{fig::pr_tasks2}
 \end{figure}
 
-Some open questions remain, most notably 
+Some open questions remain, notably 
 the behavior of the parallel environment when multiple applications of the parallel rank operator are used. 
 For example, should multiple applications of the parallel rank operator result in multiple levels of parallelizable task creation, 
 leading to increased overhead from thread creation and scheduling, 

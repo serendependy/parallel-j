@@ -326,15 +326,15 @@ that \texttt{f (" 3)} means ``apply f on the rank 3 items'', than it is to under
 
 \[\texttt{f :: (Shape sh, Elt e) => Array (sh :. Int :. Int :. Int) e -> Array sh e} \]
 
-\noindent \textit{Repa}'s greater verbosity is partially due to Haskell's static type system, 
-which is also what allows \textit{Repa} to capture the effects operations have on data rank at compile time. 
-However, capturing the rank of \texttt{f}'s argument both statically and numerically 
+\noindent Haskell's static type system causes \textit{Repa}'s greater verbosity; 
+it also allows \textit{Repa} to capture the effects operations have on data rank at compile time. 
+However, capturing the rank of \texttt{f}'s argument both statically and numerically (and thus, in a more convenient fashion)
 requires a type system more sophisticated than Haskell's or even many of its language extensions. % TODO cite
-J, in contrast, is dynamically typed, and while this means J does not provide any mechanisms for catching errors before runtime, 
+J, in contrast, is dynamically typed, and while this means J does not catch errors before runtime, 
 its functions also do not need to statically document their effects on data, simplifying the way programmers write and use code.
 
 \subsection{SA-C, Boost MultiArray}
-While we believe that \textit{Repa} is the best of the solutions we have found so far, 
+While \textit{Repa} seems to be the best of the alternative solutions available, 
 due to being already parallelized, capturing the effects functions have on the rank of their data, 
 and reducing boilerplate code, 
 it is appropriate to mention other influential work in the subject of data parallelism on regular collections.
@@ -348,7 +348,7 @@ it is a special purpose array programming language and
 not an extension to an existing, general purpose programming with a broad user base and 
 with access to large and well developed libraries.
 
-In contrast, the C++ library Boost.MultiArray is a library for a general purpose and widely used programming language\cite{boost}.
+The C++ library Boost.MultiArray, in contrast, is a library for a general purpose and widely used programming language\cite{boost}.
 However, its ability to analyze and operate on the structure of regular collections is limited compared to SA-C or \textit{Repa}.
 Furthermore, it does not benefit from a naturally parallel implementation, 
 its arrays are operated on in a conceptually lower (imperative) level, 
