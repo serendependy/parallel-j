@@ -96,17 +96,39 @@ would lead to significant expressiveness and reduced boiler-plate code,
 and could lend itself to a future parallel implementation for good performance, as well.
 
 \subsection{Implications for Other Work in Data Parallelism}
-This paper demonstrates that, conceptually, 
-the formalization of function rank found in the functional and collections oriented 
-J programming language and Parallel-J Scala library 
-can help programmers exploit potential concurrency in the form of data parallelism, 
+This research touches other fields in computing, 
+such as type theory, language and library design, and parallel design patterns.
+Consequently, future developments in these fields will likely impact 
+future work building on this research, and vice versa. 
+For example, should a functional language emerge 
+with support for both numeric values in types and data parallelism, 
+then formalized function rank would give programmers not only 
+all the benefits of J and Parallel-J, 
+but would statically catch rank and shape errors. 
+Ideally, such a language provide formal function rank built-in, 
+but as a standard library, thus allowing programmers 
+to choose their own default function extensions (e.g. prefix and postfix agreement, see \cite{rankanduni}).
+
+There may also be equivalent models of formalized function rank 
+expressed in programming paradigms other than functional. 
+For example, Parallel-J leverages Scala's object-oriented features the most to implement function rank, 
+such as inheritance and encapsulation. 
+Though Parallel-J extends functions to collections of higher rank at run-time, 
+effecting performance and increasing the possible errors programmers must detect themselves, 
+its model of formalized function rank reduces boilerplate code and 
+potentially can increase performance through parallelism. 
+Programmers of object oriented languages should consider these benefits 
+when approaching data parallel problems.
+
+Finally, independent of language or paradigm, 
+the concept of extending functions by manipulating the rank on which they apply to their arguments 
+may itself be a proper parallel design pattern, 
+or at least a useful approach for problems in many design patterns.
+The formalized function rank found in J and in the Parallel-J Scala library 
+can help programmers exploit potential concurrency 
 because it allows programmers a take existing functions and, in an inherently data parallel fashion, 
 both apply them to specific ranks of a collection and 
 extend them to similar problems in higher dimensions. 
-There may be other, equivalent models of function rank expressed in other programming paradigms, 
-such as object oriented programming, used in Parallel-J to express the rank operator; 
-developments in type theory may lead to elegant static expressions of 
-the shape of regular collections and a function's shape (instead of just rank) requirements and transformations of its data. 
 Whatever the future holds in the field of parallel computing, 
 this paper hopes to make researchers aware that an elegant (and race-condition safe) solution 
 already exists to an entire class of data parallel problems 
